@@ -77,7 +77,7 @@ private val DarkColors = darkColorScheme(
 
 
 @Composable
-fun SimpleTaskTheme(
+fun MeteoraTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable() () -> Unit
 ) {
