@@ -7,7 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="blue">#FF4359A9</color>
-    <color name="statusBarColor">#FFFEFBFF</color>
+    <color name="blue">#FF7286D3</color>
+    <color name="statusBarColor">#FF1B1B1F</color>
     <color name="ic_launcher_background">#FFFFFF</color>
 </resources>
