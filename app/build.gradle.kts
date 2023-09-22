@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "ipn.escom.meteora"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "ipn.escom.meteora"
