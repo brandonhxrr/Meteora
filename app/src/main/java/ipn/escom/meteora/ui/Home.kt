@@ -10,8 +10,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import ipn.escom.meteora.R
 
 @Composable
@@ -21,7 +23,8 @@ fun HomeScreen() {
     val icons = listOf(R.drawable.home, R.drawable.map, R.drawable.calendar_month)
 
     Column {
-        NavigationBar {
+        Forecast(modifier = Modifier.weight(0.9f))
+        NavigationBar(modifier = Modifier.weight(0.1f)) {
             items.forEachIndexed { index, item ->
                 NavigationBarItem(
                     selected = selectedItem == index,
@@ -36,4 +39,10 @@ fun HomeScreen() {
             }
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HomeScreenPreview() {
+    HomeScreen()
 }
