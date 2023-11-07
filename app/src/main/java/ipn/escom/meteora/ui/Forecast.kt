@@ -46,71 +46,12 @@ fun Forecast(modifier: Modifier) {
         }
 
         Weather()
-    }
-}
 
-@Composable
-fun Weather() {
-    Column {
-        Row(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(16.dp)
-        ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-
-                )
-            ) {
-                Row {
-                    Column(
-                        modifier = Modifier.weight(0.4f)
-
-                    ) {
-                        Row(
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.sun),
-                                contentDescription = "Sunny",
-                                modifier = Modifier.padding(top = 16.dp),
-                                tint = Color.Unspecified
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        ) {
-                            Text(
-                                text = "Sunny",
-                                style = MaterialTheme.typography.headlineMedium,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .weight(0.6f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        Text(
-                            text = "30°",
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(end = 32.dp),
-                            textAlign = TextAlign.End
-                        )
-                    }
-                }
-
-            }
-        }
-
+        Text(
+            text = "Pronóstico",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(20.dp)
+        )
     }
 }
 
