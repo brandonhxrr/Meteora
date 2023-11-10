@@ -31,8 +31,8 @@ fun Weather() {
                     .fillMaxWidth(),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primary
-
-                )
+                ),
+                elevation = CardDefaults.cardElevation(10.dp)
             ) {
                 Row {
                     Column(
