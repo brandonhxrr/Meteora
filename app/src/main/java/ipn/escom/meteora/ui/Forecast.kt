@@ -49,9 +49,10 @@ fun Forecast(modifier: Modifier) {
 
         Text(
             text = "Pronóstico",
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(20.dp)
         )
+        DailyWeather()
     }
 }
 

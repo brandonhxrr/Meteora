@@ -11,7 +11,7 @@ import ipn.escom.meteora.R
 val Typography = Typography(
     bodyMedium = TextStyle(
         fontFamily = FontFamily(Font(R.font.inter_medium)),
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Bold,
         fontSize = 16.sp
     ),
     headlineMedium = TextStyle(
