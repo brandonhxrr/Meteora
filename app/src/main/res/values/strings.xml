@@ -2,5 +2,6 @@
     <string name="app_name">Meteora</string>
     <string name="menu_home">Inicio</string>
     <string name="menu_map">Mapa</string>
-    <string name="menu_calendar">Calendario</string>
+    <string name="menu_agenda">Agenda</string>
+    <string name="menu_forecast">Pronóstico</string>
 </resources>
