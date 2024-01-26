@@ -18,10 +18,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
 import ipn.escom.meteora.R
 
 @Composable
-fun HomeScreen() {
+fun Home(navController: NavController?) {
     var selectedItem by remember { mutableIntStateOf(0) }
     val items =
         listOf(R.string.menu_home, R.string.menu_map, R.string.menu_agenda, R.string.menu_forecast)
@@ -54,5 +55,5 @@ fun HomeScreen() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    Home(null)
 }

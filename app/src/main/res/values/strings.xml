@@ -4,4 +4,14 @@
     <string name="menu_map">Mapa</string>
     <string name="menu_agenda">Agenda</string>
     <string name="menu_forecast">Pronóstico</string>
+    <string name="user">Nombre</string>
+    <string name="email">Correo electrónico</string>
+    <string name="password">Contraseña</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="sign_up">Regístrate</string>
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="no_account">¿No tienes una cuenta?</string>
+    <string name="repeat_password">Repite la contraseña</string>
+    <string name="yes_account">¿Ya tienes cuenta?</string>
+    <string name="login_action">Inicia sesión</string>
 </resources>

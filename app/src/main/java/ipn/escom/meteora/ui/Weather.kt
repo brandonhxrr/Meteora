@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -43,7 +45,7 @@ fun Weather() {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.sun),
+                                imageVector = Icons.Rounded.WbSunny,
                                 contentDescription = "Sunny",
                                 modifier = Modifier.padding(top = 16.dp),
                                 tint = Color.Unspecified
