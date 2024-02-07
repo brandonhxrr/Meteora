@@ -1,6 +1,8 @@
 package ipn.escom.meteora.ui
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Patterns
 import android.widget.Toast
@@ -22,13 +24,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Mail
 import androidx.compose.material.icons.rounded.PersonAdd
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -50,6 +54,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -66,14 +71,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import ipn.escom.meteora.R
+import java.io.ByteArrayOutputStream
 
 @OptIn(
     ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class,
@@ -88,7 +97,6 @@ fun SignUp(navController: NavController? = null) {
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     var repeatPassword by rememberSaveable { mutableStateOf("") }
     var repeatPasswordHidden by rememberSaveable { mutableStateOf(true) }
-    var passwordSecurity by rememberSaveable { mutableStateOf(PasswordSecurity.NONE) }
     var selectedImageUri by remember { mutableStateOf<String?>(null) }
     var userName by remember { mutableStateOf("") }
     var showSignUpIndicator by remember { mutableStateOf(false) }
@@ -161,15 +169,16 @@ fun SignUp(navController: NavController? = null) {
                 GlideImage(
                     model = selectedImageUri,
                     contentDescription = "",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
             } else {
                 Icon(
-                    imageVector = Icons.Default.AccountCircle,
+                    imageVector = Icons.Rounded.AddAPhoto,
                     contentDescription = null,
-                    modifier = Modifier.size(100.dp),
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(MaterialTheme.colorScheme.onBackground)
+                        .padding(20.dp),
                     tint = Color.Gray
                 )
             }
@@ -215,7 +224,6 @@ fun SignUp(navController: NavController? = null) {
         OutlinedTextField(value = password,
             onValueChange = {
                 password = it
-                passwordSecurity = evaluatePasswordSecurity(it)
             },
             singleLine = true,
             label = { Text(text = stringResource(id = R.string.password)) },
@@ -229,7 +237,7 @@ fun SignUp(navController: NavController? = null) {
             trailingIcon = {
                 IconButton(onClick = { passwordHidden = !passwordHidden }, content = {
                     val visibilityIcon =
-                        if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                        if (passwordHidden) Icons.Rounded.Visibility else Icons.Rounded.VisibilityOff
                     val description = if (passwordHidden) "Show password" else "Hide password"
                     Icon(imageVector = visibilityIcon, contentDescription = description)
                 })
@@ -268,30 +276,6 @@ fun SignUp(navController: NavController? = null) {
                 )
             })
 
-        if (password.isNotEmpty()) {
-            PasswordSecurityIndicator(passwordSecurity)
-            Spacer(modifier = Modifier.height(8.dp))
-            val passwordStrengthMessage = when (passwordSecurity) {
-                PasswordSecurity.WEAK -> "La contraseña es débil"
-                PasswordSecurity.MODERATE -> "La contraseña es moderada"
-                PasswordSecurity.STRONG -> "La contraseña es fuerte"
-                else -> ""
-            }
-            if (passwordStrengthMessage.isNotEmpty()) {
-                Text(
-                    text = passwordStrengthMessage,
-                    color = when (passwordSecurity) {
-                        PasswordSecurity.WEAK -> Color.Red
-                        PasswordSecurity.MODERATE -> Color.Yellow
-                        PasswordSecurity.STRONG -> Color.Green
-                        else -> Color.Transparent
-                    },
-                    modifier = Modifier.padding(start = 32.dp),
-                    fontFamily = FontFamily(Font(R.font.product_sans_regular))
-                )
-            }
-        }
-
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
@@ -305,54 +289,83 @@ fun SignUp(navController: NavController? = null) {
                                 val userId = auth.currentUser?.uid
 
                                 if (selectedImageUri != null) {
-                                    val imageRef = storageRef.child("profile_images/$userId")
-                                    val uploadTask = imageRef.putFile(Uri.parse(selectedImageUri))
+                                    Glide.with(context)
+                                        .asBitmap()
+                                        .load(selectedImageUri)
+                                        .override(100, 100)
+                                        .into(object : CustomTarget<Bitmap>() {
+                                            override fun onResourceReady(
+                                                resource: Bitmap,
+                                                transition: Transition<in Bitmap>?
+                                            ) {
+                                                val baos = ByteArrayOutputStream()
+                                                resource.compress(
+                                                    Bitmap.CompressFormat.JPEG,
+                                                    100,
+                                                    baos
+                                                )
+                                                val imageData = baos.toByteArray()
 
-                                    uploadTask.continueWithTask { task ->
-                                        if (!task.isSuccessful) {
-                                            task.exception?.let {
-                                                throw it
-                                            }
-                                        }
-                                        imageRef.downloadUrl
-                                    }.addOnCompleteListener { downloadUrlTask ->
-                                        if (downloadUrlTask.isSuccessful) {
-                                            val profileUpdates = UserProfileChangeRequest.Builder()
-                                                .setDisplayName(userName)
-                                                .setPhotoUri(downloadUrlTask.result)
-                                                .build()
+                                                val imageRef =
+                                                    storageRef.child("profile_images/$userId")
+                                                val uploadTask = imageRef.putBytes(imageData)
 
-                                            auth.currentUser?.updateProfile(profileUpdates)
-
-                                            val userReference = FirebaseDatabase.getInstance()
-                                                .getReference("users_public_data")
-                                                .child(userId.orEmpty())
-
-                                            val userData = hashMapOf(
-                                                "name" to userName,
-                                                "email" to user,
-                                                "profileImageUrl" to downloadUrlTask.result.toString()
-                                            )
-
-                                            userReference.setValue(userData)
-                                                .addOnSuccessListener {
-                                                    showSignUpIndicator = false
-                                                    navController?.navigate(Screens.Home.name) {
-                                                        popUpTo(Screens.SignUp.name) {
-                                                            inclusive = true
+                                                uploadTask.continueWithTask { task ->
+                                                    if (!task.isSuccessful) {
+                                                        task.exception?.let {
+                                                            throw it
                                                         }
                                                     }
+                                                    imageRef.downloadUrl
+                                                }.addOnCompleteListener { downloadUrlTask ->
+                                                    if (downloadUrlTask.isSuccessful) {
+                                                        val profileUpdates =
+                                                            UserProfileChangeRequest.Builder()
+                                                                .setDisplayName(userName)
+                                                                .setPhotoUri(downloadUrlTask.result)
+                                                                .build()
+
+                                                        auth.currentUser?.updateProfile(
+                                                            profileUpdates
+                                                        )
+
+                                                        val userReference =
+                                                            FirebaseDatabase.getInstance()
+                                                                .getReference("users")
+                                                                .child(userId.orEmpty())
+
+                                                        val userData = hashMapOf(
+                                                            "name" to userName,
+                                                            "email" to user,
+                                                            "profileImageUrl" to downloadUrlTask.result.toString()
+                                                        )
+
+                                                        userReference.setValue(userData)
+                                                            .addOnSuccessListener {
+                                                                showSignUpIndicator = false
+                                                                navController?.navigate(Screens.Home.name) {
+                                                                    popUpTo(Screens.SignUp.name) {
+                                                                        inclusive = true
+                                                                    }
+                                                                }
+                                                            }
+                                                            .addOnFailureListener {
+                                                                showSignUpIndicator = false
+                                                            }
+                                                    } else {
+                                                        // Manejar error al obtener la URL de la imagen
+                                                    }
                                                 }
-                                                .addOnFailureListener {
-                                                    showSignUpIndicator = false
-                                                }
-                                        } else {
-                                            // Manejar error al obtener la URL de la imagen
-                                        }
-                                    }
+                                            }
+
+                                            override fun onLoadCleared(placeholder: Drawable?) {
+                                                TODO("Not yet implemented")
+                                            }
+                                        })
+
                                 } else {
                                     val userReference = FirebaseDatabase.getInstance()
-                                        .getReference("users_public_data").child(userId.orEmpty())
+                                        .getReference("users").child(userId.orEmpty())
 
                                     val userData = hashMapOf(
                                         "name" to userName,

@@ -16,15 +16,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.CheckCircleOutline
-import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Logout
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +42,6 @@ import com.google.firebase.auth.auth
 @Composable
 fun UserScreen(navController: NavController? = null) {
     val context = LocalContext.current
-    val alertVisible = remember { mutableStateOf(false) }
     val alertMessage = remember { mutableStateOf("") }
     var alertIcon = remember { mutableStateOf("") }
     val currentUser = FirebaseAuth.getInstance().currentUser
@@ -125,41 +120,6 @@ fun UserScreen(navController: NavController? = null) {
             Icon(imageVector = Icons.Rounded.Logout, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = "Cerrar sesión")
-        }
-
-        if (alertVisible.value) {
-            AlertDialog(
-                onDismissRequest = {
-                    alertVisible.value = false
-                },
-                text = {
-                    Text(text = alertMessage.value)
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            alertVisible.value = false
-                        }
-                    ) {
-                        Text(text = "Aceptar")
-                    }
-                },
-                icon = {
-                    if (alertIcon.value == "error") {
-                        Icon(
-                            imageVector = Icons.Rounded.ErrorOutline,
-                            contentDescription = null,
-                            modifier = Modifier.size(48.dp)
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Rounded.CheckCircleOutline,
-                            contentDescription = null,
-                            modifier = Modifier.size(48.dp)
-                        )
-                    }
-                }
-            )
         }
     }
 }
