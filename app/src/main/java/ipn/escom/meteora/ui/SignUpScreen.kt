@@ -292,7 +292,7 @@ fun SignUp(navController: NavController? = null) {
                                     Glide.with(context)
                                         .asBitmap()
                                         .load(selectedImageUri)
-                                        .override(100, 100)
+                                        .override(300, 300)
                                         .into(object : CustomTarget<Bitmap>() {
                                             override fun onResourceReady(
                                                 resource: Bitmap,
