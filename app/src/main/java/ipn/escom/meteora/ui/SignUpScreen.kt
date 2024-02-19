@@ -202,8 +202,7 @@ fun SignUp(navController: NavController? = null) {
             },
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Next, keyboardType = KeyboardType.Text
-            ),
-            textStyle = MaterialTheme.typography.bodyMedium
+            )
         )
 
         OutlinedTextField(value = user,
@@ -213,7 +212,7 @@ fun SignUp(navController: NavController? = null) {
                 .fillMaxWidth()
                 .padding(8.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
+                keyboardType = KeyboardType.Email, imeAction = ImeAction.Next
             ),
             leadingIcon = {
                 Icon(
