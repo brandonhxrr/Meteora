@@ -3,6 +3,7 @@ package ipn.escom.meteora.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.WbSunny
@@ -20,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.R
+import ipn.escom.meteora.ui.theme.amber
 
 @Composable
 fun DailyWeather() {
@@ -40,8 +42,9 @@ fun DailyWeather() {
                 contentDescription = "Sunny",
                 modifier = Modifier
                     .padding(top = 4.dp)
-                    .align(Alignment.CenterHorizontally),
-                tint = Color.Unspecified
+                    .align(Alignment.CenterHorizontally)
+                    .size(48.dp),
+                tint = amber
             )
             Text(text = "LUN", modifier = Modifier.align(Alignment.CenterHorizontally).padding(vertical = 10.dp), style = MaterialTheme.typography.bodyMedium)
             Text(text = "24 °C", modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 4.dp), style = MaterialTheme.typography.bodyMedium)

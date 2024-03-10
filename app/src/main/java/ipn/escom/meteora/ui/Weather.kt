@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.Card
@@ -15,10 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.R
+import ipn.escom.meteora.ui.theme.amber
 
 @Composable
 fun Weather() {
@@ -47,8 +50,10 @@ fun Weather() {
                             Icon(
                                 imageVector = Icons.Rounded.WbSunny,
                                 contentDescription = "Sunny",
-                                modifier = Modifier.padding(top = 16.dp),
-                                tint = Color.Unspecified
+                                modifier = Modifier
+                                    .padding(top = 16.dp)
+                                    .size(48.dp),
+                                tint = amber
                             )
                         }
 
