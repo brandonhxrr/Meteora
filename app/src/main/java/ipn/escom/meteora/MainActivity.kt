@@ -12,16 +12,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import ipn.escom.meteora.data.login.LoginViewModel
 import ipn.escom.meteora.ui.Home
-import ipn.escom.meteora.ui.Login
+import ipn.escom.meteora.ui.login.Login
 import ipn.escom.meteora.ui.Screens
-import ipn.escom.meteora.ui.SignUp
+import ipn.escom.meteora.ui.login.SignUp
 import ipn.escom.meteora.ui.Splash
 import ipn.escom.meteora.ui.UserScreen
 import ipn.escom.meteora.ui.theme.MeteoraTheme
@@ -30,6 +33,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        FirebaseApp.initializeApp(applicationContext)
         FirebaseDatabase.getInstance().setPersistenceEnabled(true)
         setContent {
             MeteoraTheme {
@@ -95,7 +100,7 @@ fun Start() {
         }
 
         composable(Screens.Login.name) {
-            Login(navController = navController)
+            Login(navController = navController, LoginViewModel())
         }
 
         composable(Screens.SignUp.name) {

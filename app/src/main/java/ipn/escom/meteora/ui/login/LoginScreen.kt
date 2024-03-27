@@ -1,4 +1,4 @@
-package ipn.escom.meteora.ui
+package ipn.escom.meteora.ui.login
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -19,7 +19,6 @@ import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,11 +26,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -53,14 +52,18 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.login.LoginViewModel
+import ipn.escom.meteora.ui.Screens
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun Login(navController: NavController? = null) {
+fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) {
+
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    var user by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
+    val email: String by loginViewModel.email.observeAsState(initial = "")
+    val password: String by loginViewModel.password.observeAsState(initial = "")
+    val isLoginEnabled: Boolean by loginViewModel.isLoginEnabled.observeAsState(initial = false)
+
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
 
     val auth = FirebaseAuth.getInstance()
@@ -111,8 +114,10 @@ fun Login(navController: NavController? = null) {
         Spacer(modifier = Modifier.height(50.dp))
 
         OutlinedTextField(
-            value = user,
-            onValueChange = { user = it },
+            value = email,
+            onValueChange = {
+                loginViewModel.onLoginChanged(it, password)
+            },
             label = { Text(text = stringResource(id = R.string.email)) },
             modifier = Modifier
                 .fillMaxWidth()
@@ -132,7 +137,9 @@ fun Login(navController: NavController? = null) {
 
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = {
+                loginViewModel.onLoginChanged(email, it)
+            },
             singleLine = true,
             label = { Text(text = stringResource(id = R.string.password)) },
             modifier = Modifier
@@ -162,7 +169,7 @@ fun Login(navController: NavController? = null) {
             onClick = {
                 keyboardController?.hide()
 
-                auth.signInWithEmailAndPassword(user, password)
+                auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             navController?.navigate(Screens.Home.name) {
@@ -172,18 +179,18 @@ fun Login(navController: NavController? = null) {
                             }
                         } else {
                             // Si hay un error en la autenticación, maneja los posibles casos
-                            try {
+                            errorText = try {
                                 throw task.exception!!
                             } catch (e: FirebaseAuthInvalidUserException) {
                                 // El usuario no existe
-                                errorText = "Usuario no encontrado"
+                                "Usuario no encontrado"
 
                             } catch (e: FirebaseAuthInvalidCredentialsException) {
                                 // Credenciales inválidas (por ejemplo, contraseña incorrecta)
-                                errorText = "Credenciales inválidas"
+                                "Credenciales inválidas"
                             } catch (e: Exception) {
                                 // Otros errores
-                                errorText = "Error en la autenticación"
+                                "Error en la autenticación"
                             }
                             Toast.makeText(
                                 context,
@@ -199,7 +206,8 @@ fun Login(navController: NavController? = null) {
             ),
             modifier = Modifier
                 .height(50.dp)
-                .align(alignment = Alignment.CenterHorizontally)
+                .align(alignment = Alignment.CenterHorizontally),
+            enabled = isLoginEnabled
         ) {
             Text(text = stringResource(id = R.string.login))
         }
@@ -235,5 +243,5 @@ fun Login(navController: NavController? = null) {
 @Preview(showBackground = true)
 @Composable
 fun LoginPreview() {
-    Login()
+    Login(null, LoginViewModel())
 }
