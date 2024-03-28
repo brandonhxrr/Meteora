@@ -212,34 +212,32 @@ fun LoginButton(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Button(
-            onClick = {
-                keyboardController?.hide()
 
-                loginWithFirebase(email, password, context) {
-                    navController?.navigate(Screens.Home.name) {
-                        popUpTo(Screens.Login.name) {
-                            inclusive = true
-                        }
+    Button(
+        onClick = {
+            keyboardController?.hide()
+
+            loginWithFirebase(email, password, context) {
+                navController?.navigate(Screens.Home.name) {
+                    popUpTo(Screens.Login.name) {
+                        inclusive = true
                     }
                 }
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ),
-            modifier = Modifier
-                .height(50.dp)
-                .fillMaxWidth(),
-            enabled = loginEnabled
-        ) {
-            Text(text = stringResource(id = R.string.login))
-        }
+            }
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+        ),
+        modifier = Modifier
+            .padding(16.dp)
+            .height(50.dp)
+            .fillMaxWidth(),
+        enabled = loginEnabled
+    ) {
+        Text(text = stringResource(id = R.string.login))
     }
+
 }
 
 
