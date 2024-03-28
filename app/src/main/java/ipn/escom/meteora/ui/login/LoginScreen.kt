@@ -1,5 +1,6 @@
 package ipn.escom.meteora.ui.login
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -58,17 +59,9 @@ import ipn.escom.meteora.ui.Screens
 @Composable
 fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) {
 
-    val keyboardController = LocalSoftwareKeyboardController.current
-
     val email: String by loginViewModel.email.observeAsState(initial = "")
     val password: String by loginViewModel.password.observeAsState(initial = "")
     val isLoginEnabled: Boolean by loginViewModel.isLoginEnabled.observeAsState(initial = false)
-
-    var passwordHidden by rememberSaveable { mutableStateOf(true) }
-
-    val auth = FirebaseAuth.getInstance()
-    var errorText by rememberSaveable { mutableStateOf("") }
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -113,104 +106,17 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
 
         Spacer(modifier = Modifier.height(50.dp))
 
-        OutlinedTextField(
-            value = email,
-            onValueChange = {
-                loginViewModel.onLoginChanged(it, password)
-            },
-            label = { Text(text = stringResource(id = R.string.email)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp, start = 32.dp, end = 32.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
-            ),
-            leadingIcon = {
-                Icon(
-                    Icons.Rounded.Person,
-                    contentDescription = null,
-                    tint = Color.Gray
-                )
-            }
-        )
+        Email(email) {
+            loginViewModel.onLoginChanged(it, password)
+        }
 
-        OutlinedTextField(
-            value = password,
-            onValueChange = {
-                loginViewModel.onLoginChanged(email, it)
-            },
-            singleLine = true,
-            label = { Text(text = stringResource(id = R.string.password)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp, start = 32.dp, end = 32.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
-            visualTransformation =
-            if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
-            trailingIcon = {
-                IconButton(onClick = { passwordHidden = !passwordHidden }, content = {
-                    val visibilityIcon =
-                        if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (passwordHidden) "Show password" else "Hide password"
-                    Icon(imageVector = visibilityIcon, contentDescription = description)
-                })
-            },
-            leadingIcon = { Icon(Icons.Rounded.Lock, contentDescription = null, tint = Color.Gray) }
-        )
-
+        Password(password) {
+            loginViewModel.onLoginChanged(email, it)
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
-            onClick = {
-                keyboardController?.hide()
-
-                auth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            navController?.navigate(Screens.Home.name) {
-                                popUpTo(Screens.Login.name) {
-                                    inclusive = true
-                                }
-                            }
-                        } else {
-                            // Si hay un error en la autenticación, maneja los posibles casos
-                            errorText = try {
-                                throw task.exception!!
-                            } catch (e: FirebaseAuthInvalidUserException) {
-                                // El usuario no existe
-                                "Usuario no encontrado"
-
-                            } catch (e: FirebaseAuthInvalidCredentialsException) {
-                                // Credenciales inválidas (por ejemplo, contraseña incorrecta)
-                                "Credenciales inválidas"
-                            } catch (e: Exception) {
-                                // Otros errores
-                                "Error en la autenticación"
-                            }
-                            Toast.makeText(
-                                context,
-                                errorText,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ),
-            modifier = Modifier
-                .height(50.dp)
-                .align(alignment = Alignment.CenterHorizontally),
-            enabled = isLoginEnabled
-        ) {
-            Text(text = stringResource(id = R.string.login))
-        }
+        LoginButton(email, password, isLoginEnabled, navController)
 
         Spacer(modifier = Modifier.height(50.dp))
 
@@ -238,6 +144,134 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
             )
         }
     }
+}
+
+@Composable
+fun Email(email: String, onTextChanged: (String) -> Unit) {
+    OutlinedTextField(
+        value = email,
+        onValueChange = {
+            onTextChanged(it)
+        },
+        label = { Text(text = stringResource(id = R.string.email)) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Next
+        ),
+        leadingIcon = {
+            Icon(
+                Icons.Rounded.Person,
+                contentDescription = null,
+                tint = Color.Gray
+            )
+        }
+    )
+}
+
+@Composable
+fun Password(password: String, onTextChanged: (String) -> Unit) {
+    var passwordHidden by rememberSaveable { mutableStateOf(true) }
+
+    OutlinedTextField(
+        value = password,
+        onValueChange = {
+            onTextChanged(it)
+        },
+        singleLine = true,
+        label = { Text(text = stringResource(id = R.string.password)) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Done
+        ),
+        visualTransformation =
+        if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
+        trailingIcon = {
+            IconButton(onClick = { passwordHidden = !passwordHidden }, content = {
+                val visibilityIcon =
+                    if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                val description = if (passwordHidden) "Show password" else "Hide password"
+                Icon(imageVector = visibilityIcon, contentDescription = description)
+            })
+        },
+        leadingIcon = { Icon(Icons.Rounded.Lock, contentDescription = null, tint = Color.Gray) }
+    )
+}
+
+@Composable
+fun LoginButton(
+    email: String,
+    password: String,
+    loginEnabled: Boolean,
+    navController: NavController?
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Button(
+            onClick = {
+                keyboardController?.hide()
+
+                loginWithFirebase(email, password, context) {
+                    navController?.navigate(Screens.Home.name) {
+                        popUpTo(Screens.Login.name) {
+                            inclusive = true
+                        }
+                    }
+                }
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ),
+            modifier = Modifier
+                .height(50.dp)
+                .fillMaxWidth(),
+            enabled = loginEnabled
+        ) {
+            Text(text = stringResource(id = R.string.login))
+        }
+    }
+}
+
+
+fun loginWithFirebase(
+    email: String,
+    password: String,
+    context: Context,
+    onLoginSuccess: () -> Unit
+) {
+    val auth = FirebaseAuth.getInstance()
+
+    auth.signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                onLoginSuccess()
+            } else {
+                val errorText = try {
+                    throw task.exception!!
+                } catch (e: FirebaseAuthInvalidUserException) {
+                    "Usuario no encontrado"
+                } catch (e: FirebaseAuthInvalidCredentialsException) {
+                    "Credenciales inválidas"
+                } catch (e: Exception) {
+                    "Error en la autenticación"
+                }
+                Toast.makeText(
+                    context,
+                    errorText,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
 }
 
 @Preview(showBackground = true)
