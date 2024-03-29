@@ -1,10 +1,8 @@
 package ipn.escom.meteora.ui.login
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,52 +19,34 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.rounded.AddAPhoto
-import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.Mail
 import androidx.compose.material.icons.rounded.PersonAdd
-import androidx.compose.material.icons.rounded.Visibility
-import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,37 +62,29 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.signup.SignUpViewModel
 import ipn.escom.meteora.ui.Screens
 import java.io.ByteArrayOutputStream
 
 @OptIn(
-    ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class,
     ExperimentalGlideComposeApi::class
 )
 @Composable
-fun SignUp(navController: NavController? = null) {
-    val keyboardController = LocalSoftwareKeyboardController.current
+fun SignUp(navController: NavController? = null, signUpViewModel: SignUpViewModel) {
 
-    var user by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var passwordHidden by rememberSaveable { mutableStateOf(true) }
-    var repeatPassword by rememberSaveable { mutableStateOf("") }
-    var repeatPasswordHidden by rememberSaveable { mutableStateOf(true) }
-    var selectedImageUri by remember { mutableStateOf<String?>(null) }
-    var userName by remember { mutableStateOf("") }
-    var showSignUpIndicator by remember { mutableStateOf(false) }
-    val focusManager = LocalFocusManager.current
-
-    val auth = FirebaseAuth.getInstance()
-    val storage = FirebaseStorage.getInstance()
-    val storageRef = storage.reference
-
-    var errorText by rememberSaveable { mutableStateOf("") }
-    val context = LocalContext.current
+    val username: String by signUpViewModel.username.observeAsState(initial = "")
+    val email: String by signUpViewModel.email.observeAsState(initial = "")
+    val password: String by signUpViewModel.password.observeAsState(initial = "")
+    val repeatPassword: String by signUpViewModel.repeatPassword.observeAsState(initial = "")
+    val selectedImageUri: String? by signUpViewModel.selectedImageUri.observeAsState()
+    val showSignUpIndicator: Boolean by signUpViewModel.showSignUpIndicator.observeAsState(initial = false)
+    val isSignUpEnabled by signUpViewModel.isSignUpEnabled.observeAsState(initial = false)
+    val errorMessage: String by signUpViewModel.errorMessage.observeAsState(initial = "")
+    val showError: Boolean by signUpViewModel.showError.observeAsState(initial = false)
 
     val registerImageActivityLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-            selectedImageUri = uri.toString()
+            signUpViewModel.onImageSelected(uri.toString())
         }
 
     Column(
@@ -187,239 +159,37 @@ fun SignUp(navController: NavController? = null) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        OutlinedTextField(
-            value = userName,
-            onValueChange = { userName = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            label = { Text(stringResource(id = R.string.user)) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Person,
-                    contentDescription = null,
-                    tint = Color.Gray
-                )
-            },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Next, keyboardType = KeyboardType.Text
-            )
-        )
+        if (showError) {
+            ErrorMessage(errorMessage)
+        }
 
-        OutlinedTextField(value = user,
-            onValueChange = { user = it },
-            label = { Text(text = stringResource(id = R.string.email)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Email, imeAction = ImeAction.Next
-            ),
-            leadingIcon = {
-                Icon(
-                    Icons.Rounded.Mail, contentDescription = null, tint = Color.Gray
-                )
-            })
+        UserName(username) {
+            signUpViewModel.onSignUpChanged(it, email, password, repeatPassword)
+        }
 
-        OutlinedTextField(value = password,
-            onValueChange = {
-                password = it
-            },
-            singleLine = true,
-            label = { Text(text = stringResource(id = R.string.password)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Password, imeAction = ImeAction.Next
-            ),
-            visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
-            trailingIcon = {
-                IconButton(onClick = { passwordHidden = !passwordHidden }, content = {
-                    val visibilityIcon =
-                        if (passwordHidden) Icons.Rounded.Visibility else Icons.Rounded.VisibilityOff
-                    val description = if (passwordHidden) "Show password" else "Hide password"
-                    Icon(imageVector = visibilityIcon, contentDescription = description)
-                })
-            },
-            leadingIcon = {
-                Icon(
-                    Icons.Rounded.Lock, contentDescription = null, tint = Color.Gray
-                )
-            })
-        OutlinedTextField(value = repeatPassword,
-            onValueChange = { repeatPassword = it },
-            singleLine = true,
-            label = { Text(text = stringResource(id = R.string.repeat_password)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Password, imeAction = ImeAction.Done
-            ),
-            visualTransformation = if (repeatPasswordHidden) PasswordVisualTransformation() else VisualTransformation.None,
-            trailingIcon = {
-                IconButton(onClick = { repeatPasswordHidden = !repeatPasswordHidden }, content = {
-                    val visibilityIcon =
-                        if (repeatPasswordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if (repeatPasswordHidden) "Show password" else "Hide password"
-                    Icon(imageVector = visibilityIcon, contentDescription = description)
-                })
-            },
-            keyboardActions = KeyboardActions(onDone = {
-                focusManager.clearFocus()
-                keyboardController?.hide()
-            }),
-            leadingIcon = {
-                Icon(
-                    Icons.Rounded.Lock, contentDescription = null, tint = Color.Gray
-                )
-            })
+        Email(email) {
+            signUpViewModel.onSignUpChanged(username, it, password, repeatPassword)
+        }
+
+        Password(password = password, repeat = false, final = false) {
+            signUpViewModel.onSignUpChanged(username, email, it, repeatPassword)
+        }
+
+        Password(password = repeatPassword, repeat = true, final = true) {
+            signUpViewModel.onSignUpChanged(username, email, password, it)
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
-            onClick = {
-                if (validateInputs(user, password, repeatPassword, context)) {
-                    keyboardController?.hide()
-
-                    auth.createUserWithEmailAndPassword(user, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val userId = auth.currentUser?.uid
-
-                                if (selectedImageUri != null) {
-                                    Glide.with(context)
-                                        .asBitmap()
-                                        .load(selectedImageUri)
-                                        .override(300, 300)
-                                        .into(object : CustomTarget<Bitmap>() {
-                                            override fun onResourceReady(
-                                                resource: Bitmap,
-                                                transition: Transition<in Bitmap>?
-                                            ) {
-                                                val baos = ByteArrayOutputStream()
-                                                resource.compress(
-                                                    Bitmap.CompressFormat.JPEG,
-                                                    100,
-                                                    baos
-                                                )
-                                                val imageData = baos.toByteArray()
-
-                                                val imageRef =
-                                                    storageRef.child("profile_images/$userId")
-                                                val uploadTask = imageRef.putBytes(imageData)
-
-                                                uploadTask.continueWithTask { task ->
-                                                    if (!task.isSuccessful) {
-                                                        task.exception?.let {
-                                                            throw it
-                                                        }
-                                                    }
-                                                    imageRef.downloadUrl
-                                                }.addOnCompleteListener { downloadUrlTask ->
-                                                    if (downloadUrlTask.isSuccessful) {
-                                                        val profileUpdates =
-                                                            UserProfileChangeRequest.Builder()
-                                                                .setDisplayName(userName)
-                                                                .setPhotoUri(downloadUrlTask.result)
-                                                                .build()
-
-                                                        auth.currentUser?.updateProfile(
-                                                            profileUpdates
-                                                        )
-
-                                                        val userReference =
-                                                            FirebaseDatabase.getInstance()
-                                                                .getReference("users")
-                                                                .child(userId.orEmpty())
-
-                                                        val userData = hashMapOf(
-                                                            "name" to userName,
-                                                            "email" to user,
-                                                            "profileImageUrl" to downloadUrlTask.result.toString()
-                                                        )
-
-                                                        userReference.setValue(userData)
-                                                            .addOnSuccessListener {
-                                                                showSignUpIndicator = false
-                                                                navController?.navigate(Screens.Home.name) {
-                                                                    popUpTo(Screens.SignUp.name) {
-                                                                        inclusive = true
-                                                                    }
-                                                                }
-                                                            }
-                                                            .addOnFailureListener {
-                                                                showSignUpIndicator = false
-                                                            }
-                                                    } else {
-                                                        // Manejar error al obtener la URL de la imagen
-                                                    }
-                                                }
-                                            }
-
-                                            override fun onLoadCleared(placeholder: Drawable?) {
-                                                TODO("Not yet implemented")
-                                            }
-                                        })
-
-                                } else {
-                                    val userReference = FirebaseDatabase.getInstance()
-                                        .getReference("users").child(userId.orEmpty())
-
-                                    val userData = hashMapOf(
-                                        "name" to userName,
-                                        "email" to user,
-                                        "profileImageUrl" to ""
-                                    )
-
-                                    userReference.setValue(userData)
-                                        .addOnSuccessListener {
-                                            showSignUpIndicator = false
-                                            navController?.navigate(Screens.Home.name) {
-                                                popUpTo(Screens.SignUp.name) {
-                                                    inclusive = true
-                                                }
-                                            }
-                                        }
-                                        .addOnFailureListener {
-                                            showSignUpIndicator = false
-                                        }
-                                }
-                            } else {
-                                errorText = try {
-                                    throw task.exception!!
-                                } catch (e: FirebaseAuthUserCollisionException) {
-                                    // Email ya registrado
-                                    showSignUpIndicator = false
-                                    "Correo ya registrado"
-                                } catch (e: Exception) {
-                                    showSignUpIndicator = false
-                                    // Otros errores de Firebase
-                                    "Error en el registro"
-                                }
-
-                                Toast.makeText(
-                                    context,
-                                    errorText,
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                }
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ),
-            modifier = Modifier
-                .height(50.dp)
-                .align(alignment = Alignment.CenterHorizontally)
-        ) {
-            Text(text = stringResource(id = R.string.sign_up))
-        }
-
-
+        SignUpButton(
+            username,
+            email,
+            password,
+            selectedImageUri.orEmpty(),
+            isSignUpEnabled,
+            signUpViewModel,
+            navController
+        )
 
         Spacer(modifier = Modifier.height(50.dp))
 
@@ -482,80 +252,167 @@ fun SignUp(navController: NavController? = null) {
     }
 }
 
-enum class PasswordSecurity {
-    NONE, WEAK, MODERATE, STRONG
-}
-
-private fun evaluatePasswordSecurity(password: String): PasswordSecurity {
-    val minLength = 8
-    val hasUppercase = password.any { it.isUpperCase() }
-    val hasLowercase = password.any { it.isLowerCase() }
-    val hasDigit = password.any { it.isDigit() }
-    val hasSpecialChar = password.any { !it.isLetterOrDigit() }
-
-    return when {
-        password.length < minLength -> PasswordSecurity.NONE
-        !hasUppercase && !hasLowercase && !hasDigit && !hasSpecialChar -> PasswordSecurity.WEAK
-        (hasUppercase || hasLowercase) && hasDigit && hasSpecialChar -> PasswordSecurity.STRONG
-        else -> PasswordSecurity.MODERATE
-    }
-}
-
 @Composable
-private fun PasswordSecurityIndicator(passwordSecurity: PasswordSecurity) {
-    val color = when (passwordSecurity) {
-        PasswordSecurity.WEAK -> Color.Red
-        PasswordSecurity.MODERATE -> Color.Yellow
-        PasswordSecurity.STRONG -> Color.Green
-        else -> Color.Transparent
-    }
+fun SignUpButton(
+    username: String,
+    email: String,
+    password: String,
+    selectedImageUri: String,
+    enable: Boolean,
+    signUpViewModel: SignUpViewModel,
+    navController: NavController? = null
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
+    val storage = FirebaseStorage.getInstance()
+    val storageRef = storage.reference
+    var errorText by remember { mutableStateOf("") }
 
-    Box(
+    Button(
+        onClick = {
+            if (enable) {
+                signUpViewModel.hideError()
+                keyboardController?.hide()
+
+                auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val userId = auth.currentUser?.uid
+
+                            if (selectedImageUri != "") {
+                                Glide.with(context)
+                                    .asBitmap()
+                                    .load(selectedImageUri)
+                                    .override(500, 500)
+                                    .into(object : CustomTarget<Bitmap>() {
+                                        override fun onResourceReady(
+                                            resource: Bitmap,
+                                            transition: Transition<in Bitmap>?
+                                        ) {
+                                            val baos = ByteArrayOutputStream()
+                                            resource.compress(
+                                                Bitmap.CompressFormat.JPEG,
+                                                100,
+                                                baos
+                                            )
+                                            val imageData = baos.toByteArray()
+
+                                            val imageRef =
+                                                storageRef.child("profile_images/$userId")
+                                            val uploadTask = imageRef.putBytes(imageData)
+
+                                            uploadTask.continueWithTask { task ->
+                                                if (!task.isSuccessful) {
+                                                    task.exception?.let {
+                                                        throw it
+                                                    }
+                                                }
+                                                imageRef.downloadUrl
+                                            }.addOnCompleteListener { downloadUrlTask ->
+                                                if (downloadUrlTask.isSuccessful) {
+                                                    val profileUpdates =
+                                                        UserProfileChangeRequest.Builder()
+                                                            .setDisplayName(username)
+                                                            .setPhotoUri(downloadUrlTask.result)
+                                                            .build()
+
+                                                    auth.currentUser?.updateProfile(
+                                                        profileUpdates
+                                                    )
+
+                                                    val userReference =
+                                                        FirebaseDatabase.getInstance()
+                                                            .getReference("users")
+                                                            .child(userId.orEmpty())
+
+                                                    val userData = hashMapOf(
+                                                        "name" to username,
+                                                        "email" to email,
+                                                        "profileImageUrl" to downloadUrlTask.result.toString()
+                                                    )
+
+                                                    userReference.setValue(userData)
+                                                        .addOnSuccessListener {
+                                                            signUpViewModel.enableSignUpIndicator()
+                                                            navController?.navigate(Screens.Home.name) {
+                                                                popUpTo(Screens.SignUp.name) {
+                                                                    inclusive = true
+                                                                }
+                                                            }
+                                                        }
+                                                        .addOnFailureListener {
+                                                            signUpViewModel.disableSignUpIndicator()
+                                                        }
+                                                } else {
+                                                    // Manejar error al obtener la URL de la imagen
+                                                }
+                                            }
+                                        }
+
+                                        override fun onLoadCleared(placeholder: Drawable?) {
+                                        }
+                                    })
+
+                            } else {
+                                val userReference = FirebaseDatabase.getInstance()
+                                    .getReference("users").child(userId.orEmpty())
+
+                                val userData = hashMapOf(
+                                    "name" to username,
+                                    "email" to email,
+                                    "profileImageUrl" to ""
+                                )
+
+                                userReference.setValue(userData)
+                                    .addOnSuccessListener {
+                                        signUpViewModel.disableSignUpIndicator()
+                                        navController?.navigate(Screens.Home.name) {
+                                            popUpTo(Screens.SignUp.name) {
+                                                inclusive = true
+                                            }
+                                        }
+                                    }
+                                    .addOnFailureListener {
+                                        signUpViewModel.disableSignUpIndicator()
+                                    }
+                            }
+                        } else {
+                            errorText = try {
+                                throw task.exception!!
+                            } catch (e: FirebaseAuthUserCollisionException) {
+                                signUpViewModel.disableSignUpIndicator()
+                                "Correo ya registrado"
+                            } catch (e: Exception) {
+                                signUpViewModel.disableSignUpIndicator()
+                                "Error en el registro"
+                            }
+
+                            Toast.makeText(
+                                context,
+                                errorText,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+            } else {
+                signUpViewModel.showError()
+            }
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+        ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(4.dp)
-            .background(color)
-    )
-}
-
-private fun isValidEmail(email: String): Boolean {
-    return Patterns.EMAIL_ADDRESS.matcher(email).matches()
-}
-
-
-private fun validateInputs(
-    user: String,
-    password: String,
-    repeatPassword: String,
-    context: Context
-): Boolean {
-    var isValid = true
-    var errorMessage = ""
-
-    if (user.isBlank() || !isValidEmail(user)) {
-        errorMessage = "El correo no es válido"
-        isValid = false
-    } else if (password.isBlank()) {
-        errorMessage = "La contraseña no puede estar vacía"
-        isValid = false
-    } else if (password != repeatPassword) {
-        errorMessage = "Las contraseñas no coinciden"
-        isValid = false
-    } else if (evaluatePasswordSecurity(password) != PasswordSecurity.STRONG) {
-        isValid = false
-        errorMessage =
-            "La contraseña debe ser de al menos 8 caracteres, tener al menos una mayúscula, una minúscula, un número y un caracter especial"
+            .height(50.dp)
+    ) {
+        Text(text = stringResource(id = R.string.sign_up))
     }
-
-    if (!isValid) {
-        Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-    }
-
-    return isValid
 }
 
 @Preview(showBackground = true)
 @Composable
 fun SignUpPreview() {
-    SignUp()
+    SignUp(signUpViewModel = SignUpViewModel())
 }

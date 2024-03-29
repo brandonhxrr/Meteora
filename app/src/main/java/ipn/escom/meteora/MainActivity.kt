@@ -21,6 +21,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import ipn.escom.meteora.data.login.LoginViewModel
+import ipn.escom.meteora.data.signup.SignUpViewModel
 import ipn.escom.meteora.ui.Home
 import ipn.escom.meteora.ui.login.Login
 import ipn.escom.meteora.ui.Screens
@@ -104,7 +105,7 @@ fun Start() {
         }
 
         composable(Screens.SignUp.name) {
-            SignUp(navController = navController)
+            SignUp(navController = navController, SignUpViewModel())
         }
 
         composable(Screens.User.name) {

@@ -12,25 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,10 +29,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -110,7 +94,7 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
             loginViewModel.onLoginChanged(it, password)
         }
 
-        Password(password) {
+        Password(password = password, repeat = false, final = true) {
             loginViewModel.onLoginChanged(email, it)
         }
 
@@ -144,63 +128,6 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
             )
         }
     }
-}
-
-@Composable
-fun Email(email: String, onTextChanged: (String) -> Unit) {
-    OutlinedTextField(
-        value = email,
-        onValueChange = {
-            onTextChanged(it)
-        },
-        label = { Text(text = stringResource(id = R.string.email)) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Next
-        ),
-        leadingIcon = {
-            Icon(
-                Icons.Rounded.Person,
-                contentDescription = null,
-                tint = Color.Gray
-            )
-        }
-    )
-}
-
-@Composable
-fun Password(password: String, onTextChanged: (String) -> Unit) {
-    var passwordHidden by rememberSaveable { mutableStateOf(true) }
-
-    OutlinedTextField(
-        value = password,
-        onValueChange = {
-            onTextChanged(it)
-        },
-        singleLine = true,
-        label = { Text(text = stringResource(id = R.string.password)) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done
-        ),
-        visualTransformation =
-        if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
-        trailingIcon = {
-            IconButton(onClick = { passwordHidden = !passwordHidden }, content = {
-                val visibilityIcon =
-                    if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                val description = if (passwordHidden) "Show password" else "Hide password"
-                Icon(imageVector = visibilityIcon, contentDescription = description)
-            })
-        },
-        leadingIcon = { Icon(Icons.Rounded.Lock, contentDescription = null, tint = Color.Gray) }
-    )
 }
 
 @Composable
