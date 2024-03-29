@@ -1,7 +1,10 @@
 package ipn.escom.meteora.ui.login
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -19,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,9 +37,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.GoogleAuthProvider
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.login.LoginViewModel
 import ipn.escom.meteora.ui.Screens
@@ -102,6 +111,8 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
 
         LoginButton(email, password, isLoginEnabled, navController)
 
+        GoogleSignInButton(navController)
+
         Spacer(modifier = Modifier.height(50.dp))
 
         Row(
@@ -167,7 +178,6 @@ fun LoginButton(
 
 }
 
-
 fun loginWithFirebase(
     email: String,
     password: String,
@@ -195,6 +205,67 @@ fun loginWithFirebase(
                     errorText,
                     Toast.LENGTH_SHORT
                 ).show()
+            }
+        }
+}
+
+@Composable
+fun GoogleSignInButton(navController: NavController?) {
+    val context = LocalContext.current
+    val googleSignInClient: GoogleSignInClient = remember { provideGoogleSignInClient(context) }
+
+    val registerSignInActivityLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)!!
+                firebaseAuthWithGoogle(account.idToken!!)
+                navController?.navigate(Screens.Home.name) {
+                    popUpTo(Screens.Login.name) {
+                        inclusive = true
+                    }
+                }
+            } catch (e: ApiException) {
+                Log.w("", "Google sign in failed", e)
+            }
+        }
+
+    Button(
+        onClick = {
+            val signInIntent = googleSignInClient.signInIntent
+            registerSignInActivityLauncher.launch(signInIntent)
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        modifier = Modifier
+            .padding(16.dp)
+            .height(50.dp)
+            .fillMaxWidth()
+    ) {
+        Text(text = "Sign in with Google")
+    }
+}
+
+private fun provideGoogleSignInClient(context: Context): GoogleSignInClient {
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(context.getString(R.string.default_web_client_id))
+        .requestEmail()
+        .build()
+
+    return GoogleSignIn.getClient(context, gso)
+}
+
+private fun firebaseAuthWithGoogle(idToken: String) {
+    val credential = GoogleAuthProvider.getCredential(idToken, null)
+    val auth = FirebaseAuth.getInstance()
+    auth.signInWithCredential(credential)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("GSI", "signInWithCredential:success")
+            } else {
+                Log.w("GSI", "signInWithCredential:failure", task.exception)
             }
         }
 }
