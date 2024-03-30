@@ -191,6 +191,8 @@ fun SignUp(navController: NavController? = null, signUpViewModel: SignUpViewMode
             navController
         )
 
+        GoogleSignInButton(navController)
+
         Spacer(modifier = Modifier.height(50.dp))
 
         Row(

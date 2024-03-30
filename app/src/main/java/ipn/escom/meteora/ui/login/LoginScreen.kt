@@ -209,67 +209,6 @@ fun loginWithFirebase(
         }
 }
 
-@Composable
-fun GoogleSignInButton(navController: NavController?) {
-    val context = LocalContext.current
-    val googleSignInClient: GoogleSignInClient = remember { provideGoogleSignInClient(context) }
-
-    val registerSignInActivityLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)!!
-                firebaseAuthWithGoogle(account.idToken!!)
-                navController?.navigate(Screens.Home.name) {
-                    popUpTo(Screens.Login.name) {
-                        inclusive = true
-                    }
-                }
-            } catch (e: ApiException) {
-                Log.w("", "Google sign in failed", e)
-            }
-        }
-
-    Button(
-        onClick = {
-            val signInIntent = googleSignInClient.signInIntent
-            registerSignInActivityLauncher.launch(signInIntent)
-        },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface
-        ),
-        modifier = Modifier
-            .padding(16.dp)
-            .height(50.dp)
-            .fillMaxWidth()
-    ) {
-        Text(text = "Sign in with Google")
-    }
-}
-
-private fun provideGoogleSignInClient(context: Context): GoogleSignInClient {
-    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestIdToken(context.getString(R.string.default_web_client_id))
-        .requestEmail()
-        .build()
-
-    return GoogleSignIn.getClient(context, gso)
-}
-
-private fun firebaseAuthWithGoogle(idToken: String) {
-    val credential = GoogleAuthProvider.getCredential(idToken, null)
-    val auth = FirebaseAuth.getInstance()
-    auth.signInWithCredential(credential)
-        .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d("GSI", "signInWithCredential:success")
-            } else {
-                Log.w("GSI", "signInWithCredential:failure", task.exception)
-            }
-        }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun LoginPreview() {

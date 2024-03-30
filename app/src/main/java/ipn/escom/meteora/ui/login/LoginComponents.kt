@@ -1,5 +1,9 @@
 package ipn.escom.meteora.ui.login
 
+import android.content.Context
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,17 +15,22 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,7 +38,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import ipn.escom.meteora.R
+import ipn.escom.meteora.ui.Screens
 
 @Composable
 fun UserName(username: String, onTextChanged: (String) -> Unit) {
@@ -111,6 +128,67 @@ fun Password(password: String, repeat: Boolean = false, final: Boolean = true, o
         },
         leadingIcon = { Icon(Icons.Rounded.Lock, contentDescription = null, tint = Color.Gray) }
     )
+}
+
+@Composable
+fun GoogleSignInButton(navController: NavController?) {
+    val context = LocalContext.current
+    val googleSignInClient: GoogleSignInClient = remember { provideGoogleSignInClient(context) }
+
+    val registerSignInActivityLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)!!
+                firebaseAuthWithGoogle(account.idToken!!)
+                navController?.navigate(Screens.Home.name) {
+                    popUpTo(Screens.Login.name) {
+                        inclusive = true
+                    }
+                }
+            } catch (e: ApiException) {
+                Log.w("", "Google sign in failed", e)
+            }
+        }
+
+    Button(
+        onClick = {
+            val signInIntent = googleSignInClient.signInIntent
+            registerSignInActivityLauncher.launch(signInIntent)
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        modifier = Modifier
+            .padding(16.dp)
+            .height(50.dp)
+            .fillMaxWidth()
+    ) {
+        Text(text = "Sign in with Google")
+    }
+}
+
+private fun provideGoogleSignInClient(context: Context): GoogleSignInClient {
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(context.getString(R.string.default_web_client_id))
+        .requestEmail()
+        .build()
+
+    return GoogleSignIn.getClient(context, gso)
+}
+
+private fun firebaseAuthWithGoogle(idToken: String) {
+    val credential = GoogleAuthProvider.getCredential(idToken, null)
+    val auth = FirebaseAuth.getInstance()
+    auth.signInWithCredential(credential)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("GSI", "signInWithCredential:success")
+            } else {
+                Log.w("GSI", "signInWithCredential:failure", task.exception)
+            }
+        }
 }
 
 @Composable
