@@ -4,22 +4,27 @@ import android.content.Context
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.rounded.WbCloudy
+import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,14 +33,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -63,13 +71,6 @@ fun UserName(username: String, onTextChanged: (String) -> Unit) {
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next
         ),
-        leadingIcon = {
-            Icon(
-                Icons.Rounded.Person,
-                contentDescription = null,
-                tint = Color.Gray
-            )
-        }
     )
 }
 
@@ -80,26 +81,24 @@ fun Email(email: String, onTextChanged: (String) -> Unit) {
         onValueChange = {
             onTextChanged(it)
         },
-        label = { Text(text = stringResource(id = R.string.email)) },
+        placeholder = { Text(text = stringResource(id = R.string.email)) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp),
         keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Text,
+            keyboardType = KeyboardType.Email,
             imeAction = ImeAction.Next
         ),
-        leadingIcon = {
-            Icon(
-                Icons.Rounded.Person,
-                contentDescription = null,
-                tint = Color.Gray
-            )
-        }
     )
 }
 
 @Composable
-fun Password(password: String, repeat: Boolean = false, final: Boolean = true, onTextChanged: (String) -> Unit) {
+fun Password(
+    password: String,
+    repeat: Boolean = false,
+    final: Boolean = true,
+    onTextChanged: (String) -> Unit
+) {
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
 
     OutlinedTextField(
@@ -108,7 +107,13 @@ fun Password(password: String, repeat: Boolean = false, final: Boolean = true, o
             onTextChanged(it)
         },
         singleLine = true,
-        label = { Text(text = if (repeat) stringResource(id = R.string.repeat_password) else stringResource(id = R.string.password)) },
+        label = {
+            Text(
+                text = if (repeat) stringResource(id = R.string.repeat_password) else stringResource(
+                    id = R.string.password
+                )
+            )
+        },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp),
@@ -121,13 +126,43 @@ fun Password(password: String, repeat: Boolean = false, final: Boolean = true, o
         trailingIcon = {
             IconButton(onClick = { passwordHidden = !passwordHidden }, content = {
                 val visibilityIcon =
-                    if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    if (passwordHidden) Icons.Rounded.WbSunny else Icons.Rounded.WbCloudy
                 val description = if (passwordHidden) "Show password" else "Hide password"
                 Icon(imageVector = visibilityIcon, contentDescription = description)
             })
         },
-        leadingIcon = { Icon(Icons.Rounded.Lock, contentDescription = null, tint = Color.Gray) }
     )
+}
+
+@Composable
+fun OrDivider() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        HorizontalDivider(
+            modifier = Modifier
+                .weight(1f)
+                .align(
+                    Alignment.CenterVertically
+                )
+        )
+        Text(
+            text = "o", modifier = Modifier
+                .weight(1f)
+                .padding(16.dp),
+            textAlign = TextAlign.Center
+
+        )
+        HorizontalDivider(
+            modifier = Modifier
+                .weight(1f)
+                .align(
+                    Alignment.CenterVertically
+                )
+        )
+    }
 }
 
 @Composable
@@ -151,13 +186,13 @@ fun GoogleSignInButton(navController: NavController?) {
             }
         }
 
-    Button(
+    OutlinedButton(
         onClick = {
             val signInIntent = googleSignInClient.signInIntent
             registerSignInActivityLauncher.launch(signInIntent)
         },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+        shape = MaterialTheme.shapes.medium,
+        colors = ButtonDefaults.outlinedButtonColors(
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
         modifier = Modifier
@@ -165,8 +200,22 @@ fun GoogleSignInButton(navController: NavController?) {
             .height(50.dp)
             .fillMaxWidth()
     ) {
-        Text(text = "Sign in with Google")
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_google),
+                contentDescription = "Google Icon",
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Sign in with Google"
+            )
+        }
     }
+
 }
 
 private fun provideGoogleSignInClient(context: Context): GoogleSignInClient {

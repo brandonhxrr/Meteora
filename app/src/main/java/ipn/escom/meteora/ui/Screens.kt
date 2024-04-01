@@ -4,6 +4,7 @@ enum class Screens {
     Splash,
     Home,
     Login,
-    SignUp,
+    SignUp1,
+    SignUp2,
     User,
 }

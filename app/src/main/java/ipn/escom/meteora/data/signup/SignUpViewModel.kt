@@ -38,12 +38,15 @@ class SignUpViewModel : ViewModel() {
         _selectedImageUri.value = imageUri
     }
 
-    fun onSignUpChanged(username: String, email: String, password: String, repeatPassword: String) {
+    fun onNameChanged(username: String) {
         _username.value = username
+    }
+
+    fun onSignUpChanged(email: String, password: String, repeatPassword: String) {
         _email.value = email
         _password.value = password
         _repeatPassword.value = repeatPassword
-        _isSignUpEnabled.value = enableSignUp(username, email, password, repeatPassword)
+        _isSignUpEnabled.value = enableSignUp(email, password, repeatPassword)
     }
 
     private fun evaluatePasswordSecurity(password: String): PasswordSecurity {
@@ -62,14 +65,11 @@ class SignUpViewModel : ViewModel() {
     }
 
     private fun enableSignUp(
-        username: String,
         email: String,
         password: String,
         repeatPassword: String
     ): Boolean {
-        if (username.isBlank()) {
-            _errorMessage.value = "El nombre de usuario no puede estar vacío"
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             _errorMessage.value = "El correo no es válido"
         } else if (password.isBlank()) {
             _errorMessage.value = "La contraseña no puede estar vacía"
@@ -82,16 +82,15 @@ class SignUpViewModel : ViewModel() {
             _errorMessage.value = ""
         }
 
-        return validateSignUp(username, email, password, repeatPassword)
+        return validateSignUp(email, password, repeatPassword)
     }
 
     private fun validateSignUp(
-        username: String,
         email: String,
         password: String,
         repeatPassword: String
     ) =
-        username.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email)
+        android.util.Patterns.EMAIL_ADDRESS.matcher(email)
             .matches() && password.length >= 8 && password == repeatPassword && evaluatePasswordSecurity(
             password
         ) == PasswordSecurity.STRONG

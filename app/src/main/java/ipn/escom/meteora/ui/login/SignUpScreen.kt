@@ -7,9 +7,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,9 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AddAPhoto
 import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -37,9 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -52,8 +46,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.auth.FirebaseAuth
@@ -66,11 +58,8 @@ import ipn.escom.meteora.data.signup.SignUpViewModel
 import ipn.escom.meteora.ui.Screens
 import java.io.ByteArrayOutputStream
 
-@OptIn(
-    ExperimentalGlideComposeApi::class
-)
 @Composable
-fun SignUp(navController: NavController? = null, signUpViewModel: SignUpViewModel) {
+fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewModel) {
 
     val username: String by signUpViewModel.username.observeAsState(initial = "")
     val email: String by signUpViewModel.email.observeAsState(initial = "")
@@ -82,17 +71,12 @@ fun SignUp(navController: NavController? = null, signUpViewModel: SignUpViewMode
     val errorMessage: String by signUpViewModel.errorMessage.observeAsState(initial = "")
     val showError: Boolean by signUpViewModel.showError.observeAsState(initial = false)
 
-    val registerImageActivityLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-            signUpViewModel.onImageSelected(uri.toString())
-        }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         Row(
             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -101,82 +85,59 @@ fun SignUp(navController: NavController? = null, signUpViewModel: SignUpViewMode
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "",
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(40.dp)
                     .align(alignment = Alignment.CenterVertically)
             )
             Text(
                 text = stringResource(id = R.string.app_name),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 16.dp)
                     .align(alignment = Alignment.CenterVertically),
                 color = Color.Black,
-                fontSize = 20.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight(400)
             )
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(50.dp))
 
         Text(
             text = stringResource(id = R.string.sign_up),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier
-                .padding(horizontal = 8.dp)
+                .padding(horizontal = 16.dp)
                 .align(alignment = Alignment.CenterHorizontally),
             color = Color.Black,
             fontSize = 32.sp
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Text(
+            text = "Queremos conocerte mejor :)",
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier
+                .padding(vertical = 16.dp)
+                .align(alignment = Alignment.CenterHorizontally),
+            color = Color.Gray,
+            fontSize = 14.sp
+        )
 
-        Box(modifier = Modifier
-            .size(100.dp)
-            .clip(CircleShape)
-            .clickable {
-                registerImageActivityLauncher.launch("image/*")
-            }
-            .align(Alignment.CenterHorizontally), contentAlignment = Alignment.Center
-        ) {
-            if (selectedImageUri != null) {
-                GlideImage(
-                    model = selectedImageUri,
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Rounded.AddAPhoto,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .background(MaterialTheme.colorScheme.onBackground)
-                        .padding(20.dp),
-                    tint = Color.Gray
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(50.dp))
 
         if (showError) {
             ErrorMessage(errorMessage)
         }
 
-        UserName(username) {
-            signUpViewModel.onSignUpChanged(it, email, password, repeatPassword)
-        }
-
         Email(email) {
-            signUpViewModel.onSignUpChanged(username, it, password, repeatPassword)
+            signUpViewModel.onSignUpChanged(it, password, repeatPassword)
         }
 
         Password(password = password, repeat = false, final = false) {
-            signUpViewModel.onSignUpChanged(username, email, it, repeatPassword)
+            signUpViewModel.onSignUpChanged(email, it, repeatPassword)
         }
 
         Password(password = repeatPassword, repeat = true, final = true) {
-            signUpViewModel.onSignUpChanged(username, email, password, it)
+            signUpViewModel.onSignUpChanged(email, password, it)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -191,7 +152,7 @@ fun SignUp(navController: NavController? = null, signUpViewModel: SignUpViewMode
             navController
         )
 
-        GoogleSignInButton(navController)
+
 
         Spacer(modifier = Modifier.height(50.dp))
 
@@ -207,15 +168,14 @@ fun SignUp(navController: NavController? = null, signUpViewModel: SignUpViewMode
             )
             Text(
                 text = stringResource(id = R.string.login_action),
-                color = Color.Blue,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable {
                     navController?.navigate(Screens.Login.name) {
-                        popUpTo(Screens.SignUp.name) {
+                        popUpTo(Screens.SignUp1.name) {
                             inclusive = true
                         }
                     }
-                },
-                fontFamily = FontFamily(Font(R.font.product_sans_regular))
+                }
             )
         }
 
@@ -272,6 +232,7 @@ fun SignUpButton(
     var errorText by remember { mutableStateOf("") }
 
     Button(
+        shape = MaterialTheme.shapes.small,
         onClick = {
             if (enable) {
                 signUpViewModel.hideError()
@@ -338,7 +299,7 @@ fun SignUpButton(
                                                         .addOnSuccessListener {
                                                             signUpViewModel.enableSignUpIndicator()
                                                             navController?.navigate(Screens.Home.name) {
-                                                                popUpTo(Screens.SignUp.name) {
+                                                                popUpTo(Screens.SignUp1.name) {
                                                                     inclusive = true
                                                                 }
                                                             }
@@ -370,7 +331,7 @@ fun SignUpButton(
                                     .addOnSuccessListener {
                                         signUpViewModel.disableSignUpIndicator()
                                         navController?.navigate(Screens.Home.name) {
-                                            popUpTo(Screens.SignUp.name) {
+                                            popUpTo(Screens.SignUp1.name) {
                                                 inclusive = true
                                             }
                                         }
@@ -402,7 +363,7 @@ fun SignUpButton(
             }
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = Color.Black,
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ),
         modifier = Modifier
@@ -416,5 +377,5 @@ fun SignUpButton(
 @Preview(showBackground = true)
 @Composable
 fun SignUpPreview() {
-    SignUp(signUpViewModel = SignUpViewModel())
+    SignUp2(signUpViewModel = SignUpViewModel())
 }

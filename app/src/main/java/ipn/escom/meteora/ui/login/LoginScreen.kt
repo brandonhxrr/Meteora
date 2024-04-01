@@ -61,7 +61,7 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        Spacer(modifier = Modifier.height(72.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         Row(
             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -80,7 +80,7 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
                     .padding(horizontal = 16.dp)
                     .align(alignment = Alignment.CenterVertically),
                 color = Color.Black,
-                fontSize = 32.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight(400)
             )
         }
@@ -94,7 +94,7 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
                 .padding(horizontal = 16.dp)
                 .align(alignment = Alignment.CenterHorizontally),
             color = Color.Black,
-            fontSize = 40.sp
+            fontSize = 32.sp
         )
 
         Spacer(modifier = Modifier.height(50.dp))
@@ -110,6 +110,8 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
         Spacer(modifier = Modifier.height(24.dp))
 
         LoginButton(email, password, isLoginEnabled, navController)
+
+        OrDivider()
 
         GoogleSignInButton(navController)
 
@@ -127,15 +129,10 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
             )
             Text(
                 text = stringResource(id = R.string.sign_up),
-                color = Color.Blue,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable {
-                    navController?.navigate(Screens.SignUp.name) {
-                        popUpTo(Screens.Login.name) {
-                            inclusive = true
-                        }
-                    }
-                },
-                fontFamily = FontFamily(Font(R.font.product_sans_regular))
+                    navController?.navigate(Screens.SignUp1.name)
+                }
             )
         }
     }
@@ -164,9 +161,10 @@ fun LoginButton(
             }
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = Color.Black,
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ),
+        shape = MaterialTheme.shapes.small,
         modifier = Modifier
             .padding(16.dp)
             .height(50.dp)

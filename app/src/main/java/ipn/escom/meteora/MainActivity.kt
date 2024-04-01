@@ -12,7 +12,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,11 +22,12 @@ import com.google.firebase.database.FirebaseDatabase
 import ipn.escom.meteora.data.login.LoginViewModel
 import ipn.escom.meteora.data.signup.SignUpViewModel
 import ipn.escom.meteora.ui.Home
-import ipn.escom.meteora.ui.login.Login
 import ipn.escom.meteora.ui.Screens
-import ipn.escom.meteora.ui.login.SignUp
 import ipn.escom.meteora.ui.Splash
 import ipn.escom.meteora.ui.UserScreen
+import ipn.escom.meteora.ui.login.Login
+import ipn.escom.meteora.ui.login.SignUp1
+import ipn.escom.meteora.ui.login.SignUp2
 import ipn.escom.meteora.ui.theme.MeteoraTheme
 
 class MainActivity : ComponentActivity() {
@@ -66,6 +66,8 @@ fun Start() {
         navController = navController,
         startDestination = Screens.Splash.name
     ) {
+        val signUpViewModel = SignUpViewModel()
+
         composable(Screens.Splash.name) {
             Splash()
             val timer = object : CountDownTimer(2000, 1000) {
@@ -104,8 +106,12 @@ fun Start() {
             Login(navController = navController, LoginViewModel())
         }
 
-        composable(Screens.SignUp.name) {
-            SignUp(navController = navController, SignUpViewModel())
+        composable(Screens.SignUp1.name) {
+            SignUp1(navController = navController, signUpViewModel)
+        }
+
+        composable(Screens.SignUp2.name) {
+            SignUp2(navController = navController, signUpViewModel)
         }
 
         composable(Screens.User.name) {

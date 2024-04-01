@@ -15,21 +15,20 @@ val Typography = Typography(
         fontSize = 14.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.product_sans_regular)),
-        fontWeight = FontWeight.Bold,
-        fontSize = 16.sp
+        fontFamily = FontFamily(Font(R.font.inter_medium)),
+        fontSize = 14.sp
     ),
     headlineMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.product_sans_regular)),
+        fontFamily = FontFamily(Font(R.font.inter_medium)),
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp
     ),
     titleMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.product_sans_regular)),
+        fontFamily = FontFamily(Font(R.font.inter_medium)),
         fontSize = 24.sp
     ),
     titleLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.product_sans_bold)),
+        fontFamily = FontFamily(Font(R.font.inter_bold)),
         fontWeight = FontWeight.Normal,
         fontSize = 42.sp
     ),
