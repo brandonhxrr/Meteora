@@ -23,13 +23,19 @@ val Typography = Typography(
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp
     ),
-    titleMedium = TextStyle(
+    titleSmall = TextStyle(
         fontFamily = FontFamily(Font(R.font.inter_medium)),
-        fontSize = 24.sp
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp
+    ),
+    titleMedium = TextStyle(
+        fontFamily = FontFamily(Font(R.font.clash_display)),
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold
     ),
     titleLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.inter_bold)),
-        fontWeight = FontWeight.Normal,
-        fontSize = 42.sp
+        fontFamily = FontFamily(Font(R.font.space_grotesk_bold)),
+        fontWeight = FontWeight.Bold,
+        fontSize = 32.sp
     ),
 )
