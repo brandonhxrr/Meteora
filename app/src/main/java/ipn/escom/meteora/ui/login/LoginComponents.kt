@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -57,19 +58,67 @@ import ipn.escom.meteora.R
 import ipn.escom.meteora.ui.Screens
 
 @Composable
+fun Header(title: String, subtitle: String = "") {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Spacer(modifier = Modifier.height(40.dp))
+
+        Row(
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "",
+                modifier = Modifier
+                    .size(40.dp)
+                    .align(alignment = Alignment.CenterVertically)
+            )
+            Text(
+                text = stringResource(id = R.string.app_name),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .align(alignment = Alignment.CenterVertically)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(50.dp))
+
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .align(alignment = Alignment.CenterHorizontally)
+        )
+
+        if (subtitle.isNotEmpty()) {
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .padding(vertical = 16.dp)
+                    .align(alignment = Alignment.CenterHorizontally),
+                color = Color.Gray,
+                fontSize = 14.sp
+            )
+        }
+    }
+}
+
+@Composable
 fun UserName(username: String, onTextChanged: (String) -> Unit) {
     OutlinedTextField(
         value = username,
         onValueChange = {
             onTextChanged(it)
         },
-        label = { Text(text = stringResource(id = R.string.user)) },
+        placeholder = { Text(text = stringResource(id = R.string.user)) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp),
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Done
         ),
     )
 }
@@ -107,7 +156,7 @@ fun Password(
             onTextChanged(it)
         },
         singleLine = true,
-        label = {
+        placeholder = {
             Text(
                 text = if (repeat) stringResource(id = R.string.repeat_password) else stringResource(
                     id = R.string.password
@@ -211,7 +260,7 @@ fun GoogleSignInButton(navController: NavController?) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Sign in with Google"
+                text = "Sign in with Google",
             )
         }
     }
