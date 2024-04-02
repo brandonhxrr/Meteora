@@ -1,12 +1,9 @@
 package ipn.escom.meteora
 
-import android.Manifest
 import android.os.Bundle
 import android.os.CountDownTimer
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,7 +20,7 @@ import ipn.escom.meteora.data.login.LoginViewModel
 import ipn.escom.meteora.data.signup.SignUpViewModel
 import ipn.escom.meteora.ui.Home
 import ipn.escom.meteora.ui.Screens
-import ipn.escom.meteora.ui.Splash
+import ipn.escom.meteora.ui.SplashScreen
 import ipn.escom.meteora.ui.UserScreen
 import ipn.escom.meteora.ui.login.Login
 import ipn.escom.meteora.ui.login.SignUp1
@@ -56,12 +53,6 @@ fun Start() {
     val navController = rememberNavController()
     val user = FirebaseAuth.getInstance().currentUser
 
-    val requestStoragePermission = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) {
-
-    }
-
     NavHost(
         navController = navController,
         startDestination = Screens.Splash.name
@@ -69,8 +60,8 @@ fun Start() {
         val signUpViewModel = SignUpViewModel()
 
         composable(Screens.Splash.name) {
-            Splash()
-            val timer = object : CountDownTimer(2000, 1000) {
+            SplashScreen()
+            val timer = object : CountDownTimer(1500, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
 
                 }
@@ -84,7 +75,6 @@ fun Start() {
                                 }
                             }
                         } else {
-                            requestStoragePermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             navController.navigate(Screens.Login.name) {
                                 popUpTo(Screens.Splash.name) {
                                     inclusive = true
