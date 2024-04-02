@@ -164,7 +164,7 @@ fun Home(navController: NavController?) {
                                 contentDescription = stringResource(id = item)
                             )
                         },
-                        label = { Text(stringResource(id = item)) })
+                        label = { Text(text = stringResource(id = item), style = MaterialTheme.typography.bodySmall) })
                 }
             }
         }
