@@ -10,13 +10,12 @@ import ipn.escom.meteora.R
 
 val Typography = Typography(
     bodySmall = TextStyle(
-        fontFamily = FontFamily(Font(R.font.inter)),
-        fontWeight = FontWeight.Bold,
+        fontFamily = FontFamily(Font(R.font.space_grotesk_medium)),
         fontSize = 14.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.inter_medium)),
-        fontSize = 14.sp
+        fontFamily = FontFamily(Font(R.font.space_grotesk_medium)),
+        fontSize = 16.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily(Font(R.font.inter_medium)),

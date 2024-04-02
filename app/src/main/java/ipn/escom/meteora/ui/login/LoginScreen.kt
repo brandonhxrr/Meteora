@@ -78,14 +78,15 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
                 modifier = Modifier
                     .align(alignment = Alignment.CenterVertically)
                     .padding(end = 8.dp),
-                fontFamily = FontFamily(Font(R.font.product_sans_regular))
+                style = MaterialTheme.typography.bodySmall
             )
             Text(
                 text = stringResource(id = R.string.sign_up),
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable {
                     navController?.navigate(Screens.SignUp1.name)
-                }
+                },
+                style = MaterialTheme.typography.bodySmall
             )
         }
     }
@@ -124,7 +125,10 @@ fun LoginButton(
             .fillMaxWidth(),
         enabled = loginEnabled
     ) {
-        Text(text = stringResource(id = R.string.login))
+        Text(
+            text = stringResource(id = R.string.login),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 
 }

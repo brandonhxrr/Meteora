@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,6 +38,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -45,6 +48,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -112,7 +116,13 @@ fun UserName(username: String, onTextChanged: (String) -> Unit) {
         onValueChange = {
             onTextChanged(it)
         },
-        placeholder = { Text(text = stringResource(id = R.string.user)) },
+        placeholder = {
+            Text(
+                text = stringResource(id = R.string.user),
+                style = MaterialTheme.typography.bodySmall
+            )
+        },
+        textStyle = MaterialTheme.typography.bodySmall,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp),
@@ -130,7 +140,13 @@ fun Email(email: String, onTextChanged: (String) -> Unit) {
         onValueChange = {
             onTextChanged(it)
         },
-        placeholder = { Text(text = stringResource(id = R.string.email)) },
+        placeholder = {
+            Text(
+                text = stringResource(id = R.string.email),
+                style = MaterialTheme.typography.bodySmall
+            )
+        },
+        textStyle = MaterialTheme.typography.bodySmall,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp),
@@ -160,9 +176,11 @@ fun Password(
             Text(
                 text = if (repeat) stringResource(id = R.string.repeat_password) else stringResource(
                     id = R.string.password
-                )
+                ),
+                style = MaterialTheme.typography.bodySmall
             )
         },
+        textStyle = MaterialTheme.typography.bodySmall,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp),
@@ -294,16 +312,23 @@ fun ErrorMessage(errorMessage: String) {
     if (errorMessage.isNotEmpty()) {
         Box(
             modifier = Modifier
+                .padding(16.dp)
                 .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 16.dp),
         ) {
-
-            Text(
-                text = errorMessage,
-                modifier = Modifier.padding(8.dp),
-                fontSize = 12.sp
-
-            )
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.small)
+                    .border(1.dp, Color(0xFFE57373), MaterialTheme.shapes.small),
+                color = Color(0xFFFFDAD9),
+                contentColor = Color(0xFFE57373)
+            ) {
+                Text(
+                    text = errorMessage,
+                    modifier = Modifier.padding(8.dp),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }

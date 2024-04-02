@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AddAPhoto
+import androidx.compose.material.icons.rounded.AddPhotoAlternate
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -82,13 +82,13 @@ fun SignUp1(navController: NavController? = null, signUpViewModel: SignUpViewMod
                 )
             } else {
                 Icon(
-                    imageVector = Icons.Rounded.AddAPhoto,
+                    imageVector = Icons.Rounded.AddPhotoAlternate,
                     contentDescription = null,
                     modifier = Modifier
                         .size(100.dp)
                         .background(MaterialTheme.colorScheme.onBackground)
                         .padding(20.dp),
-                    tint = Color.Gray
+                    tint = Color.White
                 )
             }
         }
@@ -120,7 +120,7 @@ fun SignUp1(navController: NavController? = null, signUpViewModel: SignUpViewMod
                 .height(50.dp),
             enabled = username.isNotEmpty()
         ) {
-            Text(text = "Continuar")
+            Text(text = "Continuar", style = MaterialTheme.typography.bodyMedium)
         }
 
         OrDivider()

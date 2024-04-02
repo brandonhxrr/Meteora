@@ -71,7 +71,7 @@ fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewMod
     ) {
         Header(title = stringResource(id = R.string.sign_up), subtitle = "Queremos conocerte mejor")
 
-        Spacer(modifier = Modifier.height(36.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         if (showError) {
             ErrorMessage(errorMessage)
@@ -111,7 +111,7 @@ fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewMod
                 modifier = Modifier
                     .align(alignment = Alignment.CenterVertically)
                     .padding(end = 8.dp),
-                fontFamily = FontFamily(Font(R.font.product_sans_regular))
+                style = MaterialTheme.typography.bodySmall
             )
             Text(
                 text = stringResource(id = R.string.login_action),
@@ -122,7 +122,8 @@ fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewMod
                             inclusive = true
                         }
                     }
-                }
+                },
+                style = MaterialTheme.typography.bodySmall
             )
         }
 
@@ -318,7 +319,10 @@ fun SignUpButton(
             .padding(16.dp)
             .height(50.dp)
     ) {
-        Text(text = stringResource(id = R.string.sign_up))
+        Text(
+            text = stringResource(id = R.string.sign_up),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
