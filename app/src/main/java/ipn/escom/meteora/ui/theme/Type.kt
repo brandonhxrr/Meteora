@@ -18,7 +18,7 @@ val Typography = Typography(
         fontSize = 16.sp
     ),
     headlineMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.inter_medium)),
+        fontFamily = FontFamily(Font(R.font.clash_display)),
         fontWeight = FontWeight.Bold,
         fontSize = 18.sp
     ),

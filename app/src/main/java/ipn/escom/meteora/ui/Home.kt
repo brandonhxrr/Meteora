@@ -2,6 +2,7 @@ package ipn.escom.meteora.ui
 
 import android.content.pm.PackageManager
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -98,17 +100,16 @@ fun Home(navController: NavController?) {
 
     }
 
-
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Column(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                            horizontalArrangement = Arrangement.Center
                         ) {
                             Image(
                                 painter = painterResource(id = R.drawable.logo),
@@ -137,7 +138,8 @@ fun Home(navController: NavController?) {
                                 contentDescription = "User profile picture",
                                 modifier = Modifier.clip(
                                     CircleShape
-                                )
+                                ),
+                                contentScale = ContentScale.Crop
                             )
                         } else {
                             Icon(
