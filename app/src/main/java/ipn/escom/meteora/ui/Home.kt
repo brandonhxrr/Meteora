@@ -50,6 +50,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.google.firebase.auth.FirebaseAuth
 import ipn.escom.meteora.MainActivity
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.weather.WeatherViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
@@ -169,7 +170,7 @@ fun Home(navController: NavController?) {
             }
         }
     ) {
-        Forecast(modifier = Modifier.padding(it))
+        Forecast(modifier = Modifier.padding(it), WeatherViewModel())
     }
 }
 

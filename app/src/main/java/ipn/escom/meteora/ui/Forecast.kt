@@ -25,30 +25,43 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.LocationServices
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.weather.WeatherViewModel
 import kotlinx.coroutines.tasks.await
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.Locale
 
 @Composable
-fun Forecast(modifier: Modifier) {
+fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
 
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     var location by remember { mutableStateOf<Location?>(null) }
     var municipality by remember { mutableStateOf<String?>(null) }
     var postalCode by remember { mutableStateOf<String?>(null) }
+    val temperature: Double by weatherViewModel.temperature.observeAsState(initial = 0.0)
+    val description: String by weatherViewModel.description.observeAsState(initial = "")
+    val feelsLike: Double by weatherViewModel.feelsLike.observeAsState(initial = 0.0)
+    val humidity: Int by weatherViewModel.humidity.observeAsState(initial = 0)
+    val windSpeed: Double by weatherViewModel.windSpeed.observeAsState(initial = 0.0)
+    val name: String by weatherViewModel.name.observeAsState(initial = "")
+    val apiKey =  stringResource(id = R.string.OpenWeatherAPIKEY)
+
+    Log.d("API KEY", apiKey)
+
 
 
     LaunchedEffect(key1 = true) {
@@ -65,6 +78,9 @@ fun Forecast(modifier: Modifier) {
                 val lastLocation = fusedLocationClient.lastLocation.await()
                 location = lastLocation
                 location?.let {
+
+                    weatherViewModel.getWeather(apiKey, it.latitude, it.longitude)
+                    Log.d("Forecast", "Location: ${it.latitude}, ${it.longitude}")
                     val geocoder = Geocoder(context, Locale.getDefault())
                     val addresses = geocoder.getFromLocation(it.latitude, it.longitude, 1)
                     if (addresses!!.isNotEmpty()) {
@@ -85,7 +101,7 @@ fun Forecast(modifier: Modifier) {
         modifier = modifier.fillMaxSize()
     ) {
         LocationIndicator(postalCode)
-        Weather()
+        Weather(temperature, description, feelsLike, humidity, windSpeed, name)
 
 
         Text(
@@ -193,5 +209,5 @@ fun getLocalityFromPostalCode(postalCode: String?): String? {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ForecastPreview() {
-    Forecast(modifier = Modifier)
+    Forecast(modifier = Modifier, WeatherViewModel())
 }
