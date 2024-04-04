@@ -24,7 +24,7 @@ import ipn.escom.meteora.R
 import ipn.escom.meteora.ui.theme.amber
 
 @Composable
-fun Weather() {
+fun Weather(temperature: Double, description: String, feelsLike: Double, humidity: Int, windSpeed: Double, name: String) {
     Column {
         Row(
             modifier = Modifier
@@ -61,7 +61,7 @@ fun Weather() {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         ) {
                             Text(
-                                text = "Sunny",
+                                text = "$description en $name",
                                 style = MaterialTheme.typography.headlineMedium,
                                 modifier = Modifier.padding(16.dp)
                             )
@@ -74,7 +74,7 @@ fun Weather() {
                             .align(Alignment.CenterVertically)
                     ) {
                         Text(
-                            text = "30°",
+                            text = "$temperature °C",
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier
                                 .fillMaxWidth()
