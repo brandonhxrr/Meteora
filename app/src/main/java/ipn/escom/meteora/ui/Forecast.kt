@@ -52,13 +52,13 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
     var location by remember { mutableStateOf<Location?>(null) }
     var municipality by remember { mutableStateOf<String?>(null) }
     var postalCode by remember { mutableStateOf<String?>(null) }
-    val temperature: Double by weatherViewModel.temperature.observeAsState(initial = 0.0)
-    val description: String by weatherViewModel.description.observeAsState(initial = "")
-    val feelsLike: Double by weatherViewModel.feelsLike.observeAsState(initial = 0.0)
-    val humidity: Int by weatherViewModel.humidity.observeAsState(initial = 0)
+    val temperature: Double by weatherViewModel.mainTemp.observeAsState(initial = 0.0)
+    val description: String by weatherViewModel.weatherDescription.observeAsState(initial = "")
+    val feelsLike: Double by weatherViewModel.mainFeelsLike.observeAsState(initial = 0.0)
+    val humidity: Int by weatherViewModel.mainHumidity.observeAsState(initial = 0)
     val windSpeed: Double by weatherViewModel.windSpeed.observeAsState(initial = 0.0)
     val name: String by weatherViewModel.name.observeAsState(initial = "")
-    val apiKey =  stringResource(id = R.string.OpenWeatherAPIKEY)
+    val apiKey = stringResource(id = R.string.OpenWeatherAPIKEY)
 
     Log.d("API KEY", apiKey)
 
