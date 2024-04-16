@@ -60,10 +60,6 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
     val name: String by weatherViewModel.name.observeAsState(initial = "")
     val apiKey = stringResource(id = R.string.OpenWeatherAPIKEY)
 
-    Log.d("API KEY", apiKey)
-
-
-
     LaunchedEffect(key1 = true) {
         if (ActivityCompat.checkSelfPermission(
                 context,
@@ -78,7 +74,6 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                 val lastLocation = fusedLocationClient.lastLocation.await()
                 location = lastLocation
                 location?.let {
-
                     weatherViewModel.getWeather(apiKey, it.latitude, it.longitude)
                     Log.d("Forecast", "Location: ${it.latitude}, ${it.longitude}")
                     val geocoder = Geocoder(context, Locale.getDefault())
@@ -103,6 +98,7 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
         LocationIndicator(postalCode)
         Weather(temperature, description, feelsLike, humidity, windSpeed, name)
 
+        WeatherParameters(feelsLike, humidity, windSpeed)
 
         Text(
             text = "Pronóstico",
@@ -185,8 +181,6 @@ fun LocationIndicator(postalCode: String? = null) {
                     )
                 }
             }
-
-
         }
     }
 }

@@ -35,6 +35,6 @@ val Typography = Typography(
     titleLarge = TextStyle(
         fontFamily = FontFamily(Font(R.font.space_grotesk_bold)),
         fontWeight = FontWeight.Bold,
-        fontSize = 32.sp
+        fontSize = 40.sp
     ),
 )

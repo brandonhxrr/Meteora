@@ -170,7 +170,18 @@ fun Home(navController: NavController?) {
             }
         }
     ) {
-        Forecast(modifier = Modifier.padding(it), WeatherViewModel())
+        when (selectedItem) {
+            0 -> {
+                Forecast(modifier = Modifier.padding(it), WeatherViewModel())
+            }
+            1 -> {
+                Maps(modifier = Modifier.padding(it))
+            }
+            else -> {
+                Forecast(modifier = Modifier.padding(it), WeatherViewModel())
+            }
+        }
+
     }
 }
 
