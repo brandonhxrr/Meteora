@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,7 +32,11 @@ fun Weather(
     windSpeed: Double,
     name: String
 ) {
-    Column( modifier = Modifier.fillMaxWidth().padding(16.dp)){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
         Icon(
             imageVector = Icons.Rounded.WbSunny,
             contentDescription = "Soleado",
@@ -58,53 +63,51 @@ fun Weather(
 }
 
 @Composable
-fun WeatherParameters(feelsLike: Double, humidity: Int, windSpeed: Double) {
-    val titles = listOf("Sensación térmica", "Humedad", "Velocidad del viento")
-    val values = listOf("$feelsLike °C", "$humidity %", "$windSpeed km/h")
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(16.dp)
-    ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            ),
-            elevation = CardDefaults.cardElevation(10.dp)
+fun WeatherParameter(weatherObject: WeatherObject, modifier: Modifier) {
+    Card(modifier = modifier.padding(8.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.CenterHorizontally)
         ) {
-            Column {
-                Row {
-                    titles.forEach { title ->
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .weight(1f)
-                                .wrapContentWidth(Alignment.CenterHorizontally),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-                Row {
-                    values.forEach { value ->
-                        Text(
-                            text = value,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .weight(1f)
-                                .wrapContentWidth(Alignment.CenterHorizontally)
-                        )
-                    }
-
-                }
-            }
+            Icon(
+                imageVector = weatherObject.icon,
+                contentDescription = weatherObject.contentDescription,
+                tint = weatherObject.iconColor,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Text(
+                text = weatherObject.value,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.wrapContentWidth()
+            )
         }
     }
 }
 
+@Composable
+fun WeatherParameters(weatherObjects: List<WeatherObject>) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(16.dp)
+    ) {
+        for(i in weatherObjects.indices step 2) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                WeatherParameter(weatherObject = weatherObjects[i], modifier = Modifier.weight(1f))
+                WeatherParameter(weatherObject = weatherObjects[i+1], modifier = Modifier.weight(1f))
+            }
+        }
+
+    }
+}
+
+data class WeatherObject(
+    val value: String,
+    val icon: ImageVector,
+    val contentDescription: String,
+    val iconColor: Color
+)
 
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
@@ -115,5 +118,11 @@ fun WeatherPreview() {
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun WeatherParametersPreview() {
-    WeatherParameters(feelsLike = 30.0, humidity = 60, windSpeed = 15.0)
+    val weatherObjects = listOf(
+        WeatherObject("25 °C", Icons.Rounded.WbSunny, "Soleado", amber),
+        WeatherObject("25 km/h", Icons.Rounded.Air, "Viento", Color.Blue),
+        WeatherObject("50%", Icons.Rounded.Air, "Humedad", Color.Green),
+        WeatherObject("25 °C", Icons.Rounded.WbSunny, "Soleado", amber),
+    )
+    WeatherParameters(weatherObjects)
 }

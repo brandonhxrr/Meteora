@@ -15,8 +15,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AcUnit
+import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.Thermostat
+import androidx.compose.material.icons.rounded.Water
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -26,11 +31,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,14 +58,14 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
 
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
-    var location by remember { mutableStateOf<Location?>(null) }
+    var location by rememberSaveable { mutableStateOf<Location?>(null) }
     var municipality by remember { mutableStateOf<String?>(null) }
-    var postalCode by remember { mutableStateOf<String?>(null) }
+    var postalCode by rememberSaveable { mutableStateOf<String?>(null) }
     val temperature: Double by weatherViewModel.mainTemp.observeAsState(initial = 0.0)
     val description: String by weatherViewModel.weatherDescription.observeAsState(initial = "")
     val feelsLike: Double by weatherViewModel.mainFeelsLike.observeAsState(initial = 0.0)
     val humidity: Int by weatherViewModel.mainHumidity.observeAsState(initial = 0)
-    val windSpeed: Double by weatherViewModel.windSpeed.observeAsState(initial = 0.0)
+    val windSpeed: Double by weatherViewModel.windSpeed.observeAsState(initial =0.0)
     val name: String by weatherViewModel.name.observeAsState(initial = "")
     val apiKey = stringResource(id = R.string.OpenWeatherAPIKEY)
 
@@ -91,21 +100,49 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
         }
     }
 
-
-    Column(
+    LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
-        LocationIndicator(postalCode)
-        Weather(temperature, description, feelsLike, humidity, windSpeed, name)
+        item {
+            LocationIndicator(postalCode)
+            Weather(temperature, description, feelsLike, humidity, windSpeed, name)
 
-        WeatherParameters(feelsLike, humidity, windSpeed)
+            val weatherParameters = listOf(
+                WeatherObject(
+                    value = "$temperature °C",
+                    icon = Icons.Rounded.Thermostat,
+                    contentDescription = "Temperatura",
+                    iconColor = Color.Blue
+                ),
+                WeatherObject(
+                    value = "$feelsLike °C",
+                    icon = Icons.Rounded.AcUnit,
+                    contentDescription = "Sensación térmica",
+                    iconColor = Color.Green
+                ),
+                WeatherObject(
+                    value = "$humidity %",
+                    icon = Icons.Rounded.Water,
+                    contentDescription = "Humedad",
+                    iconColor = Color.Blue
+                ),
+                WeatherObject(
+                    value = "$windSpeed km/h",
+                    icon = Icons.Rounded.Air,
+                    contentDescription = "Velocidad del viento",
+                    iconColor = Color.Cyan
+                )
+            )
 
-        Text(
-            text = "Pronóstico",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(20.dp)
-        )
-        DailyWeather()
+            WeatherParameters(weatherParameters)
+
+            Text(
+                text = "Pronóstico",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(20.dp)
+            )
+            DailyWeather()
+        }
     }
 }
 
@@ -137,7 +174,7 @@ fun LocationIndicator(postalCode: String? = null) {
         )
         val selectedItem = postalCode?.let { getLocalityFromPostalCode(it) }
 
-        var selectedLocality by remember { mutableStateOf("") }
+        var selectedLocality by rememberSaveable { mutableStateOf("") }
         selectedLocality =
             if (selectedItem in localities) selectedItem!! else "Ubicación no disponible"
 
