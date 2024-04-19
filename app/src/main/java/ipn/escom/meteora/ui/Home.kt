@@ -55,7 +55,11 @@ import ipn.escom.meteora.data.weather.WeatherViewModel
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun Home(navController: NavController?) {
+    val context = LocalContext.current
+
     var selectedItem by remember { mutableIntStateOf(0) }
+    val hasInternetAccess by remember { mutableStateOf(isInternetAvailable(context)) }
+
     val auth = FirebaseAuth.getInstance()
 
     val items =
@@ -68,7 +72,7 @@ fun Home(navController: NavController?) {
     )
 
     var isLocationPermissionGranted by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+
 
     if (ContextCompat.checkSelfPermission(
             context,
@@ -165,23 +169,34 @@ fun Home(navController: NavController?) {
                                 contentDescription = stringResource(id = item)
                             )
                         },
-                        label = { Text(text = stringResource(id = item), style = MaterialTheme.typography.bodySmall) })
+                        label = {
+                            Text(
+                                text = stringResource(id = item),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        })
                 }
             }
         }
     ) {
-        when (selectedItem) {
-            0 -> {
-                Forecast(modifier = Modifier.padding(it), WeatherViewModel())
-            }
-            1 -> {
-                Maps(modifier = Modifier.padding(it))
-            }
-            else -> {
-                Forecast(modifier = Modifier.padding(it), WeatherViewModel())
-            }
-        }
+        if (hasInternetAccess) {
+            when (selectedItem) {
+                0 -> {
+                    Forecast(modifier = Modifier.padding(it), WeatherViewModel())
+                }
 
+                1 -> {
+                    Maps(modifier = Modifier.padding(it))
+                }
+
+                else -> {
+                    Forecast(modifier = Modifier.padding(it), WeatherViewModel())
+                }
+            }
+        } else {
+            DisconnectedScreen {
+        }
+    }
     }
 }
 

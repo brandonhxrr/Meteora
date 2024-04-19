@@ -8,6 +8,7 @@ import ipn.escom.meteora.data.weather.domain.WeatherUseCase
 import kotlinx.coroutines.launch
 
 class WeatherViewModel : ViewModel() {
+
     private val weatherUseCase = WeatherUseCase()
 
     private val _coordLon = MutableLiveData<Double>()

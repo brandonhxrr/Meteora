@@ -1,6 +1,7 @@
 package ipn.escom.meteora.ui
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
@@ -31,11 +32,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.weather.WeatherViewModel
@@ -58,46 +57,25 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
 
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
-    var location by rememberSaveable { mutableStateOf<Location?>(null) }
+    var location by remember { mutableStateOf<Location?>(null) }
     var municipality by remember { mutableStateOf<String?>(null) }
-    var postalCode by rememberSaveable { mutableStateOf<String?>(null) }
+    var postalCode by remember { mutableStateOf<String?>(null) }
     val temperature: Double by weatherViewModel.mainTemp.observeAsState(initial = 0.0)
     val description: String by weatherViewModel.weatherDescription.observeAsState(initial = "")
     val feelsLike: Double by weatherViewModel.mainFeelsLike.observeAsState(initial = 0.0)
     val humidity: Int by weatherViewModel.mainHumidity.observeAsState(initial = 0)
-    val windSpeed: Double by weatherViewModel.windSpeed.observeAsState(initial =0.0)
+    val windSpeed: Double by weatherViewModel.windSpeed.observeAsState(initial = 0.0)
     val name: String by weatherViewModel.name.observeAsState(initial = "")
     val apiKey = stringResource(id = R.string.OpenWeatherAPIKEY)
 
     LaunchedEffect(key1 = true) {
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            try {
-                val lastLocation = fusedLocationClient.lastLocation.await()
-                location = lastLocation
-                location?.let {
-                    weatherViewModel.getWeather(apiKey, it.latitude, it.longitude)
-                    Log.d("Forecast", "Location: ${it.latitude}, ${it.longitude}")
-                    val geocoder = Geocoder(context, Locale.getDefault())
-                    val addresses = geocoder.getFromLocation(it.latitude, it.longitude, 1)
-                    if (addresses!!.isNotEmpty()) {
-                        municipality = addresses[0].locality
-                        postalCode = addresses[0].postalCode
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("LocationProvider", "Error getting location: ${e.message}", e)
-            }
-        } else {
-            Log.e("LocationProvider", "Location permissions not granted")
-        }
+        location = getLocation(context, fusedLocationClient)
+        postalCode = getPostalCOde(context, location)
+    }
+
+    if(location != null) {
+        weatherViewModel.getWeather(apiKey = apiKey, lat = location?.latitude!!, lon = location?.longitude!!)
+        Log.d("Forecast", "Location: ${location?.latitude}, ${location?.longitude}")
     }
 
     LazyColumn(
@@ -174,7 +152,9 @@ fun LocationIndicator(postalCode: String? = null) {
         )
         val selectedItem = postalCode?.let { getLocalityFromPostalCode(it) }
 
-        var selectedLocality by rememberSaveable { mutableStateOf("") }
+        var selectedLocality by remember { mutableStateOf("") }
+
+        Log.d("LocationIndicator", "Localuty: $selectedLocality")
         selectedLocality =
             if (selectedItem in localities) selectedItem!! else "Ubicación no disponible"
 
@@ -220,6 +200,46 @@ fun LocationIndicator(postalCode: String? = null) {
             }
         }
     }
+}
+
+suspend fun getLocation(
+    context: Context,
+    fusedLocationClient: FusedLocationProviderClient
+): Location? {
+    if (ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED &&
+        ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+        try {
+            return fusedLocationClient.lastLocation.await()
+        } catch (e: Exception) {
+            Log.e("LocationProvider", "Error getting location: ${e.message}", e)
+        }
+    } else {
+        Log.e("LocationProvider", "Location permissions not granted")
+    }
+    return null
+}
+
+suspend fun getPostalCOde(
+    context: Context,
+    location: Location?
+): String? {
+    location?.let {
+        val geocoder = Geocoder(context, Locale.getDefault())
+        val addresses = geocoder.getFromLocation(it.latitude, it.longitude, 1)
+        if (addresses != null) {
+            if (addresses.isNotEmpty()) {
+                return addresses[0].postalCode
+            }
+        }
+    }
+    return null
 }
 
 @Composable
