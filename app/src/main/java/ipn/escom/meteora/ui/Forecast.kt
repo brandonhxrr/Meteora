@@ -6,6 +6,7 @@ import android.location.Geocoder
 import android.location.Location
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,9 +25,12 @@ import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.material.icons.rounded.Water
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -38,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,11 +52,13 @@ import com.google.android.gms.location.LocationServices
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.utils.RequestLocationPermission
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
 
@@ -67,6 +74,18 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
     val name: String by weatherViewModel.name.observeAsState(initial = "")
     val apiKey = stringResource(id = R.string.OpenWeatherAPIKEY)
     val isLocationPermissionGranted = remember { mutableStateOf(false) }
+    val refreshState = rememberPullToRefreshState()
+
+    if (refreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            weatherViewModel.getWeather(
+                apiKey = apiKey, lat = location?.latitude!!, lon = location?.longitude!!
+            )
+            delay(1500)
+            refreshState.endRefresh()
+        }
+
+    }
 
     RequestLocationPermission(isLocationPermissionGranted)
 
@@ -77,55 +96,62 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
 
     if (location != null) {
         weatherViewModel.getWeather(
-            apiKey = apiKey,
-            lat = location?.latitude!!,
-            lon = location?.longitude!!
+            apiKey = apiKey, lat = location?.latitude!!, lon = location?.longitude!!
         )
         Log.d("Forecast", "Location: ${location?.latitude}, ${location?.longitude}")
     }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .nestedScroll(refreshState.nestedScrollConnection)
     ) {
         item {
-            LocationIndicator(postalCode)
-            Weather(temperature, description, feelsLike, humidity, windSpeed, name)
+            Box(modifier = Modifier.fillMaxWidth()) {
 
-            val weatherParameters = listOf(
-                WeatherObject(
-                    value = "$temperature °C",
-                    icon = Icons.Rounded.Thermostat,
-                    contentDescription = "Temperatura",
-                    iconColor = Color.Blue
-                ),
-                WeatherObject(
-                    value = "$feelsLike °C",
-                    icon = Icons.Rounded.AcUnit,
-                    contentDescription = "Sensación térmica",
-                    iconColor = Color.Green
-                ),
-                WeatherObject(
-                    value = "$humidity %",
-                    icon = Icons.Rounded.Water,
-                    contentDescription = "Humedad",
-                    iconColor = Color.Blue
-                ),
-                WeatherObject(
-                    value = "$windSpeed km/h",
-                    icon = Icons.Rounded.Air,
-                    contentDescription = "Velocidad del viento",
-                    iconColor = Color.Cyan
+                Column {
+                    LocationIndicator(postalCode)
+                    Weather(temperature, description, feelsLike, humidity, windSpeed, name)
+
+                    val weatherParameters = listOf(
+                        WeatherObject(
+                            value = "$temperature °C",
+                            icon = Icons.Rounded.Thermostat,
+                            contentDescription = "Temperatura",
+                            iconColor = Color.Blue
+                        ), WeatherObject(
+                            value = "$feelsLike °C",
+                            icon = Icons.Rounded.AcUnit,
+                            contentDescription = "Sensación térmica",
+                            iconColor = Color.Green
+                        ), WeatherObject(
+                            value = "$humidity %",
+                            icon = Icons.Rounded.Water,
+                            contentDescription = "Humedad",
+                            iconColor = Color.Blue
+                        ), WeatherObject(
+                            value = "$windSpeed km/h",
+                            icon = Icons.Rounded.Air,
+                            contentDescription = "Velocidad del viento",
+                            iconColor = Color.Cyan
+                        )
+                    )
+
+                    WeatherParameters(weatherParameters)
+
+                    Text(
+                        text = "Pronóstico",
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.padding(20.dp)
+                    )
+                    DailyWeather()
+                }
+                PullToRefreshContainer(
+                    state = refreshState, modifier = Modifier.align(Alignment.TopCenter)
                 )
-            )
+            }
 
-            WeatherParameters(weatherParameters)
 
-            Text(
-                text = "Pronóstico",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(20.dp)
-            )
-            DailyWeather()
         }
     }
 }
@@ -169,10 +195,8 @@ fun LocationIndicator(postalCode: String? = null) {
                 .padding(8.dp)
                 .align(Alignment.CenterHorizontally)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable { expanded = true }
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { expanded = true }) {
                 Text(
                     text = selectedLocality,
                     style = MaterialTheme.typography.bodyMedium,
@@ -193,15 +217,12 @@ fun LocationIndicator(postalCode: String? = null) {
                     .height(300.dp),
             ) {
                 localities.forEach { locality ->
-                    DropdownMenuItem(
-                        onClick = {
-                            selectedLocality = locality
-                            expanded = false
-                        },
-                        text = {
-                            Text(text = locality, style = MaterialTheme.typography.bodyMedium)
-                        }
-                    )
+                    DropdownMenuItem(onClick = {
+                        selectedLocality = locality
+                        expanded = false
+                    }, text = {
+                        Text(text = locality, style = MaterialTheme.typography.bodyMedium)
+                    })
                 }
             }
         }
@@ -226,8 +247,7 @@ suspend fun getLocation(
 }
 
 fun getPostalCode(
-    context: Context,
-    location: Location?
+    context: Context, location: Location?
 ): String? {
     location?.let {
         val geocoder = Geocoder(context, Locale.getDefault())
