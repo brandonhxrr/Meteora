@@ -1,8 +1,7 @@
 package ipn.escom.meteora.ui
 
-import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.util.Log
@@ -30,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -42,11 +42,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.weather.WeatherViewModel
+import ipn.escom.meteora.utils.RequestLocationPermission
 import kotlinx.coroutines.tasks.await
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -58,7 +58,6 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     var location by remember { mutableStateOf<Location?>(null) }
-    var municipality by remember { mutableStateOf<String?>(null) }
     var postalCode by remember { mutableStateOf<String?>(null) }
     val temperature: Double by weatherViewModel.mainTemp.observeAsState(initial = 0.0)
     val description: String by weatherViewModel.weatherDescription.observeAsState(initial = "")
@@ -67,14 +66,21 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
     val windSpeed: Double by weatherViewModel.windSpeed.observeAsState(initial = 0.0)
     val name: String by weatherViewModel.name.observeAsState(initial = "")
     val apiKey = stringResource(id = R.string.OpenWeatherAPIKEY)
+    val isLocationPermissionGranted = remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = true) {
-        location = getLocation(context, fusedLocationClient)
-        postalCode = getPostalCOde(context, location)
+    RequestLocationPermission(isLocationPermissionGranted)
+
+    LaunchedEffect(isLocationPermissionGranted.value, true) {
+        location = getLocation(fusedLocationClient, isLocationPermissionGranted)
+        postalCode = getPostalCode(context, location)
     }
 
-    if(location != null) {
-        weatherViewModel.getWeather(apiKey = apiKey, lat = location?.latitude!!, lon = location?.longitude!!)
+    if (location != null) {
+        weatherViewModel.getWeather(
+            apiKey = apiKey,
+            lat = location?.latitude!!,
+            lon = location?.longitude!!
+        )
         Log.d("Forecast", "Location: ${location?.latitude}, ${location?.longitude}")
     }
 
@@ -202,19 +208,12 @@ fun LocationIndicator(postalCode: String? = null) {
     }
 }
 
+@SuppressLint("MissingPermission")
 suspend fun getLocation(
-    context: Context,
-    fusedLocationClient: FusedLocationProviderClient
+    fusedLocationClient: FusedLocationProviderClient,
+    isLocationPermissionGranted: MutableState<Boolean>
 ): Location? {
-    if (ActivityCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED &&
-        ActivityCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    ) {
+    if (isLocationPermissionGranted.value) {
         try {
             return fusedLocationClient.lastLocation.await()
         } catch (e: Exception) {
@@ -226,7 +225,7 @@ suspend fun getLocation(
     return null
 }
 
-suspend fun getPostalCOde(
+fun getPostalCode(
     context: Context,
     location: Location?
 ): String? {

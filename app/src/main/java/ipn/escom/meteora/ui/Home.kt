@@ -1,11 +1,12 @@
 package ipn.escom.meteora.ui
 
-import android.content.pm.PackageManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,7 +18,6 @@ import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.WbSunny
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,7 +27,10 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,15 +45,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.firebase.auth.FirebaseAuth
-import ipn.escom.meteora.MainActivity
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.weather.WeatherViewModel
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
@@ -58,7 +59,16 @@ fun Home(navController: NavController?) {
     val context = LocalContext.current
 
     var selectedItem by remember { mutableIntStateOf(0) }
-    val hasInternetAccess by remember { mutableStateOf(isInternetAvailable(context)) }
+    var hasInternetAccess by remember { mutableStateOf(isInternetAvailable(context)) }
+    val state = rememberPullToRefreshState()
+
+    if (state.isRefreshing) {
+        LaunchedEffect(true) {
+            hasInternetAccess = isInternetAvailable(context)
+            delay(1500)
+            state.endRefresh()
+        }
+    }
 
     val auth = FirebaseAuth.getInstance()
 
@@ -70,40 +80,6 @@ fun Home(navController: NavController?) {
         Icons.Rounded.CalendarMonth,
         Icons.Rounded.WbSunny
     )
-
-    var isLocationPermissionGranted by remember { mutableStateOf(false) }
-
-
-    if (ContextCompat.checkSelfPermission(
-            context,
-            android.Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    ) {
-        isLocationPermissionGranted = true
-    } else {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(
-                context as MainActivity,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
-            )
-        ) {
-            AlertDialog(onDismissRequest = {
-                ActivityCompat.requestPermissions(
-                    context,
-                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                    1
-                )
-            }, title = { Text(text = "Permiso de ubicación") }, text = {
-                Text(text = "Se necesita el permiso de ubicación para mostrar el clima de tu ubicación actual")
-            }, confirmButton = { Text(text = "Aceptar") })
-        } else {
-            ActivityCompat.requestPermissions(
-                context,
-                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-                1
-            )
-        }
-
-    }
 
     Scaffold(
         topBar = {
@@ -179,24 +155,36 @@ fun Home(navController: NavController?) {
             }
         }
     ) {
-        if (hasInternetAccess) {
-            when (selectedItem) {
-                0 -> {
-                    Forecast(modifier = Modifier.padding(it), WeatherViewModel())
-                }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            if (hasInternetAccess) {
+                when (selectedItem) {
+                    0 -> {
+                        Forecast(modifier = Modifier.padding(it), WeatherViewModel())
+                    }
 
-                1 -> {
-                    Maps(modifier = Modifier.padding(it))
-                }
+                    1 -> {
+                        Maps(modifier = Modifier.padding(it))
+                    }
 
-                else -> {
-                    Forecast(modifier = Modifier.padding(it), WeatherViewModel())
+                    else -> {
+                        Forecast(modifier = Modifier.padding(it), WeatherViewModel())
+                    }
+                }
+            } else {
+                DisconnectedScreen {
+                    state.startRefresh()
                 }
             }
-        } else {
-            DisconnectedScreen {
+            PullToRefreshContainer(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(it),
+                state = state,
+            )
         }
-    }
     }
 }
 
