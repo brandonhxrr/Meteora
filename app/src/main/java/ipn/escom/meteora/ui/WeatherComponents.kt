@@ -1,5 +1,8 @@
 package ipn.escom.meteora.ui
 
+import android.content.res.Configuration
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,8 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ipn.escom.meteora.ui.theme.amber
 
 @Composable
@@ -63,6 +68,54 @@ fun Weather(
 }
 
 @Composable
+fun MainWeather() {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "Ciudad de México",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(16.dp)
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "25°",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.primary
+            )
+            Icon(
+                imageVector = Icons.Rounded.WbSunny,
+                contentDescription = "Soleado",
+                tint = amber,
+                modifier = Modifier.size(50.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "Soleado",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.align(Alignment.End),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Sensación térmica: 24°",
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.align(Alignment.End),
+                    color = MaterialTheme.colorScheme.inversePrimary
+                )
+            }
+        }
+    }
+
+}
+
+@Composable
 fun WeatherParameter(weatherObject: WeatherObject, modifier: Modifier) {
     Card(modifier = modifier.padding(8.dp)) {
         Column(
@@ -92,10 +145,13 @@ fun WeatherParameters(weatherObjects: List<WeatherObject>) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(16.dp)
     ) {
-        for(i in weatherObjects.indices step 2) {
+        for (i in weatherObjects.indices step 2) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 WeatherParameter(weatherObject = weatherObjects[i], modifier = Modifier.weight(1f))
-                WeatherParameter(weatherObject = weatherObjects[i+1], modifier = Modifier.weight(1f))
+                WeatherParameter(
+                    weatherObject = weatherObjects[i + 1],
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
 
@@ -125,4 +181,93 @@ fun WeatherParametersPreview() {
         WeatherObject("25 °C", Icons.Rounded.WbSunny, "Soleado", amber),
     )
     WeatherParameters(weatherObjects)
+}
+
+@Composable
+@Preview(showBackground = true, showSystemUi = true)
+fun MainWeatherPreview() {
+    MainWeather()
+}
+
+
+@Composable
+fun CurrentWeatherContent(
+    modifier: Modifier = Modifier,
+    location: String,
+    time: String,
+    temperature: Double,
+    feelsLike: Double,
+    description: String,
+    icon: ImageVector
+) {
+    Column(
+        modifier = modifier
+            .padding(
+                horizontal = 16.dp,
+                vertical = 10.dp,
+            )
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = location,
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = time,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = "$temperature °C",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 50.sp,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                Text(
+                    text = "Se siente como $feelsLike °C",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Box {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = description,
+                        tint = amber,
+                        modifier = Modifier.size(100.dp)
+                    )
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun CurrentWeatherPreview() {
+    MaterialTheme {
+        CurrentWeatherContent(
+            location = "Ciudad de Mexico",
+            time = "04:56 PM",
+            temperature = 25.0,
+            feelsLike = 24.0,
+            description = "Soleado",
+            icon = Icons.Rounded.WbSunny
+        )
+    }
 }

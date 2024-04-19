@@ -23,6 +23,7 @@ import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.material.icons.rounded.Water
+import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,6 +53,7 @@ import com.google.android.gms.location.LocationServices
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.utils.RequestLocationPermission
+import ipn.escom.meteora.utils.getCurrentTime
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import java.io.BufferedReader
@@ -71,6 +73,9 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
     val feelsLike: Double by weatherViewModel.mainFeelsLike.observeAsState(initial = 0.0)
     val humidity: Int by weatherViewModel.mainHumidity.observeAsState(initial = 0)
     val windSpeed: Double by weatherViewModel.windSpeed.observeAsState(initial = 0.0)
+    val sunrise: Long by weatherViewModel.sysSunrise.observeAsState(initial = 0)
+    val sunset: Long by weatherViewModel.sysSunset.observeAsState(initial = 0)
+    val windDeg: Int by weatherViewModel.windDeg.observeAsState(initial = 0)
     val name: String by weatherViewModel.name.observeAsState(initial = "")
     val apiKey = stringResource(id = R.string.OpenWeatherAPIKEY)
     val isLocationPermissionGranted = remember { mutableStateOf(false) }
@@ -111,7 +116,14 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
 
                 Column {
                     LocationIndicator(postalCode)
-                    Weather(temperature, description, feelsLike, humidity, windSpeed, name)
+                    CurrentWeatherContent(
+                        location = name,
+                        time = getCurrentTime(),
+                        temperature = temperature,
+                        feelsLike = feelsLike,
+                        description = description,
+                        icon = Icons.Rounded.WbSunny,
+                    )
 
                     val weatherParameters = listOf(
                         WeatherObject(
