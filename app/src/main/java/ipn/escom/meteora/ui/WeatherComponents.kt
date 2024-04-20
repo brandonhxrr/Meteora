@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +29,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import ipn.escom.meteora.ui.theme.amber
 import ipn.escom.meteora.R
 
@@ -200,7 +205,8 @@ fun CurrentWeatherContent(
     temperature: Double,
     feelsLike: Double,
     description: Int,
-    icon: Int
+    icon: Int,
+    animatedIcon: Int
 ) {
     Column(
         modifier = modifier
@@ -240,11 +246,13 @@ fun CurrentWeatherContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        painter = painterResource(id = icon),
-                        contentDescription = stringResource(id = description),
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(100.dp)
+                    val composition by rememberLottieComposition(
+                            LottieCompositionSpec.RawRes(animatedIcon)
+                            )
+                    LottieAnimation(
+                        composition = composition,
+                        iterations = LottieConstants.IterateForever,
+                        modifier = modifier.size(100.dp)
                     )
                     Text(
                         text = stringResource(id = description),
@@ -269,7 +277,8 @@ fun CurrentWeatherPreview() {
             temperature = 25.0,
             feelsLike = 24.0,
             description = R.string.condition_sunny,
-            icon = R.drawable.ic_weather_sunny
+            icon = R.drawable.ic_weather_sunny,
+            animatedIcon = R.raw.weather_sunny
         )
     }
 }

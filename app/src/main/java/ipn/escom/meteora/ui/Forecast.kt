@@ -133,6 +133,7 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                         feelsLike = weatherCondition.feelsLike,
                         description = weatherCondition.getDescription(),
                         icon = weatherCondition.getIconDrawable(),
+                        animatedIcon = weatherCondition.getAnimatedIcon()
                     )
 
                     val weatherParameters = listOf(
