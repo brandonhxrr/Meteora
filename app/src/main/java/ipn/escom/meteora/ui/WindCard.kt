@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,39 +23,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.R
 
 @Composable
-fun ParameterCard(
-    title: String,
-    content: @Composable () -> Unit
-) {
-    Card(
-        modifier = Modifier.padding(16.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            content()
-        }
-    }
-}
-
-@Composable
 fun WindCardContent(
     windSpeed: Double,
-    windDirection: Int
+    windDirection: Int,
+    modifier: Modifier = Modifier
 ) {
-    ParameterCard(title = "Viento") {
+    ParameterCard(title = "Viento", modifier = modifier) {
         Row {
             Column(
                 modifier = Modifier
@@ -115,7 +92,7 @@ fun WindDirectionsVisualizer(
 ) {
     var animate by remember { mutableStateOf(false) }
     val arrowAngle: Float by animateFloatAsState(
-        targetValue = windDirection.toFloat() * -1,
+        targetValue = windDirection.toFloat(),
         animationSpec = tween(
             durationMillis = if (animate) 1000 else 0,
             easing = FastOutSlowInEasing

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -140,12 +141,10 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier.padding(20.dp)
                     )
-
-                    Row {
-                        WindCardContent(windSpeed = windSpeed, windDirection = windDeg)
-                        WindCardContent(windSpeed = windSpeed, windDirection = windDeg)
+                    Row (modifier = Modifier.fillMaxWidth().height(160.dp)) {
+                        WindCardContent(windSpeed = windSpeed, windDirection = windDeg, modifier = Modifier.weight(1f).fillMaxHeight())
+                        HumidityCard(humity = humidity, modifier = Modifier.weight(1f).fillMaxHeight())
                     }
-
 
                     val weatherParameters = listOf(
                         WeatherObject(
