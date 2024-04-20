@@ -15,4 +15,13 @@
     <string name="yes_account">¿Ya tienes cuenta?</string>
     <string name="login_action">Inicia sesión</string>
     <string name="default_web_client_id">288436219572-51187esc0mlcr4560vfv7h4lhmuoktrf.apps.googleusercontent.com</string>
+    <string name="condition_sunny">Soleado</string>
+    <string name="condition_clear">Despejado</string>
+    <string name="condition_partly_cloudy">Parcialmente nublado</string>
+    <string name="condition_cloudy">Nublado</string>
+    <string name="condition_windy">Ventoso</string>
+    <string name="condition_snow">Nieve</string>
+    <string name="condition_mist">Niebla</string>
+    <string name="condition_rain">Lluvia</string>
+    <string name="condition_thunderstorm">Tormenta</string>
 </resources>

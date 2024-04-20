@@ -21,12 +21,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ipn.escom.meteora.ui.theme.amber
+import ipn.escom.meteora.R
 
 @Composable
 fun Weather(
@@ -91,7 +94,6 @@ fun MainWeather() {
             Icon(
                 imageVector = Icons.Rounded.WbSunny,
                 contentDescription = "Soleado",
-                tint = amber,
                 modifier = Modifier.size(50.dp)
             )
             Column(
@@ -197,8 +199,8 @@ fun CurrentWeatherContent(
     time: String,
     temperature: Double,
     feelsLike: Double,
-    description: String,
-    icon: ImageVector
+    description: Int,
+    icon: Int
 ) {
     Column(
         modifier = modifier
@@ -239,13 +241,13 @@ fun CurrentWeatherContent(
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Icon(
-                        imageVector = icon,
-                        contentDescription = description,
-                        tint = amber,
+                        painter = painterResource(id = icon),
+                        contentDescription = stringResource(id = description),
+                        tint = Color.Unspecified,
                         modifier = Modifier.size(100.dp)
                     )
                     Text(
-                        text = description,
+                        text = stringResource(id = description),
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
@@ -266,8 +268,8 @@ fun CurrentWeatherPreview() {
             time = "04:56 PM",
             temperature = 25.0,
             feelsLike = 24.0,
-            description = "Soleado",
-            icon = Icons.Rounded.WbSunny
+            description = R.string.condition_sunny,
+            icon = R.drawable.ic_weather_sunny
         )
     }
 }

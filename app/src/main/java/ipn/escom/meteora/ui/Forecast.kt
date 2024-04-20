@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.weather.WeatherCondition
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.utils.RequestLocationPermission
 import ipn.escom.meteora.utils.getCurrentTime
@@ -80,6 +81,15 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
     val apiKey = stringResource(id = R.string.OpenWeatherAPIKEY)
     val isLocationPermissionGranted = remember { mutableStateOf(false) }
     val refreshState = rememberPullToRefreshState()
+    val code: String by weatherViewModel.weatherIcon.observeAsState(initial = "")
+
+    val weatherCondition = WeatherCondition(
+        location = name,
+        temperature = temperature,
+        feelsLike = feelsLike,
+        description = description,
+        code = code
+    )
 
     if (refreshState.isRefreshing) {
         LaunchedEffect(true) {
@@ -117,12 +127,12 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                 Column {
                     LocationIndicator(postalCode)
                     CurrentWeatherContent(
-                        location = name,
+                        location = weatherCondition.location,
                         time = getCurrentTime(),
-                        temperature = temperature,
-                        feelsLike = feelsLike,
-                        description = description,
-                        icon = Icons.Rounded.WbSunny,
+                        temperature = weatherCondition.temperature,
+                        feelsLike = weatherCondition.feelsLike,
+                        description = weatherCondition.getDescription(),
+                        icon = weatherCondition.getIconDrawable(),
                     )
 
                     val weatherParameters = listOf(
