@@ -23,7 +23,6 @@ import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.material.icons.rounded.Water
-import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -135,6 +134,18 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                         icon = weatherCondition.getIconDrawable(),
                         animatedIcon = weatherCondition.getAnimatedIcon()
                     )
+
+                    Text(
+                        text = "Condiciones diarias",
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.padding(20.dp)
+                    )
+
+                    Row {
+                        WindCardContent(windSpeed = windSpeed, windDirection = windDeg)
+                        WindCardContent(windSpeed = windSpeed, windDirection = windDeg)
+                    }
+
 
                     val weatherParameters = listOf(
                         WeatherObject(
