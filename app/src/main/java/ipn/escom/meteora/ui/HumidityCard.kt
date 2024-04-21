@@ -2,6 +2,7 @@ package ipn.escom.meteora.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ipn.escom.meteora.ui.theme.amber
+import ipn.escom.meteora.ui.theme.amberLight
 
 @Composable
 fun HumidityCard(humity: Int, modifier: Modifier = Modifier) {
@@ -28,6 +31,7 @@ fun HumidityCard(humity: Int, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
+            Spacer(modifier = Modifier.width(32.dp))
             HumidityVisualizer(humity)
         }
     }
@@ -55,11 +59,11 @@ fun HumidityVisualizer(humidity: Int) {
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .width(40.dp)
-                .height(20.dp)
+                .height(24.dp)
                 .rotate(-90f)
                 .clip(shape = RoundedCornerShape(20.dp)),
-            color = MaterialTheme.colorScheme.primary,
-            trackColor = MaterialTheme.colorScheme.onSecondaryContainer
+            color = amber,
+            trackColor = amberLight
         )
 
         Text(

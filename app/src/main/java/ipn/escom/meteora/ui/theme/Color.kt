@@ -220,4 +220,5 @@ val surfaceContainerHighestDarkHighContrast = Color(0xFF33353A)
 
 val seed = Color(0xFF3C79F5)
 val amber = Color(0xFFFFD600)
+val amberLight = Color(0xFFF8EB9E)
 val gray = Color(0xFF50577A)

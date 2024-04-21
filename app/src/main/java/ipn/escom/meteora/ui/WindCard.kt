@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,7 +35,7 @@ fun WindCardContent(
     modifier: Modifier = Modifier
 ) {
     ParameterCard(title = "Viento", modifier = modifier) {
-        Row {
+        Row(modifier = modifier.fillMaxHeight()) {
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterVertically)

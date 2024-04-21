@@ -19,11 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AcUnit
-import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
-import androidx.compose.material.icons.rounded.Thermostat
-import androidx.compose.material.icons.rounded.Water
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -141,36 +136,27 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier.padding(20.dp)
                     )
-                    Row (modifier = Modifier.fillMaxWidth().height(160.dp)) {
-                        WindCardContent(windSpeed = windSpeed, windDirection = windDeg, modifier = Modifier.weight(1f).fillMaxHeight())
-                        HumidityCard(humity = humidity, modifier = Modifier.weight(1f).fillMaxHeight())
-                    }
-
-                    val weatherParameters = listOf(
-                        WeatherObject(
-                            value = "$temperature °C",
-                            icon = Icons.Rounded.Thermostat,
-                            contentDescription = "Temperatura",
-                            iconColor = Color.Blue
-                        ), WeatherObject(
-                            value = "$feelsLike °C",
-                            icon = Icons.Rounded.AcUnit,
-                            contentDescription = "Sensación térmica",
-                            iconColor = Color.Green
-                        ), WeatherObject(
-                            value = "$humidity %",
-                            icon = Icons.Rounded.Water,
-                            contentDescription = "Humedad",
-                            iconColor = Color.Blue
-                        ), WeatherObject(
-                            value = "$windSpeed km/h",
-                            icon = Icons.Rounded.Air,
-                            contentDescription = "Velocidad del viento",
-                            iconColor = Color.Cyan
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .height(140.dp)
+                    ) {
+                        WindCardContent(
+                            windSpeed = windSpeed,
+                            windDirection = windDeg,
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
                         )
-                    )
-
-                    WeatherParameters(weatherParameters)
+                        Spacer(modifier = Modifier.width(16.dp))
+                        HumidityCard(
+                            humity = humidity,
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                        )
+                    }
 
                     Text(
                         text = "Pronóstico",

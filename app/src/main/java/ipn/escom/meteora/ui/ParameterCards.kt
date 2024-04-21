@@ -1,6 +1,7 @@
 package ipn.escom.meteora.ui
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -16,9 +17,7 @@ fun ParameterCard(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Card(
-        modifier = modifier.padding(16.dp)
-    ) {
+    Card(modifier = modifier.fillMaxHeight()) {
         Column(
             modifier = Modifier
                 .padding(16.dp)

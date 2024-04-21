@@ -4,20 +4,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import ipn.escom.meteora.R
 
-enum class WeatherStatus {
-    SUNNY_DAY,
-    CLEAR_NIGHT,
-    PARTLY_CLOUDY_DAY,
-    PARTLY_CLOUDY_NIGHT,
-    WINDY,
-    RAIN_DAY,
-    STORM_RAIN_DAY,
-    STORM_RAIN_NIGHT,
-    SNOW_DAY,
-    SNOW_NIGHT,
-    MIST
-}
-
 data class WeatherCondition(
     val location: String,
     val temperature: Double,
