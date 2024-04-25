@@ -1,7 +1,11 @@
 package ipn.escom.meteora.ui
 
+import android.Manifest
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,11 +42,38 @@ fun DisconnectedScreen(onRetry :() -> Unit) {
 }
 
 fun isInternetAvailable(context: Context): Boolean {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val networkInfo = connectivityManager.activeNetworkInfo
+    if (networkInfo != null && networkInfo.isConnected) {
+        return try {
+            val url = URL("https://www.google.com")
+            val urlConnection = url.openConnection() as HttpURLConnection
+            urlConnection.connectTimeout = 3000 // 3 seconds
+            urlConnection.connect()
+            urlConnection.responseCode == 200
+        } catch (e: Exception) {
+            false
+        }
+    }
+    return false
+}
+
+@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+fun isNetworkAvailable(context: Context): Boolean {
     val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val networkInfo = connectivityManager.activeNetworkInfo
-    return networkInfo != null && networkInfo.isConnected
+    val activeNetwork = connectivityManager.activeNetwork ?: return false
+    val networkCapabilities =
+        connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+    return when {
+        networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+        networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+        networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> true
+        networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+        else -> false
+    }
 }
+
 
 fun hasInternetAccess(): Boolean {
     return try {

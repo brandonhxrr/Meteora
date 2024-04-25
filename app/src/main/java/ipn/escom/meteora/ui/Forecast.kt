@@ -50,6 +50,7 @@ import ipn.escom.meteora.data.weather.WeatherCondition
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.utils.RequestLocationPermission
 import ipn.escom.meteora.utils.getCurrentTime
+import ipn.escom.meteora.utils.getCurrentTimeLong
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import java.io.BufferedReader
@@ -71,6 +72,7 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
     val windSpeed: Double by weatherViewModel.windSpeed.observeAsState(initial = 0.0)
     val sunrise: Long by weatherViewModel.sysSunrise.observeAsState(initial = 0)
     val sunset: Long by weatherViewModel.sysSunset.observeAsState(initial = 0)
+    val datetime: Long by weatherViewModel.dt.observeAsState(initial = 0)
     val windDeg: Int by weatherViewModel.windDeg.observeAsState(initial = 0)
     val name: String by weatherViewModel.name.observeAsState(initial = "")
     val apiKey = stringResource(id = R.string.OpenWeatherAPIKEY)
@@ -121,15 +123,17 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
 
                 Column {
                     LocationIndicator(postalCode)
-                    CurrentWeatherContent(
-                        location = weatherCondition.location,
-                        time = getCurrentTime(),
-                        temperature = weatherCondition.temperature,
-                        feelsLike = weatherCondition.feelsLike,
-                        description = weatherCondition.getDescription(),
-                        icon = weatherCondition.getIconDrawable(),
-                        animatedIcon = weatherCondition.getAnimatedIcon()
-                    )
+                    ParameterCard(title = "", modifier = Modifier.padding(horizontal = 16.dp)) {
+                        CurrentWeatherContent(
+                            location = weatherCondition.location,
+                            time = getCurrentTime(),
+                            temperature = weatherCondition.temperature,
+                            feelsLike = weatherCondition.feelsLike,
+                            description = weatherCondition.getDescription(),
+                            icon = weatherCondition.getIconDrawable(),
+                            animatedIcon = weatherCondition.getAnimatedIcon()
+                        )
+                    }
 
                     Text(
                         text = "Condiciones diarias",
@@ -157,6 +161,12 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                                 .fillMaxHeight()
                         )
                     }
+
+                    SunriseSunsetCardContent(
+                        sunriseHour = sunrise,
+                        sunsetHour = sunset,
+                        currentTime = datetime
+                    )
 
                     Text(
                         text = "Pronóstico",
@@ -277,7 +287,7 @@ fun getPostalCode(
             }
         }
     }
-    return null
+    return ""
 }
 
 @Composable

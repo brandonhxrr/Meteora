@@ -211,8 +211,7 @@ fun CurrentWeatherContent(
     Column(
         modifier = modifier
             .padding(
-                horizontal = 16.dp,
-                vertical = 10.dp,
+                8.dp
             )
     ) {
         Row(
@@ -233,7 +232,7 @@ fun CurrentWeatherContent(
                 Text(
                     text = "$temperature °C",
                     style = MaterialTheme.typography.titleMedium,
-                    fontSize = 50.sp,
+                    fontSize = 45.sp,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
                 Text(

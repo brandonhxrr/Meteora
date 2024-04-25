@@ -24,4 +24,11 @@
     <string name="condition_mist">Niebla</string>
     <string name="condition_rain">Lluvia</string>
     <string name="condition_thunderstorm">Tormenta</string>
+    <string name="sunrise_sunset"><![CDATA[Amanecer & Atardecer]]></string>
+    <string name="sunrise">Amanecer</string>
+    <string name="sunset">Puesta de sol</string>
+    <string name="length_of_day">Longitud del día:\u00A0</string>
+    <string name="remaining_daylight_x">Luz del día restante:\u00A0</string>
+    <string name="hours_minutes_x_y" formatted="false">%dh %dm</string>
+    <string name="minutes_x">%dm</string>
 </resources>

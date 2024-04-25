@@ -64,7 +64,7 @@ fun Home(navController: NavController?) {
 
     if (state.isRefreshing) {
         LaunchedEffect(true) {
-            hasInternetAccess = isInternetAvailable(context)
+            hasInternetAccess = isNetworkAvailable(context)
             delay(1500)
             state.endRefresh()
         }
