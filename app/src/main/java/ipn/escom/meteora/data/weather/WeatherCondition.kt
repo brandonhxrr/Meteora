@@ -3,17 +3,14 @@ package ipn.escom.meteora.data.weather
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.weather.data.network.response.WeatherResponse
 
 data class WeatherCondition(
-    val location: String,
-    val temperature: Double,
-    val feelsLike: Double,
-    val description: String,
-    val code: String
+    val weather: WeatherResponse
 ) {
 
     fun getDescription(): Int {
-        return when (code) {
+        return when (weather.weather[0].icon) {
             "01d" -> R.string.condition_sunny
             "01n" -> R.string.condition_clear
             "02d", "02n" -> R.string.condition_partly_cloudy
@@ -28,7 +25,7 @@ data class WeatherCondition(
 
     @DrawableRes
     fun getIconDrawable(): Int {
-        return when (code) {
+        return when (weather.weather[0].icon) {
             "01d" -> R.drawable.ic_weather_sunny
             "01n" -> R.drawable.ic_weather_night
             "02d" -> R.drawable.ic_weather_partly_cloudy
@@ -47,7 +44,7 @@ data class WeatherCondition(
 
     @RawRes
     fun getAnimatedIcon(): Int {
-        return getAnimatedIcon(code)
+        return getAnimatedIcon(weather.weather[0].icon)
     }
 }
 

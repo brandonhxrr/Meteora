@@ -48,6 +48,7 @@ import com.google.android.gms.location.LocationServices
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.weather.WeatherCondition
 import ipn.escom.meteora.data.weather.WeatherViewModel
+import ipn.escom.meteora.data.weather.data.network.response.WeatherResponse
 import ipn.escom.meteora.utils.RequestLocationPermission
 import ipn.escom.meteora.utils.getCurrentTime
 import kotlinx.coroutines.delay
@@ -64,30 +65,20 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     var location by remember { mutableStateOf<Location?>(null) }
     var postalCode by remember { mutableStateOf<String?>(null) }
-    val temperature: Double by weatherViewModel.mainTemp.observeAsState(initial = 0.0)
-    val description: String by weatherViewModel.weatherDescription.observeAsState(initial = "")
-    val feelsLike: Double by weatherViewModel.mainFeelsLike.observeAsState(initial = 0.0)
-    val humidity: Int by weatherViewModel.mainHumidity.observeAsState(initial = 0)
-    val windSpeed: Double by weatherViewModel.windSpeed.observeAsState(initial = 0.0)
-    val sunrise: Long by weatherViewModel.sysSunrise.observeAsState(initial = 0)
-    val sunset: Long by weatherViewModel.sysSunset.observeAsState(initial = 0)
-    val datetime: Long by weatherViewModel.dt.observeAsState(initial = 0)
-    val windDeg: Int by weatherViewModel.windDeg.observeAsState(initial = 0)
-    val name: String by weatherViewModel.name.observeAsState(initial = "")
     val apiKey = stringResource(id = R.string.OpenWeatherAPIKEY)
     val isLocationPermissionGranted = remember { mutableStateOf(false) }
     val refreshState = rememberPullToRefreshState()
-    val code: String by weatherViewModel.weatherIcon.observeAsState(initial = "")
     val hourlyForecast by weatherViewModel.hourlyForecast.observeAsState(initial = null)
     val dailyForecast by weatherViewModel.dailyForecast.observeAsState(initial = null)
-
-    val weatherCondition = WeatherCondition(
-        location = name,
-        temperature = temperature,
-        feelsLike = feelsLike,
-        description = description,
-        code = code
+    val weather by weatherViewModel.weather.observeAsState(
+        initial = WeatherResponse()
     )
+
+    val weatherCondition = weather?.let {
+        WeatherCondition(
+            weather = it
+        )
+    }
 
     if (refreshState.isRefreshing) {
 
@@ -143,11 +134,11 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                     LocationIndicator(postalCode)
                     ParameterCard(title = "", modifier = Modifier.padding(horizontal = 16.dp)) {
                         CurrentWeatherContent(
-                            location = weatherCondition.location,
+                            location = weather!!.name,
                             time = getCurrentTime(),
-                            temperature = weatherCondition.temperature,
-                            feelsLike = weatherCondition.feelsLike,
-                            description = weatherCondition.getDescription(),
+                            temperature = weather!!.main.temp,
+                            feelsLike = weather!!.main.feelsLike,
+                            description = weatherCondition!!.getDescription(),
                             icon = weatherCondition.getIconDrawable(),
                             animatedIcon = weatherCondition.getAnimatedIcon()
                         )
@@ -159,7 +150,7 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                         modifier = Modifier.padding(20.dp)
                     )
 
-                    DailyWeather(hourlyForecast)
+                    HourlyWeather(hourlyForecast)
 
                     Text(
                         text = "Condiciones diarias",
@@ -173,15 +164,15 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                             .height(140.dp)
                     ) {
                         WindCardContent(
-                            windSpeed = windSpeed,
-                            windDirection = windDeg,
+                            windSpeed = weather!!.wind.speed,
+                            windDirection = weather!!.wind.deg,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         HumidityCard(
-                            humity = humidity,
+                            humity = weather!!.main.humidity,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
@@ -189,9 +180,9 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                     }
 
                     SunriseSunsetCardContent(
-                        sunriseHour = sunrise,
-                        sunsetHour = sunset,
-                        currentTime = datetime
+                        sunriseHour = weather!!.sys.sunrise,
+                        sunsetHour = weather!!.sys.sunset,
+                        currentTime = weather!!.dt,
                     )
                 }
                 PullToRefreshContainer(

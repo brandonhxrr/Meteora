@@ -2,9 +2,9 @@ package ipn.escom.meteora.data.weather.data.network
 
 import android.util.Log
 import ipn.escom.meteora.core.network.RetrofitHelper
-import ipn.escom.meteora.data.weather.Weather
 import ipn.escom.meteora.data.weather.data.network.response.DailyForecastResponse
 import ipn.escom.meteora.data.weather.data.network.response.HourlyForecastResponse
+import ipn.escom.meteora.data.weather.data.network.response.WeatherResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -15,7 +15,7 @@ class WeatherService {
     private val retrofitAPI = RetrofitHelper.getRetrofit("https://api.openweathermap.org/data/2.5/")
     private val retrofitPro = RetrofitHelper.getRetrofit("https://pro.openweathermap.org/data/2.5/")
 
-    suspend fun getWeather(apiKey: String, lat: Double, lon: Double): Weather? {
+    suspend fun getWeather(apiKey: String, lat: Double, lon: Double): WeatherResponse? {
         return withContext(Dispatchers.IO) {
             try {
                 val response =
