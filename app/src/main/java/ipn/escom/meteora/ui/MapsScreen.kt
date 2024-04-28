@@ -31,16 +31,6 @@ fun Maps(modifier: Modifier) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier.weight(1f)
-        ) {
-            when (selectedIndex) {
-                0 -> MeteoblueWidget("temperature")
-                1 -> MeteoblueWidget("cloudsAndPrecipitation")
-                2 -> MeteoblueWidget("windAnimation")
-            }
-        }
-
         SingleChoiceSegmentedButtonRow(modifier = Modifier.padding(16.dp)) {
             options.forEachIndexed { index, label ->
                 SegmentedButton(
@@ -50,6 +40,15 @@ fun Maps(modifier: Modifier) {
                 ) {
                     Text(text = label)
                 }
+            }
+        }
+        Box(
+            modifier = Modifier.weight(1f)
+        ) {
+            when (selectedIndex) {
+                0 -> MeteoblueWidget("temperature")
+                1 -> MeteoblueWidget("cloudsAndPrecipitation")
+                2 -> MeteoblueWidget("windAnimation")
             }
         }
     }

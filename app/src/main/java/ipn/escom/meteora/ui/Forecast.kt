@@ -50,7 +50,6 @@ import ipn.escom.meteora.data.weather.WeatherCondition
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.utils.RequestLocationPermission
 import ipn.escom.meteora.utils.getCurrentTime
-import ipn.escom.meteora.utils.getCurrentTimeLong
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import java.io.BufferedReader
@@ -89,10 +88,12 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
     )
 
     if (refreshState.isRefreshing) {
+
         LaunchedEffect(true) {
             weatherViewModel.getWeather(
                 apiKey = apiKey, lat = location?.latitude!!, lon = location?.longitude!!
             )
+
             delay(1500)
             refreshState.endRefresh()
         }
@@ -102,7 +103,7 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
     RequestLocationPermission(isLocationPermissionGranted)
 
     LaunchedEffect(isLocationPermissionGranted.value, true) {
-        location = getLocation(fusedLocationClient, isLocationPermissionGranted)
+        location = getLocation(fusedLocationClient, isLocationPermissionGranted, context)
         postalCode = getPostalCode(context, location)
     }
 
@@ -261,16 +262,17 @@ fun LocationIndicator(postalCode: String? = null) {
 @SuppressLint("MissingPermission")
 suspend fun getLocation(
     fusedLocationClient: FusedLocationProviderClient,
-    isLocationPermissionGranted: MutableState<Boolean>
+    isLocationPermissionGranted: MutableState<Boolean>,
+    context: Context
 ): Location? {
-    if (isLocationPermissionGranted.value) {
+    if (isLocationPermissionGranted.value && isNetworkAvailable(context) && isInternetAvailable()) {
         try {
             return fusedLocationClient.lastLocation.await()
         } catch (e: Exception) {
             Log.e("LocationProvider", "Error getting location: ${e.message}", e)
         }
     } else {
-        Log.e("LocationProvider", "Location permissions not granted")
+        Log.e("LocationProvider", "Location permissions not granted or no internet connection")
     }
     return null
 }

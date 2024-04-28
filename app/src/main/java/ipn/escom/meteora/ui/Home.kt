@@ -59,8 +59,14 @@ fun Home(navController: NavController?) {
     val context = LocalContext.current
 
     var selectedItem by remember { mutableIntStateOf(0) }
-    var hasInternetAccess by remember { mutableStateOf(isInternetAvailable(context)) }
+    var hasInternetAccess: Boolean by remember {
+        mutableStateOf(true)
+    }
     val state = rememberPullToRefreshState()
+
+    LaunchedEffect(true) {
+        hasInternetAccess = isNetworkAvailable(context)
+    }
 
     if (state.isRefreshing) {
         LaunchedEffect(true) {
