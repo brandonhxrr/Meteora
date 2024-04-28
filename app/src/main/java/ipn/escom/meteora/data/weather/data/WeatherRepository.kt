@@ -7,4 +7,8 @@ class WeatherRepository {
 
     suspend fun getWeather(apiKey: String, lat: Double, lon: Double) = api.getWeather(apiKey, lat, lon)
 
+    suspend fun getHourlyForecast(apiKey: String, lat: Double, lon: Double) = api.getHourlyForecast(apiKey, lat, lon)
+
+    suspend fun getDailyForecast(apiKey: String, lat: Double, lon: Double) = api.getDailyForecast(apiKey, lat, lon)
+
 }

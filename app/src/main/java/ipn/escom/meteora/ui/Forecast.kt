@@ -78,6 +78,8 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
     val isLocationPermissionGranted = remember { mutableStateOf(false) }
     val refreshState = rememberPullToRefreshState()
     val code: String by weatherViewModel.weatherIcon.observeAsState(initial = "")
+    val hourlyForecast by weatherViewModel.hourlyForecast.observeAsState(initial = null)
+    val dailyForecast by weatherViewModel.dailyForecast.observeAsState(initial = null)
 
     val weatherCondition = WeatherCondition(
         location = name,
@@ -91,6 +93,14 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
 
         LaunchedEffect(true) {
             weatherViewModel.getWeather(
+                apiKey = apiKey, lat = location?.latitude!!, lon = location?.longitude!!
+            )
+
+            weatherViewModel.getDailyForecast(
+                apiKey = apiKey, lat = location?.latitude!!, lon = location?.longitude!!
+            )
+
+            weatherViewModel.getHourlyForecast(
                 apiKey = apiKey, lat = location?.latitude!!, lon = location?.longitude!!
             )
 
@@ -109,6 +119,13 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
 
     if (location != null) {
         weatherViewModel.getWeather(
+            apiKey = apiKey, lat = location?.latitude!!, lon = location?.longitude!!
+        )
+        weatherViewModel.getDailyForecast(
+            apiKey = apiKey, lat = location?.latitude!!, lon = location?.longitude!!
+        )
+
+        weatherViewModel.getHourlyForecast(
             apiKey = apiKey, lat = location?.latitude!!, lon = location?.longitude!!
         )
         Log.d("Forecast", "Location: ${location?.latitude}, ${location?.longitude}")
@@ -135,6 +152,14 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                             animatedIcon = weatherCondition.getAnimatedIcon()
                         )
                     }
+
+                    Text(
+                        text = "Pronóstico por hora",
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.padding(20.dp)
+                    )
+
+                    DailyWeather(hourlyForecast)
 
                     Text(
                         text = "Condiciones diarias",
@@ -168,13 +193,6 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                         sunsetHour = sunset,
                         currentTime = datetime
                     )
-
-                    Text(
-                        text = "Pronóstico",
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.padding(20.dp)
-                    )
-                    DailyWeather()
                 }
                 PullToRefreshContainer(
                     state = refreshState, modifier = Modifier.align(Alignment.TopCenter)

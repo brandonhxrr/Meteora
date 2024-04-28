@@ -11,4 +11,6 @@ class WeatherUseCase {
         return repository.getWeather(apiKey, lat, lon)
     }
 
+
+
 }

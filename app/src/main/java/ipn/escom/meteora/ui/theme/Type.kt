@@ -17,6 +17,10 @@ val Typography = Typography(
         fontFamily = FontFamily(Font(R.font.space_grotesk_medium)),
         fontSize = 16.sp
     ),
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily(Font(R.font.space_grotesk_medium)),
+        fontSize = 18.sp
+    ),
     headlineMedium = TextStyle(
         fontFamily = FontFamily(Font(R.font.clash_display)),
         fontWeight = FontWeight.Bold,

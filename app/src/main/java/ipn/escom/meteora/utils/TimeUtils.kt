@@ -6,6 +6,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -35,10 +36,15 @@ fun getHourWithMinutesString(time: Long): String {
     return "$hourFormatted:$minute $amPm"
 }
 
-
 fun Long.getHoursAndMinutesDiff(other: Long): Pair<Int, Int> {
     val diffInSeconds = kotlin.math.abs(this - other)
     val hours = (diffInSeconds / 3600).toInt()
     val minutes = ((diffInSeconds % 3600) / 60).toInt()
     return Pair(hours, minutes)
+}
+
+fun calculateTimestamps(): Int {
+    val now = LocalDateTime.now()
+    val nextDaySixAM = now.plusDays(1).withHour(7).withMinute(0).withSecond(0).withNano(0)
+    return ChronoUnit.HOURS.between(now, nextDaySixAM).toInt()
 }

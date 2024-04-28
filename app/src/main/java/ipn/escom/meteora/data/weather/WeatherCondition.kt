@@ -47,19 +47,24 @@ data class WeatherCondition(
 
     @RawRes
     fun getAnimatedIcon(): Int {
-        return when (code) {
-            "01d" -> R.raw.weather_sunny
-            "01n" -> R.raw.weather_night
-            "02d" -> R.raw.weather_partly_cloudy
-            "02n" -> R.raw.weather_cloudynight
-            "03d", "03n", "04d", "04n" -> R.raw.weather_windy
-            "09d", "09n", "10d", "10n" -> R.raw.weather_partly_shower
-            "11d" -> R.raw.weather_stormshowersday
-            "11n" -> R.raw.weather_storm
-            "13d" -> R.raw.weather_snow_sunny
-            "13n" -> R.raw.weather_snownight
-            "50d", "50n" -> R.raw.weather_mist
-            else -> R.raw.weather_sunny
-        }
+        return getAnimatedIcon(code)
+    }
+}
+
+@RawRes
+fun getAnimatedIcon(code: String): Int {
+    return when (code) {
+        "01d" -> R.raw.weather_sunny
+        "01n" -> R.raw.weather_night
+        "02d" -> R.raw.weather_partly_cloudy
+        "02n" -> R.raw.weather_cloudynight
+        "03d", "03n", "04d", "04n" -> R.raw.weather_windy
+        "09d", "09n", "10d", "10n" -> R.raw.weather_partly_shower
+        "11d" -> R.raw.weather_stormshowersday
+        "11n" -> R.raw.weather_storm
+        "13d" -> R.raw.weather_snow_sunny
+        "13n" -> R.raw.weather_snownight
+        "50d", "50n" -> R.raw.weather_mist
+        else -> R.raw.weather_sunny
     }
 }

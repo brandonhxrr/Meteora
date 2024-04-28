@@ -4,12 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ipn.escom.meteora.data.weather.data.network.response.DailyForecastResponse
+import ipn.escom.meteora.data.weather.data.network.response.HourlyForecastResponse
+import ipn.escom.meteora.data.weather.domain.DailyForecastUseCase
+import ipn.escom.meteora.data.weather.domain.HourlyForecastUseCase
 import ipn.escom.meteora.data.weather.domain.WeatherUseCase
 import kotlinx.coroutines.launch
 
 class WeatherViewModel : ViewModel() {
 
     private val weatherUseCase = WeatherUseCase()
+    private val dailyForecastUseCase = DailyForecastUseCase()
+    private val hourlyForecastUseCase = HourlyForecastUseCase()
 
     private val _coordLon = MutableLiveData<Double>()
     val coordLon: LiveData<Double> = _coordLon
@@ -104,6 +110,12 @@ class WeatherViewModel : ViewModel() {
     private val _cod = MutableLiveData<Int>()
     val cod: LiveData<Int> = _cod
 
+    private val _hourlyForecast = MutableLiveData<HourlyForecastResponse?>()
+    val hourlyForecast: MutableLiveData<HourlyForecastResponse?> = _hourlyForecast
+
+    private val _dailyForecast = MutableLiveData<DailyForecastResponse?>()
+    val dailyForecast: MutableLiveData<DailyForecastResponse?> = _dailyForecast
+
     fun getWeather(apiKey: String, lat: Double, lon: Double) {
         viewModelScope.launch {
             val response = weatherUseCase(apiKey, lat, lon)
@@ -141,6 +153,20 @@ class WeatherViewModel : ViewModel() {
                 _name.value = response.name
                 _cod.value = response.cod
             }
+        }
+    }
+
+    fun getHourlyForecast(apiKey: String, lat: Double, lon: Double) {
+        viewModelScope.launch {
+            val response = hourlyForecastUseCase(apiKey, lat, lon)
+            _hourlyForecast.value = response
+        }
+    }
+
+    fun getDailyForecast(apiKey: String, lat: Double, lon: Double) {
+        viewModelScope.launch {
+            val response = dailyForecastUseCase(apiKey, lat, lon)
+            _dailyForecast.value = response
         }
     }
 }
