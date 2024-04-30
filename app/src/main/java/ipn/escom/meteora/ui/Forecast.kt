@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.DailyWeather
 import ipn.escom.meteora.data.weather.WeatherCondition
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.data.weather.data.network.response.WeatherResponse
@@ -184,6 +185,9 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                         sunsetHour = weather!!.sys.sunset,
                         currentTime = weather!!.dt,
                     )
+
+                    Text(text = "Pronóstico extendido", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(20.dp))
+                    DailyWeather(dailyForecast)
                 }
                 PullToRefreshContainer(
                     state = refreshState, modifier = Modifier.align(Alignment.TopCenter)

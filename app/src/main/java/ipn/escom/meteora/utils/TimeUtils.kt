@@ -1,11 +1,14 @@
 package ipn.escom.meteora.utils
 
+import androidx.compose.ui.text.capitalize
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 fun getCurrentTime(): String {
     val currentTime = LocalTime.now()
@@ -26,6 +29,18 @@ fun getDateString(time: Long): String {
     val dateTime = LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC)
     val formatter = DateTimeFormatter.ofPattern("EEEE, dd/MM/yyyy")
     return dateTime.format(formatter)
+}
+
+fun getOnlyDateString(time: Long): String {
+    val dateTime = LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC)
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    return dateTime.format(formatter)
+}
+
+fun getDayOfWeekFromLong(time: Long): String {
+    val dateTime = LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC)
+    return dateTime.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
+        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
 }
 
 fun getHourWithMinutesString(time: Long): String {
