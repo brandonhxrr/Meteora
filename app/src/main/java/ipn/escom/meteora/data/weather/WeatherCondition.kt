@@ -10,17 +10,7 @@ data class WeatherCondition(
 ) {
 
     fun getDescription(): Int {
-        return when (weather.weather[0].icon) {
-            "01d" -> R.string.condition_sunny
-            "01n" -> R.string.condition_clear
-            "02d", "02n" -> R.string.condition_partly_cloudy
-            "03d", "03n", "04d", "04n" -> R.string.condition_cloudy
-            "09d", "09n", "10d", "10n" -> R.string.condition_rain
-            "11d", "11n" -> R.string.condition_thunderstorm
-            "13d", "13n" -> R.string.condition_snow
-            "50d", "50n" -> R.string.condition_mist
-            else -> R.string.condition_sunny
-        }
+        return getDescription(weather.weather[0].icon)
     }
 
     @DrawableRes
@@ -63,5 +53,19 @@ fun getAnimatedIcon(code: String): Int {
         "13n" -> R.raw.weather_snownight
         "50d", "50n" -> R.raw.weather_mist
         else -> R.raw.weather_sunny
+    }
+}
+
+fun getDescription(code: String): Int {
+    return when (code) {
+        "01d" -> R.string.condition_sunny
+        "01n" -> R.string.condition_clear
+        "02d", "02n" -> R.string.condition_partly_cloudy
+        "03d", "03n", "04d", "04n" -> R.string.condition_cloudy
+        "09d", "09n", "10d", "10n" -> R.string.condition_rain
+        "11d", "11n" -> R.string.condition_thunderstorm
+        "13d", "13n" -> R.string.condition_snow
+        "50d", "50n" -> R.string.condition_mist
+        else -> R.string.condition_sunny
     }
 }

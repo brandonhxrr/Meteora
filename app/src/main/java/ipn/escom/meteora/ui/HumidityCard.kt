@@ -17,22 +17,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.ui.theme.amber
 import ipn.escom.meteora.ui.theme.amberLight
 
 @Composable
-fun HumidityCard(humity: Int, modifier: Modifier = Modifier) {
+fun HumidityCard(humity: Int, hiddenIcon: Boolean = false, modifier: Modifier = Modifier) {
     ParameterCard(title = "Humedad", modifier = modifier) {
-        Row {
+        Row(modifier = Modifier.fillMaxHeight()) {
             Text(
                 text = "$humity%",
                 style = MaterialTheme.typography.titleSmall,
-                modifier = Modifier.align(Alignment.CenterVertically)
+                modifier = Modifier.align(Alignment.CenterVertically),
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.width(32.dp))
-            HumidityVisualizer(humity)
+            if (!hiddenIcon) {
+                HumidityVisualizer(humity)
+            }
         }
     }
 

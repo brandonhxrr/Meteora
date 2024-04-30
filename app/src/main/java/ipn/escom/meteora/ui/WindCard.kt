@@ -32,6 +32,7 @@ import ipn.escom.meteora.R
 fun WindCardContent(
     windSpeed: Double,
     windDirection: Int,
+    hiddenIcon: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     ParameterCard(title = "Viento", modifier = modifier) {
@@ -78,10 +79,12 @@ fun WindCardContent(
                     modifier = Modifier
                 )
             }
-            WindDirectionsVisualizer(
-                windDirection,
-                Modifier.align(Alignment.CenterVertically)
-            )
+            if(!hiddenIcon){
+                WindDirectionsVisualizer(
+                    windDirection,
+                    Modifier.align(Alignment.CenterVertically)
+                )
+            }
         }
     }
 }
