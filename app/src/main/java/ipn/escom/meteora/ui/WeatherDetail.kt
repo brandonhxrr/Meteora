@@ -1,6 +1,8 @@
 package ipn.escom.meteora.ui
 
 import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -8,11 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,14 +32,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import ipn.escom.meteora.data.weather.WeatherViewModel
+import ipn.escom.meteora.data.weather.data.network.response.DailyForecast
 import ipn.escom.meteora.data.weather.data.network.response.HourlyForecast
 import ipn.escom.meteora.data.weather.getAnimatedIcon
 import ipn.escom.meteora.data.weather.getDescription
+import ipn.escom.meteora.utils.getDayFromLong
 import ipn.escom.meteora.utils.getDayOfWeekFromLong
 import ipn.escom.meteora.utils.getLocalDateString
-import ipn.escom.meteora.utils.getOnlyDateString
 
 @Composable
 fun WeatherDetailScreen(
@@ -46,11 +57,16 @@ fun WeatherDetailScreen(
 
     val dailyForecast by weatherViewModel.dailyForecast.observeAsState()
     val hourlyForecast by weatherViewModel.hourlyForecast.observeAsState()
-    val selectedDayForecast = dailyForecast?.list?.find { it.dt.toString() == timestamp }
-    val selectedHourlyForecast = hourlyForecast?.list?.filter {
-        getLocalDateString(it.dt) == getLocalDateString(
-            selectedDayForecast?.dt ?: 0
-        )
+    var selectedDayForecast by remember {
+        mutableStateOf(dailyForecast?.list?.find { it.dt.toString() == timestamp })
+    }
+    var selectedHourlyForecast by remember {
+        mutableStateOf(
+            hourlyForecast?.list?.filter {
+                getLocalDateString(it.dt) == getLocalDateString(
+                    selectedDayForecast?.dt ?: 0
+                )
+            })
     }
     var showDialog by remember { mutableStateOf(false) }
     var selectedForecast by remember { mutableStateOf<HourlyForecast?>(null) }
@@ -59,11 +75,11 @@ fun WeatherDetailScreen(
         topBar = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { navController.navigateUp() }) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = getOnlyDateString(selectedDayForecast?.dt ?: 0),
+                    text = "Pronóstico extendido",
                     style = MaterialTheme.typography.headlineMedium
                 )
             }
@@ -74,6 +90,28 @@ fun WeatherDetailScreen(
                 .padding(it)
                 .fillMaxSize()
         ) {
+            item {
+                if (dailyForecast != null) {
+                    LazyRow(modifier = Modifier.padding(16.dp)) {
+                        items(dailyForecast!!.list.size) { index ->
+                            DailyForecastCard(
+                                dailyForecast = dailyForecast!!.list[index],
+                                selected = dailyForecast!!.list[index] == selectedDayForecast
+                            ) {
+                                selectedDayForecast = dailyForecast!!.list[index]
+
+                                selectedHourlyForecast =
+                                    hourlyForecast?.list?.filter { filteredForecast ->
+                                        getLocalDateString(filteredForecast.dt) == getLocalDateString(
+                                            selectedDayForecast?.dt ?: 0
+                                        )
+                                    }
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+                    }
+                }
+            }
             item {
                 selectedDayForecast?.let { weather ->
                     ParameterCard(
@@ -90,24 +128,27 @@ fun WeatherDetailScreen(
                         )
                     }
 
-                    if(!selectedHourlyForecast.isNullOrEmpty()) {
-                        Log.d("WeatherDetailScreen", "selectedHourlyForecast: $selectedHourlyForecast")
+                    if (!selectedHourlyForecast.isNullOrEmpty()) {
+                        Log.d(
+                            "WeatherDetailScreen",
+                            "selectedHourlyForecast: $selectedHourlyForecast"
+                        )
                         Text(
                             text = "Pronóstico por hora",
                             style = MaterialTheme.typography.headlineMedium,
                             modifier = Modifier.padding(20.dp)
                         )
                         LazyRow(modifier = Modifier.padding(horizontal = 16.dp)) {
-                            items(selectedHourlyForecast.size) { index ->
-                                HourlyWeatherCard(hourlyForecast = selectedHourlyForecast[index]) {
-                                    selectedForecast = selectedHourlyForecast[index]
+                            items(selectedHourlyForecast!!.size) { index ->
+                                HourlyWeatherCard(hourlyForecast = selectedHourlyForecast!![index]) {
+                                    selectedForecast = selectedHourlyForecast!![index]
                                     showDialog = true
                                 }
                                 Spacer(modifier = Modifier.width(16.dp))
                                 HourlyForecastDialog(
                                     showDialog = showDialog,
                                     onDismiss = { showDialog = false },
-                                    selectedForecast = selectedHourlyForecast[index]
+                                    selectedForecast = selectedHourlyForecast!![index]
                                 )
                             }
                         }
@@ -149,6 +190,56 @@ fun WeatherDetailScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun DailyForecastCard(dailyForecast: DailyForecast, selected: Boolean, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .width(80.dp)
+            .height(120.dp)
+            .clickable(onClick = onClick),
+        colors = CardColors(
+            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+            contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+            disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.38f)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(4.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            val composition by rememberLottieComposition(
+                LottieCompositionSpec.RawRes(getAnimatedIcon(dailyForecast.weather[0].icon))
+            )
+            Text(
+                text = "${getDayOfWeekFromLong(dailyForecast.dt)}, ${getDayFromLong(dailyForecast.dt)}", modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = 10.dp), style = MaterialTheme.typography.bodySmall,
+                fontSize = 12.sp
+            )
+
+            LottieAnimation(
+                composition = composition,
+                iterations = LottieConstants.IterateForever,
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .size(36.dp),
+            )
+
+            Text(
+                text = "${dailyForecast.temp.max.toInt()}° / ${dailyForecast.temp.min.toInt()}°",
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 4.dp),
+                style = MaterialTheme.typography.bodySmall,
+                fontSize = 12.sp
+            )
         }
     }
 }

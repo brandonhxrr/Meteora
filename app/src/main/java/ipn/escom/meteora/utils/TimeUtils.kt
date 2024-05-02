@@ -27,6 +27,11 @@ fun getHourOfDayFromLong(time: Long): Int {
     return dateTime.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault()).hour
 }
 
+fun getDayFromLong(time: Long): Int{
+    val dateTime = LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC)
+    return dateTime.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault()).dayOfMonth
+}
+
 fun getLocalDateString(time: Long): String {
     val zoneId = ZoneId.systemDefault()
     val dateTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(time), zoneId)
