@@ -43,10 +43,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import ipn.escom.meteora.R
-import ipn.escom.meteora.data.DailyWeather
 import ipn.escom.meteora.data.weather.WeatherCondition
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.data.weather.data.network.response.WeatherResponse
@@ -60,7 +60,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
+fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel, navController: NavController? = null) {
 
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
@@ -187,7 +187,7 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel) {
                     )
 
                     Text(text = "Pronóstico extendido", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(20.dp))
-                    DailyWeather(dailyForecast)
+                    DailyWeather(weather!!.name, dailyForecast, navController)
                 }
                 PullToRefreshContainer(
                     state = refreshState, modifier = Modifier.align(Alignment.TopCenter)

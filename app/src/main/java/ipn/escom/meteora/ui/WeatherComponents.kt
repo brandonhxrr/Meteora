@@ -205,7 +205,7 @@ fun CurrentWeatherContent(
     temperature: Double,
     feelsLike: Double,
     description: Int,
-    icon: Int,
+    icon: Int? = null,
     animatedIcon: Int
 ) {
     Column(

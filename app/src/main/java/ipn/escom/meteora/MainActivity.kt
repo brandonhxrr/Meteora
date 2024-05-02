@@ -2,6 +2,7 @@ package ipn.escom.meteora
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,10 +19,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import ipn.escom.meteora.data.login.LoginViewModel
 import ipn.escom.meteora.data.signup.SignUpViewModel
+import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.ui.Home
 import ipn.escom.meteora.ui.Screens
 import ipn.escom.meteora.ui.SplashScreen
 import ipn.escom.meteora.ui.UserScreen
+import ipn.escom.meteora.ui.WeatherDetailScreen
 import ipn.escom.meteora.ui.login.Login
 import ipn.escom.meteora.ui.login.SignUp1
 import ipn.escom.meteora.ui.login.SignUp2
@@ -88,8 +91,24 @@ fun Start() {
             timer.start()
 
         }
+        val weatherViewModel = WeatherViewModel()
+
         composable(Screens.Home.name) {
-            Home(navController = navController)
+            Home(navController = navController, weatherViewModel = weatherViewModel)
+        }
+
+        composable("dailyForecast/{town}/{timestamp}") { backStackEntry ->
+            val town = backStackEntry.arguments?.getString("town")
+            Log.d("town", town ?: "null")
+            val timestamp = backStackEntry.arguments?.getString("timestamp")
+            Log.d("timestamp", timestamp ?: "null")
+
+            WeatherDetailScreen(
+                town = town,
+                timestamp = timestamp,
+                weatherViewModel = weatherViewModel,
+                navController = navController
+            )
         }
 
         composable(Screens.Login.name) {

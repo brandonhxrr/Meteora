@@ -55,7 +55,7 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun Home(navController: NavController?) {
+fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
     val context = LocalContext.current
 
     var selectedItem by remember { mutableIntStateOf(0) }
@@ -168,7 +168,7 @@ fun Home(navController: NavController?) {
             if (hasInternetAccess) {
                 when (selectedItem) {
                     0 -> {
-                        Forecast(modifier = Modifier.padding(it), WeatherViewModel())
+                        Forecast(modifier = Modifier.padding(it), weatherViewModel!!, navController)
                     }
 
                     1 -> {
@@ -176,7 +176,7 @@ fun Home(navController: NavController?) {
                     }
 
                     else -> {
-                        Forecast(modifier = Modifier.padding(it), WeatherViewModel())
+                        Forecast(modifier = Modifier.padding(it), weatherViewModel!!, navController)
                     }
                 }
             } else {
@@ -197,5 +197,5 @@ fun Home(navController: NavController?) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
-    Home(null)
+    Home(null, null)
 }

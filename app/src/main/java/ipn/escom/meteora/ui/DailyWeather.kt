@@ -1,5 +1,6 @@
-package ipn.escom.meteora.data
+package ipn.escom.meteora.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -27,22 +29,30 @@ import ipn.escom.meteora.utils.getDayOfWeekFromLong
 import ipn.escom.meteora.utils.getOnlyDateString
 
 @Composable
-fun DailyWeather(dailyForecastResponse: DailyForecastResponse? = null) {
+fun DailyWeather(
+    town: String,
+    dailyForecastResponse: DailyForecastResponse? = null,
+    navController: NavController?
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
     ) {
-        dailyForecastResponse?.list?.take(7)?.forEach {
-            DailyWeatherCard(it)
+        dailyForecastResponse?.list?.forEach {
+            DailyWeatherCard(town, it, navController)
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
 @Composable
-fun DailyWeatherCard(dailyForecast: DailyForecast) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+fun DailyWeatherCard(town: String, dailyForecast: DailyForecast, navController: NavController?) {
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .clickable {
+            navController?.navigate("dailyForecast/${town}/${dailyForecast.dt}")
+        }) {
         Row(modifier = Modifier.padding(16.dp)) {
             Column {
                 Text(
