@@ -56,9 +56,53 @@ fun HourlyWeather(hourlyForecastResponse: HourlyForecastResponse? = null) {
         }
     }
 
+    HourlyForecastDialog(showDialog, { showDialog = false }, selectedForecast)
+
+}
+
+@Composable
+fun HourlyWeatherCard(hourlyForecast: HourlyForecast, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .width(120.dp)
+            .height(180.dp)
+            .clickable(onClick = onClick)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            val composition by rememberLottieComposition(
+                LottieCompositionSpec.RawRes(getAnimatedIcon(hourlyForecast.weather[0].icon))
+            )
+            LottieAnimation(
+                composition = composition,
+                iterations = LottieConstants.IterateForever,
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .size(48.dp),
+            )
+            Text(
+                text = getHourWithMinutesString(hourlyForecast.dt), modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = 10.dp), style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = hourlyForecast.main.temp.toString() + " °C", modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 4.dp), style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+fun HourlyForecastDialog(showDialog: Boolean, onDismiss: () -> Unit, selectedForecast: HourlyForecast?) {
     if (showDialog) {
         AlertDialog(
-            onDismissRequest = { showDialog = false },
+            onDismissRequest = onDismiss,
             title = {
                 Column {
                     Text(
@@ -124,50 +168,11 @@ fun HourlyWeather(hourlyForecastResponse: HourlyForecastResponse? = null) {
                 }
             },
             confirmButton = {
-                Button(onClick = { showDialog = false }) {
+                Button(onClick = onDismiss) {
                     Text("Close")
                 }
             }
         )
-    }
-
-}
-
-@Composable
-fun HourlyWeatherCard(hourlyForecast: HourlyForecast, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .width(120.dp)
-            .height(180.dp)
-            .clickable(onClick = onClick)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.CenterHorizontally)
-        ) {
-            val composition by rememberLottieComposition(
-                LottieCompositionSpec.RawRes(getAnimatedIcon(hourlyForecast.weather[0].icon))
-            )
-            LottieAnimation(
-                composition = composition,
-                iterations = LottieConstants.IterateForever,
-                modifier = Modifier
-                    .padding(top = 4.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .size(48.dp),
-            )
-            Text(
-                text = getHourWithMinutesString(hourlyForecast.dt), modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 10.dp), style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = hourlyForecast.main.temp.toString() + " °C", modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 4.dp), style = MaterialTheme.typography.bodyMedium
-            )
-        }
     }
 }
 

@@ -1,10 +1,12 @@
 package ipn.escom.meteora.utils
 
 import androidx.compose.ui.text.capitalize
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
@@ -23,6 +25,13 @@ fun getCurrentTimeLong(): Long {
 fun getHourOfDayFromLong(time: Long): Int {
     val dateTime = LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC)
     return dateTime.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault()).hour
+}
+
+fun getLocalDateString(time: Long): String {
+    val zoneId = ZoneId.systemDefault()
+    val dateTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(time), zoneId)
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    return dateTime.format(formatter)
 }
 
 fun getDateString(time: Long): String {

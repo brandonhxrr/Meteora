@@ -32,7 +32,8 @@ interface WeatherClient {
         @Query("lon") lon: Double,
         @Query("appid") apiKey: String,
         @Query("units") units: String = "metric",
-        @Query("lang") lang: String = "es"
+        @Query("lang") lang: String = "es",
+        @Query("cnt") cnt: Int = 17
     ): Response<DailyForecastResponse>
 
 
