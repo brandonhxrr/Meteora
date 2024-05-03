@@ -31,4 +31,5 @@
     <string name="remaining_daylight_x">Luz del día restante:\u00A0</string>
     <string name="hours_minutes_x_y" formatted="false">%dh %dm</string>
     <string name="minutes_x">%dm</string>
+    <string name="date_format">EEEE, dd \'de\' MMMM</string>
 </resources>

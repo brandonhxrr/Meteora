@@ -45,6 +45,7 @@ import ipn.escom.meteora.data.weather.getAnimatedIcon
 import ipn.escom.meteora.data.weather.getDescription
 import ipn.escom.meteora.utils.getDayFromLong
 import ipn.escom.meteora.utils.getDayOfWeekFromLong
+import ipn.escom.meteora.utils.getFormattedDate
 import ipn.escom.meteora.utils.getLocalDateString
 
 @Composable
@@ -116,11 +117,11 @@ fun WeatherDetailScreen(
                 selectedDayForecast?.let { weather ->
                     ParameterCard(
                         title = "",
-                        modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
                         CurrentWeatherContent(
                             location = town ?: "",
-                            time = getDayOfWeekFromLong(weather.dt),
+                            time = getFormattedDate(weather.dt),
                             temperature = weather.temp.day,
                             feelsLike = weather.feels_like.day,
                             description = getDescription(weather.weather[0].icon),

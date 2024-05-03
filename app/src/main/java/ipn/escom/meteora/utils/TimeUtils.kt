@@ -1,6 +1,8 @@
 package ipn.escom.meteora.utils
 
-import androidx.compose.ui.text.capitalize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import ipn.escom.meteora.R
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -18,6 +20,15 @@ fun getCurrentTime(): String {
     return currentTime.format(formatter)
 }
 
+@Composable
+fun getFormattedDate(time: Long): String {
+    val zoneId = ZoneId.systemDefault()
+    val dateTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(time), zoneId)
+    val formatter = DateTimeFormatter.ofPattern(stringResource(id = R.string.date_format))
+    return dateTime.format(formatter)
+        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
+}
+
 fun getCurrentTimeLong(): Long {
     return LocalTime.now().toSecondOfDay().toLong()
 }
@@ -27,7 +38,7 @@ fun getHourOfDayFromLong(time: Long): Int {
     return dateTime.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault()).hour
 }
 
-fun getDayFromLong(time: Long): Int{
+fun getDayFromLong(time: Long): Int {
     val dateTime = LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC)
     return dateTime.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.systemDefault()).dayOfMonth
 }
