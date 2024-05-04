@@ -165,7 +165,7 @@ fun Forecast(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp)
                             .height(140.dp)
                     ) {
                         WindCardContent(
@@ -184,6 +184,8 @@ fun Forecast(
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     SunriseSunsetCardContent(
                         sunriseHour = weather!!.sys.sunrise,
                         sunsetHour = weather!!.sys.sunset,
@@ -201,8 +203,6 @@ fun Forecast(
                     state = refreshState, modifier = Modifier.align(Alignment.TopCenter)
                 )
             }
-
-
         }
     }
 }

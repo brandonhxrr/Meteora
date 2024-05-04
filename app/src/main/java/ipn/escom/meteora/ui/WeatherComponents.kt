@@ -205,6 +205,8 @@ fun CurrentWeatherContent(
     temperature: Double,
     feelsLike: Double,
     description: Int,
+    maxt: Double? = null,
+    mint: Double? = null,
     icon: Int? = null,
     animatedIcon: Int
 ) {
@@ -235,10 +237,17 @@ fun CurrentWeatherContent(
                     fontSize = 45.sp,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
+                if (maxt != null && mint != null) {
+                    Text(
+                        text = "$maxt° / $mint°",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
                 Text(
                     text = "Se siente como $feelsLike °C",
                     style = MaterialTheme.typography.bodyMedium
                 )
+
             }
             Box {
                 Column(

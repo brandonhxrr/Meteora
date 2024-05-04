@@ -39,7 +39,7 @@ fun DailyWeather(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
     ) {
-        dailyForecastResponse?.list?.forEach {
+        dailyForecastResponse?.list?.drop(1)?.forEach {
             DailyWeatherCard(town, it, navController)
             Spacer(modifier = Modifier.height(16.dp))
         }

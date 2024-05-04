@@ -126,6 +126,8 @@ fun WeatherDetailScreen(
                             feelsLike = weather.feels_like.day,
                             description = getDescription(weather.weather[0].icon),
                             animatedIcon = getAnimatedIcon(weather.weather[0].icon),
+                            maxt = weather.temp.max,
+                            mint = weather.temp.min,
                         )
                     }
 
