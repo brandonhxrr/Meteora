@@ -5,6 +5,7 @@ import android.graphics.Path
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,10 +22,39 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.R
-import ipn.escom.meteora.ui.theme.amber
 import ipn.escom.meteora.utils.getHourOfDayFromLong
 import ipn.escom.meteora.utils.getHourWithMinutesString
 import ipn.escom.meteora.utils.getHoursAndMinutesDiff
+
+@Composable
+fun SunriseSunsetMiniCard(
+    sunriseHour: Long,
+    sunsetHour: Long,
+    modifier: Modifier = Modifier
+) {
+    ParameterCard(title = "Horas de luz", modifier = modifier) {
+        Column {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Amanecer",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                text = getHourWithMinutesString(sunriseHour),
+                style = MaterialTheme.typography.titleSmall
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Atardecer",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                text = getHourWithMinutesString(sunsetHour),
+                style = MaterialTheme.typography.titleSmall
+            )
+        }
+    }
+}
 
 @Composable
 fun SunriseSunsetCardContent(
@@ -36,7 +66,10 @@ fun SunriseSunsetCardContent(
     val sunriseHourInt = getHourOfDayFromLong(sunriseHour)
     val sunsetHourInt = getHourOfDayFromLong(sunsetHour)
 
-    ParameterCard(title = stringResource(R.string.sunrise_sunset), modifier = modifier.padding(horizontal = 16.dp)) {
+    ParameterCard(
+        title = stringResource(R.string.sunrise_sunset),
+        modifier = modifier.padding(horizontal = 16.dp)
+    ) {
         Box {
             SunriseSunsetVisualizer(
                 sunriseHour = sunriseHourInt,

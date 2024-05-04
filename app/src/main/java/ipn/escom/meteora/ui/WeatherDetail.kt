@@ -165,7 +165,7 @@ fun WeatherDetailScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp)
                             .height(140.dp)
                     ) {
                         WindCardContent(
@@ -184,11 +184,26 @@ fun WeatherDetailScreen(
                         )
                     }
 
-                    SunriseSunsetCardContent(
-                        sunriseHour = weather.sunrise,
-                        sunsetHour = weather.sunset,
-                        currentTime = weather.dt,
-                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .height(140.dp)
+                    ) {
+                        SunriseSunsetMiniCard(
+                            sunriseHour = weather.sunrise,
+                            sunsetHour = weather.sunset,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        SunriseSunsetMiniCard(
+                            sunriseHour = weather.sunrise,
+                            sunsetHour = weather.sunset,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
                 }
@@ -220,9 +235,11 @@ fun DailyForecastCard(dailyForecast: DailyForecast, selected: Boolean, onClick: 
                 LottieCompositionSpec.RawRes(getAnimatedIcon(dailyForecast.weather[0].icon))
             )
             Text(
-                text = "${getDayOfWeekFromLong(dailyForecast.dt)}, ${getDayFromLong(dailyForecast.dt)}", modifier = Modifier
+                text = "${getDayOfWeekFromLong(dailyForecast.dt)}, ${getDayFromLong(dailyForecast.dt)}",
+                modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 10.dp), style = MaterialTheme.typography.bodySmall,
+                    .padding(vertical = 10.dp),
+                style = MaterialTheme.typography.bodySmall,
                 fontSize = 12.sp
             )
 
