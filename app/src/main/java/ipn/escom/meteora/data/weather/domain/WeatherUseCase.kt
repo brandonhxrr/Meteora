@@ -11,7 +11,4 @@ class WeatherUseCase {
     suspend operator fun invoke(apiKey: String, lat: Double, lon: Double): WeatherResponse? {
         return repository.getWeather(apiKey, lat, lon) as WeatherResponse
     }
-
-
-
 }

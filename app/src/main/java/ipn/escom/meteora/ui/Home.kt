@@ -50,6 +50,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.firebase.auth.FirebaseAuth
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.predictions.PredictionsViewModel
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import kotlinx.coroutines.delay
 
@@ -175,8 +176,12 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                         Maps(modifier = Modifier.padding(it))
                     }
 
-                    else -> {
+                    2 -> {
                         Forecast(modifier = Modifier.padding(it), weatherViewModel!!, navController)
+                    }
+
+                    3 -> {
+                        PredictionsScreen(modifier = Modifier.padding(it), predictionsViewModel = PredictionsViewModel(), navController = navController)
                     }
                 }
             } else {

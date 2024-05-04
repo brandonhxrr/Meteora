@@ -21,6 +21,7 @@ import ipn.escom.meteora.data.login.LoginViewModel
 import ipn.escom.meteora.data.signup.SignUpViewModel
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.ui.Home
+import ipn.escom.meteora.ui.PredictionsScreen
 import ipn.escom.meteora.ui.Screens
 import ipn.escom.meteora.ui.SplashScreen
 import ipn.escom.meteora.ui.UserScreen

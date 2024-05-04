@@ -60,7 +60,11 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel, navController: NavController? = null) {
+fun Forecast(
+    modifier: Modifier,
+    weatherViewModel: WeatherViewModel,
+    navController: NavController? = null
+) {
 
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
@@ -186,7 +190,11 @@ fun Forecast(modifier: Modifier, weatherViewModel: WeatherViewModel, navControll
                         currentTime = weather!!.dt,
                     )
 
-                    Text(text = "Pronóstico extendido", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(20.dp))
+                    Text(
+                        text = "Pronóstico extendido",
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.padding(20.dp)
+                    )
                     DailyWeather(weather!!.name, dailyForecast, navController)
                 }
                 PullToRefreshContainer(
