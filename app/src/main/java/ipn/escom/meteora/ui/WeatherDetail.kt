@@ -198,9 +198,10 @@ fun WeatherDetailScreen(
                             modifier = Modifier.weight(1f)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
-                        SunriseSunsetMiniCard(
-                            sunriseHour = weather.sunrise,
-                            sunsetHour = weather.sunset,
+
+                        RainIndicator(
+                            rain = weather.rain,
+                            pop = weather.pop,
                             modifier = Modifier.weight(1f)
                         )
                     }
