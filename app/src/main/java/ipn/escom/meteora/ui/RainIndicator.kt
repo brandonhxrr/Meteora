@@ -45,7 +45,6 @@ fun RainIndicator(
                 RainVisualizer(pop)
             }
         }
-
     }
 }
 

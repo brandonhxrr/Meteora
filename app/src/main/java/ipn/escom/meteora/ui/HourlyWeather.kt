@@ -2,6 +2,7 @@ package ipn.escom.meteora.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -11,9 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,7 +49,7 @@ fun HourlyWeather(hourlyForecastResponse: HourlyForecastResponse? = null) {
     var showDialog by remember { mutableStateOf(false) }
     var selectedForecast by remember { mutableStateOf<HourlyForecast?>(null) }
 
-    LazyRow(modifier = Modifier.padding(horizontal = 16.dp)) {
+    LazyRow(contentPadding = PaddingValues(start = 16.dp, end = 16.dp)) {
         if (hourlyForecastResponse != null) {
             items(24) { index ->
                 HourlyWeatherCard(hourlyForecastResponse.list[index]) {
@@ -64,17 +69,28 @@ fun HourlyWeather(hourlyForecastResponse: HourlyForecastResponse? = null) {
 fun HourlyWeatherCard(hourlyForecast: HourlyForecast, onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .width(120.dp)
-            .height(180.dp)
-            .clickable(onClick = onClick)
+            .width(90.dp)
+            .height(150.dp)
+            .clickable(onClick = onClick),
+        colors = CardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+            disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.38f)
+        )
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(8.dp)
                 .align(Alignment.CenterHorizontally)
         ) {
             val composition by rememberLottieComposition(
                 LottieCompositionSpec.RawRes(getAnimatedIcon(hourlyForecast.weather[0].icon))
+            )
+            Text(
+                text = "${hourlyForecast.main.temp}°", modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 4.dp), style = MaterialTheme.typography.bodyMedium
             )
             LottieAnimation(
                 composition = composition,
@@ -87,19 +103,34 @@ fun HourlyWeatherCard(hourlyForecast: HourlyForecast, onClick: () -> Unit) {
             Text(
                 text = getHourWithMinutesString(hourlyForecast.dt), modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 10.dp), style = MaterialTheme.typography.bodyLarge
+                    .padding(vertical = 10.dp), style = MaterialTheme.typography.bodyMedium
             )
-            Text(
-                text = hourlyForecast.main.temp.toString() + " °C", modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 4.dp), style = MaterialTheme.typography.bodyMedium
-            )
+            if (hourlyForecast.pop > 0.0) {
+                Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    Icon(
+                        imageVector = Icons.Rounded.WaterDrop,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "${hourlyForecast.pop * 100}%",
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-fun HourlyForecastDialog(showDialog: Boolean, onDismiss: () -> Unit, selectedForecast: HourlyForecast?) {
+fun HourlyForecastDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    selectedForecast: HourlyForecast?
+) {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = onDismiss,
@@ -108,12 +139,16 @@ fun HourlyForecastDialog(showDialog: Boolean, onDismiss: () -> Unit, selectedFor
                     Text(
                         text = getDateString(selectedForecast?.dt ?: 0),
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally)
                     )
                     Text(
                         text = getHourWithMinutesString(selectedForecast?.dt ?: 0),
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.fillMaxWidth().align(Alignment.CenterHorizontally)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally)
                     )
                 }
             },
@@ -145,13 +180,11 @@ fun HourlyForecastDialog(showDialog: Boolean, onDismiss: () -> Unit, selectedFor
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
                             .height(140.dp)
                     ) {
                         WindCardContent(
                             windSpeed = selectedForecast?.wind?.speed ?: 0.0,
                             windDirection = selectedForecast?.wind?.deg ?: 0,
-                            hiddenIcon = true,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
@@ -159,7 +192,6 @@ fun HourlyForecastDialog(showDialog: Boolean, onDismiss: () -> Unit, selectedFor
                         Spacer(modifier = Modifier.width(16.dp))
                         HumidityCard(
                             humity = selectedForecast?.main?.humidity ?: 0,
-                            hiddenIcon = true,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
