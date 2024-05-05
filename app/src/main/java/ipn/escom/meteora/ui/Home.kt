@@ -1,5 +1,6 @@
 package ipn.escom.meteora.ui
 
+import android.location.Location
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,17 +49,24 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.predictions.PredictionsViewModel
 import ipn.escom.meteora.data.weather.WeatherViewModel
+import ipn.escom.meteora.utils.RequestLocationPermission
+import ipn.escom.meteora.utils.getLocation
+import ipn.escom.meteora.utils.getPostalCode
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
     val context = LocalContext.current
-
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    var location by remember { mutableStateOf<Location?>(null) }
+    var postalCode by remember { mutableStateOf<String?>(null) }
+    val isLocationPermissionGranted = remember { mutableStateOf(false) }
     var selectedItem by remember { mutableIntStateOf(0) }
     var hasInternetAccess: Boolean by remember {
         mutableStateOf(true)
@@ -67,6 +75,13 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
 
     LaunchedEffect(true) {
         hasInternetAccess = isNetworkAvailable(context)
+    }
+
+    RequestLocationPermission(isLocationPermissionGranted)
+
+    LaunchedEffect(isLocationPermissionGranted.value, true) {
+        location = getLocation(fusedLocationClient, isLocationPermissionGranted, context)
+        postalCode = getPostalCode(context, location)
     }
 
     if (state.isRefreshing) {
@@ -169,7 +184,13 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
             if (hasInternetAccess) {
                 when (selectedItem) {
                     0 -> {
-                        Forecast(modifier = Modifier.padding(it), weatherViewModel!!, navController)
+                        Forecast(
+                            modifier = Modifier.padding(it),
+                            weatherViewModel!!,
+                            location,
+                            postalCode,
+                            navController
+                        )
                     }
 
                     1 -> {
@@ -177,11 +198,21 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                     }
 
                     2 -> {
-                        Forecast(modifier = Modifier.padding(it), weatherViewModel!!, navController)
+                        Forecast(
+                            modifier = Modifier.padding(it),
+                            weatherViewModel!!,
+                            location,
+                            postalCode,
+                            navController
+                        )
                     }
 
                     3 -> {
-                        PredictionsScreen(modifier = Modifier.padding(it), predictionsViewModel = PredictionsViewModel(), navController = navController)
+                        PredictionsScreen(
+                            modifier = Modifier.padding(it),
+                            predictionsViewModel = PredictionsViewModel(),
+                            navController = navController
+                        )
                     }
                 }
             } else {
