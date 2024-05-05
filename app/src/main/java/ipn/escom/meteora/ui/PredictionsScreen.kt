@@ -32,7 +32,7 @@ fun PredictionsScreen(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
     ) {
         item {
             Text(text = "Predicciones", style = MaterialTheme.typography.titleMedium)
