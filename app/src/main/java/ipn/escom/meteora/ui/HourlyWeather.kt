@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Umbrella
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -108,14 +109,14 @@ fun HourlyWeatherCard(hourlyForecast: HourlyForecast, onClick: () -> Unit) {
             if (hourlyForecast.pop > 0.0) {
                 Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
                     Icon(
-                        imageVector = Icons.Rounded.WaterDrop,
+                        imageVector = Icons.Rounded.Umbrella,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${hourlyForecast.pop * 100}%",
+                        text = "${(hourlyForecast.pop * 100).toInt()}%",
                         modifier = Modifier.align(Alignment.CenterVertically),
                         style = MaterialTheme.typography.bodySmall
                     )

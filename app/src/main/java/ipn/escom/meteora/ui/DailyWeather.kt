@@ -8,7 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Umbrella
+import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,6 +69,21 @@ fun DailyWeatherCard(town: String, dailyForecast: DailyForecast, navController: 
                     text = getOnlyDateString(dailyForecast.dt),
                     style = MaterialTheme.typography.bodySmall
                 )
+                if (dailyForecast.pop > 0.0) {
+                    Row {
+                        Icon(
+                            imageVector = Icons.Rounded.Umbrella,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${(dailyForecast.pop * 100).toInt()}%",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
             }
             Spacer(modifier = Modifier.weight(1f))
             Text(
@@ -85,11 +105,7 @@ fun DailyWeatherCard(town: String, dailyForecast: DailyForecast, navController: 
                     .align(Alignment.CenterVertically)
                     .size(50.dp)
             )
-
-
         }
-
-
     }
 }
 

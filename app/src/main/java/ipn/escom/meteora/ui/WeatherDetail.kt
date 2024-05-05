@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.rounded.Umbrella
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.Icon
@@ -24,8 +26,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -71,6 +75,14 @@ fun WeatherDetailScreen(
     }
     var showDialog by remember { mutableStateOf(false) }
     var selectedForecast by remember { mutableStateOf<HourlyForecast?>(null) }
+    val dailyForecastList = dailyForecast!!.list.drop(1)
+
+    var selectedIndex by remember {
+        mutableIntStateOf(
+            dailyForecastList.indexOfFirst { it.dt == selectedDayForecast?.dt }
+        )
+    }
+    val scrollState = rememberLazyListState()
 
     Scaffold(
         topBar = {
@@ -93,13 +105,14 @@ fun WeatherDetailScreen(
         ) {
             item {
                 if (dailyForecast != null) {
-                    LazyRow(modifier = Modifier.padding(16.dp)) {
-                        items(dailyForecast!!.list.size) { index ->
+
+                    LazyRow(modifier = Modifier.padding(16.dp), state = scrollState) {
+                        items(dailyForecastList.size) { index ->
                             DailyForecastCard(
-                                dailyForecast = dailyForecast!!.list[index],
-                                selected = dailyForecast!!.list[index] == selectedDayForecast
+                                dailyForecast = dailyForecastList[index],
+                                selected = dailyForecastList[index] == selectedDayForecast
                             ) {
-                                selectedDayForecast = dailyForecast!!.list[index]
+                                selectedDayForecast = dailyForecastList[index]
 
                                 selectedHourlyForecast =
                                     hourlyForecast?.list?.filter { filteredForecast ->
@@ -107,9 +120,13 @@ fun WeatherDetailScreen(
                                             selectedDayForecast?.dt ?: 0
                                         )
                                     }
+                                selectedIndex = index
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                         }
+                    }
+                    LaunchedEffect(key1 = selectedIndex) {
+                        scrollState.animateScrollToItem(selectedIndex)
                     }
                 }
             }
@@ -261,6 +278,22 @@ fun DailyForecastCard(dailyForecast: DailyForecast, selected: Boolean, onClick: 
                 style = MaterialTheme.typography.bodySmall,
                 fontSize = 12.sp
             )
+            if (dailyForecast.pop > 0.0) {
+                Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    Icon(
+                        imageVector = Icons.Rounded.Umbrella,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "${(dailyForecast.pop * 100).toInt()}%",
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
         }
     }
 }
