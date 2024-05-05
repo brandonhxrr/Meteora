@@ -1,17 +1,24 @@
 package ipn.escom.meteora.ui
 
 import android.util.Log
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.material.icons.rounded.WaterDrop
@@ -29,6 +36,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.data.predictions.data.network.response.MonthPrediction
@@ -50,18 +59,20 @@ fun PredictionsCard(predictionsResponse: PredictionsResponse) {
                 monthPrediction = monthPrediction,
                 expanded = expanded,
                 onClick = { expanded = !expanded })
-
         }
     }
 }
 
 @Composable
 fun MonthPredictionCard(monthPrediction: MonthPrediction, expanded: Boolean, onClick: () -> Unit) {
+    val scale: Float by animateFloatAsState(if (expanded) 0.95f else 1f, label = "")
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable(onClick = onClick)
+            .scale(scale),
     ) {
         Row(
             modifier = Modifier
@@ -75,8 +86,9 @@ fun MonthPredictionCard(monthPrediction: MonthPrediction, expanded: Boolean, onC
                     .align(Alignment.CenterVertically)
                     .weight(1f),
             )
+            val rotation: Float by animateFloatAsState(if (expanded) 180f else 0f)
             Icon(
-                imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                imageVector = Icons.Rounded.ExpandMore,
                 contentDescription = "Expand button",
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
@@ -84,28 +96,50 @@ fun MonthPredictionCard(monthPrediction: MonthPrediction, expanded: Boolean, onC
                     .clickable {
                         onClick()
                     }
+                    .rotate(rotation)
             )
         }
     }
     if (expanded) {
-        monthPrediction.days.forEach { dayPrediction ->
+        val enterTransition = rememberInfiniteTransition(label = "")
+        val delayOffset = enterTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1000, delayMillis = 300),
+                repeatMode = RepeatMode.Restart
+            ), label = ""
+        )
+        monthPrediction.days.forEachIndexed { index, dayPrediction ->
+            val offset by animateDpAsState(
+                targetValue = if (expanded) 0.dp else (-100).dp,
+                animationSpec = tween(300, delayMillis = (50 * index).coerceAtMost(300)), label = ""
+            )
             DailyPredictionCard(
                 maxt = dayPrediction.prediction.maxt,
                 mint = dayPrediction.prediction.mint,
                 rainfall = dayPrediction.prediction.rainfall,
-                day = dayPrediction.day
+                day = dayPrediction.day,
+                modifier = Modifier.offset(x = offset * delayOffset.value)
             )
         }
     }
 }
 
 @Composable
-fun DailyPredictionCard(maxt: Double, mint: Double, rainfall: Double, day: Int) {
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .clickable {
+fun DailyPredictionCard(
+    maxt: Double,
+    mint: Double,
+    rainfall: Double,
+    day: Int,
+    modifier: Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
 
-        },
+            },
         colors = CardColors(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface,
