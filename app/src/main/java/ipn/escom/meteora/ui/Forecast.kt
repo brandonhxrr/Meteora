@@ -185,63 +185,6 @@ fun Forecast(
     }
 }
 
-@Composable
-fun LocationIndicator(postalCode: String? = null) {
-    Column(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-    ) {
-        var expanded by remember { mutableStateOf(false) }
-
-        val selectedItem = postalCode?.let { getLocalityFromPostalCode(it) }
-
-        var selectedLocality by remember { mutableStateOf("") }
-
-        Log.d("LocationIndicator", "Localuty: $selectedLocality")
-
-        selectedLocality =
-            if (availableLocalities.any { it.name == selectedItem }) selectedItem!! else "Ubicación no disponible"
-
-        Column(
-            modifier = Modifier
-                .padding(8.dp)
-                .align(Alignment.CenterHorizontally)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable { expanded = true }) {
-                Text(
-                    text = selectedLocality,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.Rounded.KeyboardArrowDown,
-                    contentDescription = "Expand",
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .padding(8.dp)
-                    .height(300.dp),
-            ) {
-                availableLocalities.forEach { locality ->
-                    DropdownMenuItem(onClick = {
-                        selectedLocality = locality.name
-                        expanded = false
-                    }, text = {
-                        Text(text = locality.name, style = MaterialTheme.typography.bodyMedium)
-                    })
-                }
-            }
-        }
-    }
-}
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ForecastPreview() {
