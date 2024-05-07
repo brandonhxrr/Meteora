@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.localities.availableLocalities
 import ipn.escom.meteora.data.weather.WeatherCondition
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.data.weather.data.network.response.WeatherResponse
@@ -112,9 +113,8 @@ fun Forecast(
     ) {
         item {
             Box(modifier = Modifier.fillMaxWidth()) {
-
                 Column {
-                    LocationIndicator(postalCode)
+                    Spacer(modifier = Modifier.height(16.dp))
                     ParameterCard(title = "", modifier = Modifier.padding(horizontal = 16.dp)) {
                         CurrentWeatherContent(
                             location = weather!!.name,
@@ -193,31 +193,15 @@ fun LocationIndicator(postalCode: String? = null) {
             .fillMaxWidth(),
     ) {
         var expanded by remember { mutableStateOf(false) }
-        val localities = listOf(
-            "Álvaro Obregón",
-            "Azcapotzalco",
-            "Benito Juárez",
-            "Coyoacán",
-            "Cuajimalpa de Morelos",
-            "Cuauhtémoc",
-            "Gustavo A. Madero",
-            "Iztacalco",
-            "Iztapalapa",
-            "Magdalena Contreras",
-            "Miguel Hidalgo",
-            "Milpa Alta",
-            "Tláhuac",
-            "Tlalpan",
-            "Venustiano Carranza",
-            "Xochimilco"
-        )
+
         val selectedItem = postalCode?.let { getLocalityFromPostalCode(it) }
 
         var selectedLocality by remember { mutableStateOf("") }
 
         Log.d("LocationIndicator", "Localuty: $selectedLocality")
+
         selectedLocality =
-            if (selectedItem in localities) selectedItem!! else "Ubicación no disponible"
+            if (availableLocalities.any { it.name == selectedItem }) selectedItem!! else "Ubicación no disponible"
 
         Column(
             modifier = Modifier
@@ -245,12 +229,12 @@ fun LocationIndicator(postalCode: String? = null) {
                     .padding(8.dp)
                     .height(300.dp),
             ) {
-                localities.forEach { locality ->
+                availableLocalities.forEach { locality ->
                     DropdownMenuItem(onClick = {
-                        selectedLocality = locality
+                        selectedLocality = locality.name
                         expanded = false
                     }, text = {
-                        Text(text = locality, style = MaterialTheme.typography.bodyMedium)
+                        Text(text = locality.name, style = MaterialTheme.typography.bodyMedium)
                     })
                 }
             }
