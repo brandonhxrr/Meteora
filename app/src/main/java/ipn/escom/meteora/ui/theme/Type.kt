@@ -42,3 +42,8 @@ val Typography = Typography(
         fontSize = 40.sp
     ),
 )
+
+val tabStyle = TextStyle(
+    fontFamily = FontFamily(Font(R.font.inter_medium)),
+    fontSize = 14.sp
+)

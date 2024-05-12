@@ -70,7 +70,7 @@ fun MonthPredictionCard(monthPrediction: MonthPrediction, expanded: Boolean, onC
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 8.dp, horizontal = 16.dp)
             .clickable(onClick = onClick)
             .scale(scale),
     ) {
@@ -86,7 +86,7 @@ fun MonthPredictionCard(monthPrediction: MonthPrediction, expanded: Boolean, onC
                     .align(Alignment.CenterVertically)
                     .weight(1f),
             )
-            val rotation: Float by animateFloatAsState(if (expanded) 180f else 0f)
+            val rotation: Float by animateFloatAsState(if (expanded) 180f else 0f, label = "")
             Icon(
                 imageVector = Icons.Rounded.ExpandMore,
                 contentDescription = "Expand button",
