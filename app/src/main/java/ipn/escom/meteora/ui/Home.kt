@@ -1,25 +1,18 @@
 package ipn.escom.meteora.ui
 
 import android.location.Location
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Map
-import androidx.compose.material.icons.rounded.Place
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -55,7 +48,6 @@ import com.google.firebase.auth.FirebaseAuth
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.localities.LocalityViewModel
 import ipn.escom.meteora.data.localities.SearchBarWithDialog
-import ipn.escom.meteora.data.localities.availableLocalities
 import ipn.escom.meteora.data.predictions.PredictionsViewModel
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.utils.RequestLocationPermission
@@ -183,7 +175,6 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                             modifier = Modifier.padding(it),
                             weatherViewModel!!,
                             location,
-                            postalCode,
                             navController
                         )
                     }
@@ -197,7 +188,6 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                             modifier = Modifier.padding(it),
                             weatherViewModel!!,
                             location,
-                            postalCode,
                             navController
                         )
                     }

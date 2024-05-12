@@ -124,6 +124,7 @@ fun SearchBarWithDialog(
                 localityViewModel.onSearchTextChange(locality.name)
                 localityViewModel.onSearchingChanged(false)
                 focusManager.clearFocus()
+                showSuggestions = false
             }, text = {
                 Text(text = locality.name, style = MaterialTheme.typography.bodyMedium)
             })

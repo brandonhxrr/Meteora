@@ -56,16 +56,18 @@ fun getDateString(time: Long): String {
     return dateTime.format(formatter)
 }
 
-fun getOnlyDateString(time: Long): String {
+fun getDayOfWeekFromLong(time: Long): String {
+    val zoneId = ZoneId.systemDefault()
     val dateTime = LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC)
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-    return dateTime.format(formatter)
+    return dateTime.atZone(ZoneOffset.UTC).withZoneSameInstant(zoneId).dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
+        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
 }
 
-fun getDayOfWeekFromLong(time: Long): String {
+fun getOnlyDateString(time: Long): String {
+    val zoneId = ZoneId.systemDefault()
     val dateTime = LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC)
-    return dateTime.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
-        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    return dateTime.atZone(ZoneOffset.UTC).withZoneSameInstant(zoneId).format(formatter)
 }
 
 fun getHourWithMinutesString(time: Long): String {

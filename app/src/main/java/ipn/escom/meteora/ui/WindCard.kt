@@ -62,19 +62,9 @@ fun WindCardContent(
                     windSpeed < 28 -> "Muy fuerte"
                     else -> "Huracanado"
                 }
-                val windOrigin = when {
-                    windDirection < 22 -> "Norte"
-                    windDirection < 67 -> "Noreste"
-                    windDirection < 112 -> "Este"
-                    windDirection < 157 -> "Sureste"
-                    windDirection < 202 -> "Sur"
-                    windDirection < 247 -> "Suroeste"
-                    windDirection < 292 -> "Oeste"
-                    windDirection < 337 -> "Noroeste"
-                    else -> "Norte"
-                }
+
                 Text(
-                    text = "$intensity · $windOrigin",
+                    text = "$intensity · ${getWindDirection(windDirection)}",
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
                 )
@@ -121,6 +111,20 @@ fun WindDirectionsVisualizer(
     }
     LaunchedEffect(true) {
         animate = true
+    }
+}
+
+fun getWindDirection(windDirection: Int): String {
+    return when {
+        windDirection < 22 -> "Norte"
+        windDirection < 67 -> "Noreste"
+        windDirection < 112 -> "Este"
+        windDirection < 157 -> "Sureste"
+        windDirection < 202 -> "Sur"
+        windDirection < 247 -> "Suroeste"
+        windDirection < 292 -> "Oeste"
+        windDirection < 337 -> "Noroeste"
+        else -> "Norte"
     }
 }
 

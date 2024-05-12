@@ -24,7 +24,7 @@ class WeatherService {
                 response.body()
             } catch (e: SocketTimeoutException) {
                 Log.e("WeatherService", "Timeout al conectar a la API")
-                delay(5000)
+                delay(2000)
                 getWeather(apiKey, lat, lon)
                 null
             } catch (e: UnknownHostException) {
@@ -51,7 +51,7 @@ class WeatherService {
                 response.body()
             } catch (e: SocketTimeoutException) {
                 Log.e("WeatherService", "Timeout al conectar a la API")
-                delay(5000)
+                delay(2000)
                 getHourlyForecast(apiKey, lat, lon)
                 null
             } catch (e: UnknownHostException) {
@@ -78,7 +78,7 @@ class WeatherService {
                 response.body()
             } catch (e: SocketTimeoutException) {
                 Log.e("WeatherService", "Timeout al conectar a la API")
-                delay(5000)
+                delay(2000)
                 getDailyForecast(apiKey, lat, lon)
                 null
             } catch (e: UnknownHostException) {
