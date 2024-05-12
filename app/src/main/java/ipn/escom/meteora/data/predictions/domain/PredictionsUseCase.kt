@@ -6,7 +6,7 @@ import ipn.escom.meteora.data.predictions.data.network.response.PredictionsRespo
 class PredictionsUseCase {
     private val repository = PredictionsRepository()
 
-    suspend operator fun invoke(): PredictionsResponse {
-        return repository.getPredictions()
+    suspend operator fun invoke(localityKey: String): PredictionsResponse {
+        return repository.getPredictions(localityKey)
     }
 }

@@ -14,9 +14,9 @@ class PredictionsViewModel: ViewModel() {
     private val _predictions = MutableLiveData<PredictionsResponse>()
     val predictions: MutableLiveData<PredictionsResponse> = _predictions
 
-    fun getPredictions() {
+    fun getPredictions(localityKey: String) {
         viewModelScope.launch {
-            val response = predictionsUseCase()
+            val response = predictionsUseCase(localityKey)
             _predictions.value = response
         }
     }

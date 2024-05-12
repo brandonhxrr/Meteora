@@ -195,6 +195,7 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                     3 -> {
                         PredictionsScreen(
                             modifier = Modifier.padding(it),
+                            location = location,
                             predictionsViewModel = PredictionsViewModel()
                         )
                     }

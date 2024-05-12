@@ -50,9 +50,8 @@ fun getPostalCode(
     return ""
 }
 
-@Composable
-fun getLocalityFromPostalCode(postalCode: String?): String? {
-    val context = LocalContext.current
+
+fun getLocalityFromPostalCode(context: Context, postalCode: String?): String? {
     val inputStream = context.resources.openRawResource(R.raw.postal_codes)
     val reader = BufferedReader(InputStreamReader(inputStream))
     var line: String?

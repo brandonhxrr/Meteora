@@ -6,5 +6,5 @@ class PredictionsRepository {
 
     private val service = PredictionsService()
 
-    suspend fun getPredictions() = service.getPredictions()
+    suspend fun getPredictions(localityKey: String) = service.getPredictions(localityKey)
 }

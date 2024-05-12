@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -42,10 +43,11 @@ fun SearchBarWithDialog(
     postalCode: String,
     onLocationSelected: (Location) -> Unit
 ) {
+    val context = LocalContext.current
     val searchText by localityViewModel.searchText.collectAsState(initial = "")
     val isSearching by localityViewModel.isSearching.collectAsState(initial = false)
     val localities by localityViewModel.localities.collectAsState(initial = availableLocalities)
-    val currentLocality = getLocalityFromPostalCode(postalCode = postalCode)
+    val currentLocality = getLocalityFromPostalCode(context = context, postalCode = postalCode)
 
     val suggestions = localities.filter { it.name.contains(searchText, ignoreCase = true) }
     val focusManager = LocalFocusManager.current

@@ -1,6 +1,5 @@
 package ipn.escom.meteora.ui
 
-import android.util.Log
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
@@ -47,18 +46,17 @@ import ipn.escom.meteora.utils.getMonthName
 @Composable
 fun PredictionsCard(predictionsResponse: PredictionsResponse) {
     val localityPredictions = predictionsResponse.predictions
-    val gustavoPredictions = localityPredictions.find { it.locality == "GUSTAVO A MADERO" }
 
-    Log.d("PredictionsCard", "Predictions: $gustavoPredictions")
+    localityPredictions.forEach { prediction ->
+        prediction.years.forEach { yearPrediction ->
+            yearPrediction.months.forEach { monthPrediction ->
+                var expanded by remember { mutableStateOf(false) }
 
-    gustavoPredictions?.years?.forEach { yearPrediction ->
-        yearPrediction.months.forEach { monthPrediction ->
-            var expanded by remember { mutableStateOf(false) }
-
-            MonthPredictionCard(
-                monthPrediction = monthPrediction,
-                expanded = expanded,
-                onClick = { expanded = !expanded })
+                MonthPredictionCard(
+                    monthPrediction = monthPrediction,
+                    expanded = expanded,
+                    onClick = { expanded = !expanded })
+            }
         }
     }
 }

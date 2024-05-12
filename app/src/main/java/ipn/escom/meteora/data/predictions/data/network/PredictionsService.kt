@@ -66,12 +66,61 @@ class PredictionsService {
             })
 
             while (predictionsResponse == null) {
-                delay(100) // wait until predictionsResponse is set
+                delay(100)
             }
 
             predictionsResponse!!
         }
 
 
+    }
+
+    suspend fun getPredictions(localityKey: String): PredictionsResponse {
+        val query = database.child("predictions").child(localityKey)
+        var predictionsResponse: PredictionsResponse? = null
+
+        return withContext(Dispatchers.IO) {
+            query.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val localityPredictions = mutableListOf<LocalityPrediction>()
+                    val locality = snapshot.key ?: return
+                    val years = mutableListOf<YearPrediction>()
+                    for (yearSnapshot in snapshot.children) {
+                        val year = yearSnapshot.key?.toIntOrNull() ?: continue
+                        val months = mutableListOf<MonthPrediction>()
+                        for (monthSnapshot in yearSnapshot.children) {
+                            val month = monthSnapshot.key?.toIntOrNull() ?: continue
+                            val days = mutableListOf<DayPrediction>()
+                            for (daySnapshot in monthSnapshot.children) {
+                                val day = daySnapshot.key?.toIntOrNull() ?: continue
+                                val stringPrediction =
+                                    daySnapshot.getValue(StringPrediction::class.java)
+                                        ?: continue
+                                val prediction = Prediction(
+                                    maxt = stringPrediction.maxt.toDoubleOrNull() ?: 0.0,
+                                    mint = stringPrediction.mint.toDoubleOrNull() ?: 0.0,
+                                    rainfall = stringPrediction.rainfall.toDoubleOrNull() ?: 0.0
+                                )
+                                days.add(DayPrediction(day, prediction))
+                            }
+                            months.add(MonthPrediction(month, days))
+                        }
+                        years.add(YearPrediction(year, months))
+                    }
+                    localityPredictions.add(LocalityPrediction(locality, years))
+                    predictionsResponse = PredictionsResponse(localityPredictions)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d("PredictionsRepository", "Error getting predictions", error.toException())
+                }
+            })
+
+            while (predictionsResponse == null) {
+                delay(100)
+            }
+
+            predictionsResponse!!
+        }
     }
 }
