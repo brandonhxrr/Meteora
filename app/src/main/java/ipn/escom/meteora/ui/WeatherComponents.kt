@@ -5,12 +5,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Air
+import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.material.icons.rounded.ArrowDropUp
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -207,7 +211,6 @@ fun CurrentWeatherContent(
     description: Int,
     maxt: Double? = null,
     mint: Double? = null,
-    icon: Int? = null,
     animatedIcon: Int
 ) {
     Column(
@@ -237,16 +240,44 @@ fun CurrentWeatherContent(
                     fontSize = 45.sp,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
-                if (maxt != null && mint != null) {
-                    Text(
-                        text = "$maxt° / $mint°",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
                 Text(
                     text = "Se siente como $feelsLike °C",
                     style = MaterialTheme.typography.bodyMedium
                 )
+                if (maxt != null && mint != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                    ){
+                        Row(
+                            modifier = Modifier.weight(1f)
+                        ){
+                            Icon(
+                                imageVector = Icons.Rounded.ArrowDropUp,
+                                contentDescription = "Máxima",
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "$maxt°",
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.weight(1f)
+                        ){
+                            Icon(
+                                imageVector = Icons.Rounded.ArrowDropDown,
+                                contentDescription = "Mínima",
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "$mint°",
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                            )
+                        }
+                    }
+                }
 
             }
             Box {
@@ -285,7 +316,6 @@ fun CurrentWeatherPreview() {
             temperature = 25.0,
             feelsLike = 24.0,
             description = R.string.condition_sunny,
-            icon = R.drawable.ic_weather_sunny,
             animatedIcon = R.raw.weather_sunny
         )
     }

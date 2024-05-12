@@ -109,7 +109,6 @@ fun Forecast(
                             temperature = weather!!.main.temp,
                             feelsLike = weather!!.main.feelsLike,
                             description = weatherCondition!!.getDescription(),
-                            icon = weatherCondition.getIconDrawable(),
                             animatedIcon = weatherCondition.getAnimatedIcon()
                         )
                     }
