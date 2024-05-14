@@ -13,11 +13,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Place
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,38 +33,48 @@ import ipn.escom.meteora.data.events.Event
 
 @Composable
 fun AgendaScreen(modifier: Modifier = Modifier) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        item {
-            Text(
-                "Próximos eventos",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = { /*TODO*/ }) {
+                Icon(Icons.Rounded.Add, contentDescription = "Add event")
+            }
+        },
+        modifier = modifier.fillMaxSize()
+    ) {
+        LazyColumn(modifier = Modifier
+            .fillMaxSize()
+            .padding(it)) {
+            item {
+                Text(
+                    "Próximos eventos",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
 
-        item {
-            val events = listOf(
-                Event(
-                    title = "Cumpleaños de Eveline",
-                    description = "",
-                    location = "Azcapotzalco",
-                    date = "27-05-2024",
-                    time = "10:00"
-                ),
-                Event(
-                    title = "Boda de Martín y Ana",
-                    description = "",
-                    location = "Tlalpan",
-                    date = "16-10-2024",
-                    time = "11:00"
-                ),
-            )
+            item {
+                val events = listOf(
+                    Event(
+                        title = "Cumpleaños de Eveline",
+                        description = "",
+                        location = "Azcapotzalco",
+                        date = "27-05-2024",
+                        time = "10:00"
+                    ),
+                    Event(
+                        title = "Boda de Martín y Ana",
+                        description = "",
+                        location = "Tlalpan",
+                        date = "16-10-2024",
+                        time = "11:00"
+                    ),
+                )
 
-            events.forEach { event ->
-                EventItem(event = event)
+                events.forEach { event ->
+                    EventItem(event = event)
+                }
             }
         }
-
     }
 }
 
