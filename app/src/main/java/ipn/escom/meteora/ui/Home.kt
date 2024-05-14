@@ -50,6 +50,7 @@ import ipn.escom.meteora.data.localities.LocalityViewModel
 import ipn.escom.meteora.data.localities.SearchBarWithDialog
 import ipn.escom.meteora.data.predictions.PredictionsViewModel
 import ipn.escom.meteora.data.weather.WeatherViewModel
+import ipn.escom.meteora.ui.agenda.AgendaScreen
 import ipn.escom.meteora.utils.RequestLocationPermission
 import ipn.escom.meteora.utils.getLocation
 import ipn.escom.meteora.utils.getPostalCode
@@ -184,12 +185,7 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                     }
 
                     2 -> {
-                        Forecast(
-                            modifier = Modifier.padding(it),
-                            weatherViewModel!!,
-                            location,
-                            navController
-                        )
+                        AgendaScreen(modifier = Modifier.padding(it))
                     }
 
                     3 -> {
