@@ -29,13 +29,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import ipn.escom.meteora.data.events.Event
+import ipn.escom.meteora.ui.Screens
 
 @Composable
-fun AgendaScreen(modifier: Modifier = Modifier) {
+fun AgendaScreen(modifier: Modifier = Modifier, navController: NavController? = null) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { /*TODO*/ }) {
+            FloatingActionButton(onClick = { navController?.navigate(Screens.NewEvent.name) }) {
                 Icon(Icons.Rounded.Add, contentDescription = "Add event")
             }
         },

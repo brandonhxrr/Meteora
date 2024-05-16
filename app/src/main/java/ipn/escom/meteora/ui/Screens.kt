@@ -6,5 +6,7 @@ enum class Screens {
     Login,
     SignUp1,
     SignUp2,
-    User
+    User,
+    NewEvent,
+    EventDetail,
 }

@@ -185,7 +185,7 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                     }
 
                     2 -> {
-                        AgendaScreen(modifier = Modifier.padding(it))
+                        AgendaScreen(modifier = Modifier.padding(it), navController = navController)
                     }
 
                     3 -> {

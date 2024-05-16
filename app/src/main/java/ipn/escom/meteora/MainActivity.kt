@@ -17,15 +17,16 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import ipn.escom.meteora.data.events.EventViewModel
 import ipn.escom.meteora.data.login.LoginViewModel
 import ipn.escom.meteora.data.signup.SignUpViewModel
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.ui.Home
-import ipn.escom.meteora.ui.PredictionsScreen
 import ipn.escom.meteora.ui.Screens
 import ipn.escom.meteora.ui.SplashScreen
 import ipn.escom.meteora.ui.UserScreen
 import ipn.escom.meteora.ui.WeatherDetailScreen
+import ipn.escom.meteora.ui.agenda.NewEventScreen
 import ipn.escom.meteora.ui.login.Login
 import ipn.escom.meteora.ui.login.SignUp1
 import ipn.escom.meteora.ui.login.SignUp2
@@ -126,6 +127,10 @@ fun Start() {
 
         composable(Screens.User.name) {
             UserScreen(navController = navController)
+        }
+
+        composable(Screens.NewEvent.name) {
+            NewEventScreen(navController = navController, eventViewModel = EventViewModel())
         }
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Umbrella
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -88,7 +89,7 @@ fun WeatherDetailScreen(
         topBar = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { navController.navigateUp() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Atrás")
                 }
                 Spacer(Modifier.width(8.dp))
                 Text(
