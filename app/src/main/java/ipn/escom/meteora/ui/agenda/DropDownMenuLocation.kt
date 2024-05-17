@@ -35,7 +35,6 @@ fun DropdownMenuLocation(
     onLocationSelected: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(selectedLocation) }
 
     Row(
         modifier = Modifier
@@ -64,7 +63,7 @@ fun DropdownMenuLocation(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = selectedText.ifEmpty { "Ubicación" },
+                    text = selectedLocation.ifEmpty { "Ubicación" },
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Icon(Icons.Default.ArrowDropDown, contentDescription = null)
@@ -80,8 +79,7 @@ fun DropdownMenuLocation(
                     DropdownMenuItem(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            selectedText = locality.name
-                            onLocationSelected(locality.key)
+                            onLocationSelected(locality.name)
                             expanded = false
                         },
                         text = {

@@ -1,5 +1,7 @@
 package ipn.escom.meteora.ui.agenda
 
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AlertDialog
@@ -24,16 +28,23 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
 import ipn.escom.meteora.data.events.EventViewModel
+import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -43,7 +54,8 @@ fun NewEventBottomSheet(
     eventViewModel: EventViewModel,
     sheetState: SheetState = rememberModalBottomSheetState(),
     scope: CoroutineScope,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    onEventAdded: () -> Unit
 ) {
 
     val eventName: String by eventViewModel.eventName.observeAsState("")
@@ -54,6 +66,20 @@ fun NewEventBottomSheet(
     var showDialog by remember { mutableStateOf(false) }
     var allDayEvent by remember {
         mutableStateOf(false)
+    }
+    val auth = FirebaseAuth.getInstance()
+
+    val focusManager = LocalFocusManager.current
+    val interactionSource = remember { MutableInteractionSource() }
+
+    LaunchedEffect(interactionSource) {
+        interactionSource.interactions.collect {
+            when (it) {
+                is FocusInteraction.Focus -> scope.launch {
+                    sheetState.expand()
+                }
+            }
+        }
     }
 
     ModalBottomSheet(
@@ -67,7 +93,24 @@ fun NewEventBottomSheet(
             }) {
                 Icon(imageVector = Icons.Rounded.Close, contentDescription = "Close")
             }
-            Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(horizontal = 16.dp)) {
+            Button(
+                onClick = {
+                    val event = EventResponse(
+                        title = eventName,
+                        description = eventDescription,
+                        date = eventDate,
+                        time = if (allDayEvent) 0L else eventTime,
+                        location = eventLocation
+                    )
+                    eventViewModel.addEvent(auth.currentUser!!.uid, event)
+                    onEventAdded()
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            onDismissRequest()
+                        }
+                    }
+                }, modifier = Modifier.padding(horizontal = 16.dp)
+            ) {
                 Text("Guardar")
             }
         }
@@ -86,7 +129,12 @@ fun NewEventBottomSheet(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp),
+                        .height(100.dp)
+                        .onFocusChanged { focusState ->
+                            if (focusState.isFocused) {
+                                scope.launch { sheetState.expand() }
+                            }
+                        },
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
@@ -95,7 +143,11 @@ fun NewEventBottomSheet(
                     ),
                     textStyle = MaterialTheme.typography.bodySmall.copy(fontSize = 24.sp),
                     maxLines = 1,
-                    singleLine = true
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences
+                    ),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
 
                 )
                 HorizontalDivider()

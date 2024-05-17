@@ -7,7 +7,7 @@ import ipn.escom.meteora.data.predictions.data.network.response.PredictionsRespo
 import ipn.escom.meteora.data.predictions.domain.PredictionsUseCase
 import kotlinx.coroutines.launch
 
-class PredictionsViewModel: ViewModel() {
+class PredictionsViewModel : ViewModel() {
 
     private val predictionsUseCase = PredictionsUseCase()
 

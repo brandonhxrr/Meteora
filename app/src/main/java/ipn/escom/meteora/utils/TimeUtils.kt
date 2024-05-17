@@ -92,6 +92,11 @@ fun getHourWithMinutesString(time: Long): String {
     return "$hourFormatted:$minute $amPm"
 }
 
+fun getDayFromMillis(millis: Long): Int {
+    val localDate = Instant.ofEpochMilli(millis).atZone(ZoneId.of("UTC")).toLocalDate()
+    return localDate.dayOfMonth
+}
+
 fun getHoursAndMinutesFromMillis(millis: Long): Pair<Int, Int> {
     val calendar = Calendar.getInstance().apply {
         timeInMillis = millis
@@ -109,9 +114,10 @@ fun Long.getHoursAndMinutesDiff(other: Long): Pair<Int, Int> {
 }
 
 fun formatSelectedDate(selectedDayMillis: Long): String {
-    val instant = Instant.ofEpochMilli(selectedDayMillis)
+    val localDate = Instant.ofEpochMilli(selectedDayMillis).atZone(ZoneId.of("UTC")).toLocalDate()
     val formatter = DateTimeFormatter.ofPattern("EEE, d 'de' MMMM 'de' yyyy", Locale("es", "MX"))
-    return formatter.format(instant.atZone(ZoneId.systemDefault())).replaceFirstChar {
+    localDate.format(formatter)
+    return localDate.format(formatter).replaceFirstChar {
         if (it.isLowerCase()) it.titlecase(
             Locale(
                 "es",

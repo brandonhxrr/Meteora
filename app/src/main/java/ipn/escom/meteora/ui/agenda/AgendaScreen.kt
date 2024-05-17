@@ -1,5 +1,6 @@
 package ipn.escom.meteora.ui.agenda
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -25,7 +26,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,9 +40,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import ipn.escom.meteora.data.events.Event
+import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.events.EventViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,6 +49,13 @@ fun AgendaScreen(modifier: Modifier = Modifier, navController: NavController? = 
     val modalBottomSheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
+    val eventViewModel = EventViewModel()
+    val userId = eventViewModel.userId.value
+    val userEvents by eventViewModel.userEvents.observeAsState()
+
+    LaunchedEffect(key1 = true) {
+        eventViewModel.getEvents(userId!!)
+    }
 
     Scaffold(
         floatingActionButton = {
@@ -72,25 +81,8 @@ fun AgendaScreen(modifier: Modifier = Modifier, navController: NavController? = 
             }
 
             item {
-                val events = listOf(
-                    Event(
-                        title = "Cumpleaños de Eveline",
-                        description = "",
-                        location = "Azcapotzalco",
-                        date = 1715731200000,
-                        time = 54000000
-                    ),
-                    Event(
-                        title = "Boda de Martín y Ana",
-                        description = "",
-                        location = "Tlalpan",
-                        date = 1715731200000,
-                        time = 54000000
-                    ),
-                )
-
-                events.forEach { event ->
-                    EventItem(event = event)
+                userEvents?.forEach { event ->
+                    EventItem(eventResponse = event)
                 }
             }
             item {
@@ -101,6 +93,9 @@ fun AgendaScreen(modifier: Modifier = Modifier, navController: NavController? = 
                         scope = coroutineScope,
                         onDismissRequest = {
                             showBottomSheet = false
+                        },
+                        onEventAdded = {
+                            eventViewModel.getEvents(userId!!)
                         }
                     )
                 }
@@ -110,13 +105,13 @@ fun AgendaScreen(modifier: Modifier = Modifier, navController: NavController? = 
 }
 
 @Composable
-fun EventItem(event: Event) {
+fun EventItem(eventResponse: EventResponse) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
             .clickable {
-
+                Log.d("EventItem", "${eventResponse.id}")
             },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary,
@@ -135,7 +130,7 @@ fun EventItem(event: Event) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "${event.getDay()}",
+                    text = "${eventResponse.getDay()}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -152,7 +147,7 @@ fun EventItem(event: Event) {
                 ) {
                     //Icon(imageVector = Icons.Rounded.CalendarToday, contentDescription = null)
                     Text(
-                        text = event.title,
+                        text = eventResponse.title,
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
                         //.padding(start = 8.dp),
@@ -170,7 +165,7 @@ fun EventItem(event: Event) {
                         modifier = Modifier.size(16.dp)
                     )
                     Text(
-                        text = event.location,
+                        text = eventResponse.location,
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
                             .padding(start = 4.dp),

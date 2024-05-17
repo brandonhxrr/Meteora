@@ -27,7 +27,10 @@ import androidx.compose.ui.window.Dialog
 import ipn.escom.meteora.utils.convertMillisToTimeFormat
 import ipn.escom.meteora.utils.getHourWithMinutesString
 import ipn.escom.meteora.utils.getHoursAndMinutesFromMillis
+import java.time.LocalDate
 import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
 
@@ -35,7 +38,7 @@ import java.util.Calendar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerField(time: Long, onTimeSelected: (Long) -> Unit) {
-    var initialSelectedTimeMillis by remember { mutableLongStateOf(time) }
+    var initialSelectedTimeMillis by remember { mutableStateOf(time) }
 
     if(time == 0L){
         initialSelectedTimeMillis = System.currentTimeMillis()
@@ -90,7 +93,8 @@ fun TimePickerField(time: Long, onTimeSelected: (Long) -> Unit) {
                                 timePickerState.hour,
                                 timePickerState.minute
                             )
-                            val selectedTimeMillis = selectedLocalTime.toNanoOfDay() / 1_000_000
+                            val zonedDateTime = ZonedDateTime.of(LocalDate.now(), selectedLocalTime, ZoneId.systemDefault())
+                            val selectedTimeMillis = zonedDateTime.toInstant().toEpochMilli()
                             onTimeSelected(selectedTimeMillis)
                             isTimePickerOpen = false
                         }) {
@@ -102,3 +106,4 @@ fun TimePickerField(time: Long, onTimeSelected: (Long) -> Unit) {
         }
     }
 }
+

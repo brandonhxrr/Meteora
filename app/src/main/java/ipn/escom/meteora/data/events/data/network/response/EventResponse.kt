@@ -1,8 +1,10 @@
-package ipn.escom.meteora.data.events
+package ipn.escom.meteora.data.events.data.network.response
 
+import ipn.escom.meteora.utils.getDayFromMillis
 import ipn.escom.meteora.utils.getHourOfDayFromLong
 
-data class Event (
+data class EventResponse (
+    val id: String? = "",
     val title: String,
     val description: String,
     val date: Long, // dd-mm-yyyy format
@@ -10,7 +12,7 @@ data class Event (
     val location: String
 ){
     fun getDay(): Int {
-        return getHourOfDayFromLong(date)
+        return getDayFromMillis(date)
     }
 
     fun getMonth(): String {
