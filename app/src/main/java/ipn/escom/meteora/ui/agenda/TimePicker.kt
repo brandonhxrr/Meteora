@@ -17,39 +17,49 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import ipn.escom.meteora.utils.convertMillisToTimeFormat
+import ipn.escom.meteora.utils.getHourWithMinutesString
+import ipn.escom.meteora.utils.getHoursAndMinutesFromMillis
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 import java.util.Calendar
 
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimePickerField(time: String, onTimeSelected: (String) -> Unit) {
-    var timeText by remember { mutableStateOf(time) }
+fun TimePickerField(time: Long, onTimeSelected: (Long) -> Unit) {
+    var initialSelectedTimeMillis by remember { mutableLongStateOf(time) }
+
+    if(time == 0L){
+        initialSelectedTimeMillis = System.currentTimeMillis()
+        onTimeSelected(initialSelectedTimeMillis)
+    }
+
     var isTimePickerOpen by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
-            .fillMaxWidth()
             .clickable { isTimePickerOpen = true }
             .padding(8.dp)
     ) {
         Text(
-            text = if (timeText.isEmpty()) "Hora del Evento" else timeText,
-            style = MaterialTheme.typography.bodyLarge
+            text = convertMillisToTimeFormat(time),
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 
     if (isTimePickerOpen) {
-        val currentTime = Calendar.getInstance()
         val timePickerState = remember {
             TimePickerState(
-                initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
-                initialMinute = currentTime.get(Calendar.MINUTE),
+                initialHour = getHoursAndMinutesFromMillis(time).first,
+                initialMinute = getHoursAndMinutesFromMillis(time).second,
                 is24Hour = false
             )
         }
@@ -76,13 +86,12 @@ fun TimePickerField(time: String, onTimeSelected: (String) -> Unit) {
                             Text("Cancelar")
                         }
                         TextButton(onClick = {
-                            val formattedTime = String.format(
-                                "%02d:%02d",
+                            val selectedLocalTime = LocalTime.of(
                                 timePickerState.hour,
                                 timePickerState.minute
                             )
-                            timeText = formattedTime
-                            onTimeSelected(formattedTime)
+                            val selectedTimeMillis = selectedLocalTime.toNanoOfDay() / 1_000_000
+                            onTimeSelected(selectedTimeMillis)
                             isTimePickerOpen = false
                         }) {
                             Text("Aceptar")

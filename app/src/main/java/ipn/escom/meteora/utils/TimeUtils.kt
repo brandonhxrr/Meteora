@@ -3,6 +3,8 @@ package ipn.escom.meteora.utils
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import ipn.escom.meteora.R
+import java.text.SimpleDateFormat
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -12,12 +14,19 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 fun getCurrentTime(): String {
     val currentTime = LocalTime.now()
     val formatter = DateTimeFormatter.ofPattern("hh:mm a")
     return currentTime.format(formatter)
+}
+
+fun convertMillisToTimeFormat(millis: Long): String {
+    val dateFormat = SimpleDateFormat("hh:mm a", Locale.US)
+    return dateFormat.format(Date(millis))
 }
 
 @Composable
@@ -82,6 +91,15 @@ fun getHourWithMinutesString(time: Long): String {
     return "$hourFormatted:$minute $amPm"
 }
 
+fun getHoursAndMinutesFromMillis(millis: Long): Pair<Int, Int> {
+    val calendar = Calendar.getInstance().apply {
+        timeInMillis = millis
+    }
+    val hours = calendar.get(Calendar.HOUR_OF_DAY)
+    val minutes = calendar.get(Calendar.MINUTE)
+    return Pair(hours, minutes)
+}
+
 fun Long.getHoursAndMinutesDiff(other: Long): Pair<Int, Int> {
     val diffInSeconds = kotlin.math.abs(this - other)
     val hours = (diffInSeconds / 3600).toInt()
@@ -89,10 +107,10 @@ fun Long.getHoursAndMinutesDiff(other: Long): Pair<Int, Int> {
     return Pair(hours, minutes)
 }
 
-fun calculateTimestamps(): Int {
-    val now = LocalDateTime.now()
-    val nextDaySixAM = now.plusDays(1).withHour(7).withMinute(0).withSecond(0).withNano(0)
-    return ChronoUnit.HOURS.between(now, nextDaySixAM).toInt()
+fun formatSelectedDate(selectedDayMillis: Long): String {
+    val instant = Instant.ofEpochMilli(selectedDayMillis)
+    val formatter = DateTimeFormatter.ofPattern("EEE, d 'de' MMMM 'de' yyyy", Locale("es", "MX"))
+    return formatter.format(instant.atZone(ZoneId.systemDefault()))
 }
 
 @Composable
