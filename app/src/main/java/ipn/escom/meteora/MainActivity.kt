@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import ipn.escom.meteora.data.login.LoginViewModel
@@ -32,18 +33,22 @@ import ipn.escom.meteora.ui.theme.MeteoraTheme
 
 class MainActivity : ComponentActivity() {
 
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         FirebaseApp.initializeApp(applicationContext)
         FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
+
         setContent {
             MeteoraTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Start()
+                    Start(firebaseAnalytics = firebaseAnalytics)
                 }
             }
         }
@@ -52,9 +57,16 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Start() {
+fun Start(firebaseAnalytics: FirebaseAnalytics?) {
     val navController = rememberNavController()
     val user = FirebaseAuth.getInstance().currentUser
+
+    navController.addOnDestinationChangedListener { _, destination, _ ->
+        val params = Bundle()
+        params.putString(FirebaseAnalytics.Param.SCREEN_NAME, destination.label as String?)
+        params.putString(FirebaseAnalytics.Param.SCREEN_CLASS, destination.label as String?)
+        firebaseAnalytics!!.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, params)
+    }
 
     NavHost(
         navController = navController,
@@ -133,6 +145,6 @@ fun Start() {
 @Composable
 fun MainPreview() {
     MeteoraTheme {
-        Start()
+        Start(null)
     }
 }

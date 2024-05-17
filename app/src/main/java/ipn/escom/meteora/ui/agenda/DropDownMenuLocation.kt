@@ -5,9 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -18,9 +22,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.data.localities.availableLocalities
+
 
 @Composable
 fun DropdownMenuLocation(
@@ -30,33 +37,69 @@ fun DropdownMenuLocation(
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf(selectedLocation) }
 
-    Column {
-        Row(
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.LocationOn, contentDescription = null,
+            modifier = Modifier
+                .padding(vertical = 12.dp)
+                .size(24.dp)
+                .align(Alignment.CenterVertically)
+        )
+
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = true }
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(horizontal = 16.dp)
+                .align(Alignment.CenterVertically)
         ) {
-            Text(
-                text = if (selectedText.isEmpty()) "Ubicación del Evento" else selectedText,
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            availableLocalities.forEach { locality ->
-                DropdownMenuItem(onClick = {
-                    selectedText = locality.name
-                    onLocationSelected(locality.key)
-                    expanded = false
-                }, text = {
-                    Text(text = locality.name)
-                })
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = true }
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = selectedText.ifEmpty { "Ubicación" },
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .heightIn(max = 300.dp)
+            ) {
+                availableLocalities.forEach { locality ->
+                    DropdownMenuItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            selectedText = locality.name
+                            onLocationSelected(locality.key)
+                            expanded = false
+                        },
+                        text = {
+                            Text(
+                                text = locality.name,
+                                modifier = Modifier.fillMaxWidth(),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun DropdownMenuLocationPreview() {
+    DropdownMenuLocation(selectedLocation = "CDMX") {}
 }

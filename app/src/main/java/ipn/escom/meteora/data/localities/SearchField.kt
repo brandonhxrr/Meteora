@@ -111,7 +111,6 @@ fun SearchBarWithDialog(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth(0.8f)
-            .wrapContentSize(align = Alignment.TopStart, unbounded = false)
             .heightIn(max = 300.dp),
         properties = PopupProperties(
             focusable = false
@@ -128,7 +127,11 @@ fun SearchBarWithDialog(
                 focusManager.clearFocus()
                 showSuggestions = false
             }, text = {
-                Text(text = locality.name, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = locality.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.fillMaxWidth()
+                )
             })
         }
     }

@@ -81,6 +81,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-test-junit4-android:1.6.7")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     implementation("com.airbnb.android:lottie-compose:6.4.0")
+    implementation("com.google.android.gms:play-services-measurement-api:22.0.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
