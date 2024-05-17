@@ -2,6 +2,7 @@ package ipn.escom.meteora.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.capitalize
 import ipn.escom.meteora.R
 import java.text.SimpleDateFormat
 import java.time.Duration
@@ -110,7 +111,14 @@ fun Long.getHoursAndMinutesDiff(other: Long): Pair<Int, Int> {
 fun formatSelectedDate(selectedDayMillis: Long): String {
     val instant = Instant.ofEpochMilli(selectedDayMillis)
     val formatter = DateTimeFormatter.ofPattern("EEE, d 'de' MMMM 'de' yyyy", Locale("es", "MX"))
-    return formatter.format(instant.atZone(ZoneId.systemDefault()))
+    return formatter.format(instant.atZone(ZoneId.systemDefault())).replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase(
+            Locale(
+                "es",
+                "MX"
+            )
+        ) else it.toString()
+    }
 }
 
 @Composable

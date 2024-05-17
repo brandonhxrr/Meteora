@@ -47,7 +47,7 @@ fun TimePickerField(time: Long, onTimeSelected: (Long) -> Unit) {
     Box(
         modifier = Modifier
             .clickable { isTimePickerOpen = true }
-            .padding(8.dp)
+            .padding(vertical = 8.dp)
     ) {
         Text(
             text = convertMillisToTimeFormat(time),

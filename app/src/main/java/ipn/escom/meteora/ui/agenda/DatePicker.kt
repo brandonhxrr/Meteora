@@ -56,7 +56,7 @@ fun DatePickerField(date: Long, onDateSelected: (Long) -> Unit) {
     Box(
         modifier = Modifier
             .clickable { isDatePickerOpen = true }
-            .padding(8.dp)
+            .padding(vertical = 8.dp)
     ) {
         Text(
             text = formatSelectedDate(date),

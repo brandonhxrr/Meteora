@@ -1,22 +1,24 @@
 package ipn.escom.meteora.data.events
 
+import ipn.escom.meteora.utils.getHourOfDayFromLong
+
 data class Event (
     val title: String,
     val description: String,
-    val date: String, // dd-mm-yyyy format
-    val time: String,
+    val date: Long, // dd-mm-yyyy format
+    val time: Long,
     val location: String
 ){
-    fun getDay(): String {
-        return date.split("-")[0]
+    fun getDay(): Int {
+        return getHourOfDayFromLong(date)
     }
 
     fun getMonth(): String {
-        return date.split("-")[1]
+        return ""// date.split("-")[1]
     }
 
     fun getYear(): String {
-        return date.split("-")[2]
+        return ""//date.split("-")[2]
     }
 }
 

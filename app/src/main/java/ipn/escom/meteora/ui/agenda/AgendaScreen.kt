@@ -77,15 +77,15 @@ fun AgendaScreen(modifier: Modifier = Modifier, navController: NavController? = 
                         title = "Cumpleaños de Eveline",
                         description = "",
                         location = "Azcapotzalco",
-                        date = "27-05-2024",
-                        time = "10:00"
+                        date = 1715731200000,
+                        time = 54000000
                     ),
                     Event(
                         title = "Boda de Martín y Ana",
                         description = "",
                         location = "Tlalpan",
-                        date = "16-10-2024",
-                        time = "11:00"
+                        date = 1715731200000,
+                        time = 54000000
                     ),
                 )
 
@@ -135,7 +135,7 @@ fun EventItem(event: Event) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = event.getDay(),
+                    text = "${event.getDay()}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
