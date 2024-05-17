@@ -40,6 +40,7 @@ class EventViewModel : ViewModel() {
 
     init {
         _userId.value = auth.currentUser?.uid
+        _userId.value?.let { getEvents(it) }
     }
 
     fun onEventNameChanged(eventName: String) {
@@ -64,14 +65,30 @@ class EventViewModel : ViewModel() {
 
     fun getEvents(userId: String) {
         viewModelScope.launch {
-            _userEvents.value = eventsUseCase(userId)
+            val events = eventsUseCase(userId)
+            _userEvents.postValue(events.sortedBy { it.date })
         }
     }
+
 
     fun addEvent(userId: String, event: EventResponse) {
         viewModelScope.launch {
             eventsUseCase(userId, event)
         }
     }
+
+    fun onEventOrderChanged(ascending: Boolean) {
+        viewModelScope.launch {
+            val sortedList = if (ascending) {
+                _userEvents.value?.sortedBy { it.date }
+            } else {
+                _userEvents.value?.sortedByDescending { it.date }
+            }
+            sortedList?.let {
+                _userEvents.postValue(it)
+            }
+        }
+    }
+
 
 }

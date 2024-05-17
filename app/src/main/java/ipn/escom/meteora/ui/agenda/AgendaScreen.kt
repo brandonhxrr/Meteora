@@ -3,6 +3,7 @@ package ipn.escom.meteora.ui.agenda
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,8 +41,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.events.EventViewModel
+import ipn.escom.meteora.data.events.data.network.response.EventResponse
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,11 +74,21 @@ fun AgendaScreen(modifier: Modifier = Modifier, navController: NavController? = 
                 .padding(it)
         ) {
             item {
-                Text(
-                    "Próximos eventos",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(16.dp)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        "Próximos eventos",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                    SortButton(modifier = Modifier.align(Alignment.CenterVertically)) { ascending ->
+                        eventViewModel.onEventOrderChanged(ascending)
+                    }
+                }
             }
 
             item {
@@ -86,7 +97,7 @@ fun AgendaScreen(modifier: Modifier = Modifier, navController: NavController? = 
                 }
             }
             item {
-                if(showBottomSheet){
+                if (showBottomSheet) {
                     NewEventBottomSheet(
                         eventViewModel = EventViewModel(),
                         sheetState = modalBottomSheetState,
