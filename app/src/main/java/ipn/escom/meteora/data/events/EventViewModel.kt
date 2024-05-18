@@ -78,16 +78,25 @@ class EventViewModel() : ViewModel() {
         }
     }
 
-
     fun addEvent(userId: String, event: EventResponse) {
         viewModelScope.launch {
             eventsUseCase(userId, event)
+            getEvents(userId)
         }
     }
 
     fun updateEvent(userId: String, event: EventResponse) {
         viewModelScope.launch {
             eventsUseCase.updateEvent(userId, event)
+            getEvents(userId)
+        }
+    }
+
+    fun deleteEvent(userId: String, eventId: String) {
+        viewModelScope.launch {
+            _userEvents.value = emptyList()
+            eventsUseCase.deleteEvent(userId, eventId)
+            getEvents(userId)
         }
     }
 

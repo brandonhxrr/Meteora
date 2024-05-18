@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
@@ -59,8 +60,7 @@ fun EventDetailBottomSheet(
     eventResponse: EventResponse,
     sheetState: SheetState = rememberModalBottomSheetState(),
     scope: CoroutineScope,
-    onDismissRequest: () -> Unit,
-    onEventUpdated: () -> Unit
+    onDismissRequest: () -> Unit
 ) {
     val eventViewModel = EventViewModel()
     val eventName: String by eventViewModel.eventName.observeAsState("")
@@ -70,6 +70,7 @@ fun EventDetailBottomSheet(
     val userId: String = eventViewModel.userId.value!!
     val eventLocation by eventViewModel.eventLocation.observeAsState("")
     var showDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     var isEditable by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -97,7 +98,15 @@ fun EventDetailBottomSheet(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             IconButton(onClick = {
-                showDialog = true
+                if (isEditable) {
+                    showDialog = true
+                } else {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            onDismissRequest()
+                        }
+                    }
+                }
             }) {
                 Icon(imageVector = Icons.Rounded.Close, contentDescription = "Close")
             }
@@ -113,7 +122,6 @@ fun EventDetailBottomSheet(
                             location = eventLocation
                         )
                         eventViewModel.updateEvent(userId, event)
-                        onEventUpdated()
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
                                 onDismissRequest()
@@ -123,14 +131,15 @@ fun EventDetailBottomSheet(
                     isEditable = !isEditable
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if(isEditable) green else Color.Black,
+                    containerColor = if (isEditable) green else Color.Black,
                     contentColor = Color.White
                 ),
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
                 Icon(
                     imageVector = if (isEditable) Icons.Rounded.Check else Icons.Rounded.Edit,
-                    contentDescription = null
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(if (isEditable) "Guardar" else "Editar")
@@ -211,6 +220,31 @@ fun EventDetailBottomSheet(
                         )
                     }
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
+                        onClick = {
+                            showDeleteDialog = true
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Delete,
+                            contentDescription = "Delete",
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Eliminar")
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                }
             }
         }
         if (showDialog) {
@@ -232,6 +266,32 @@ fun EventDetailBottomSheet(
                 },
                 dismissButton = {
                     TextButton(onClick = { showDialog = false }) {
+                        Text("No")
+                    }
+                }
+            )
+        }
+
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text("Eliminar evento") },
+                text = { Text("¿Está seguro de que desea eliminar el evento?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        eventViewModel.deleteEvent(userId, eventResponse.id!!)
+                        showDeleteDialog = false
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                onDismissRequest()
+                            }
+                        }
+                    }) {
+                        Text("Sí")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteDialog = false }) {
                         Text("No")
                     }
                 }

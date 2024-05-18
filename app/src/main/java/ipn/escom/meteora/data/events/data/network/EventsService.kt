@@ -66,4 +66,8 @@ class EventsService {
         query.child("time").setValue(event.time)
         query.child("location").setValue(event.location)
     }
+
+    suspend fun deleteEvent(userId: String, eventId: String) {
+        database.child("events").child(userId).child(eventId).removeValue()
+    }
 }
