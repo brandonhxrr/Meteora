@@ -113,9 +113,9 @@ fun Long.getHoursAndMinutesDiff(other: Long): Pair<Int, Int> {
     return Pair(hours, minutes)
 }
 
-fun formatSelectedDate(selectedDayMillis: Long): String {
+fun formatSelectedDate(selectedDayMillis: Long, format: String? = "EEE, d 'de' MMMM 'de' yyyy"): String {
     val localDate = Instant.ofEpochMilli(selectedDayMillis).atZone(ZoneId.of("UTC")).toLocalDate()
-    val formatter = DateTimeFormatter.ofPattern("EEE, d 'de' MMMM 'de' yyyy", Locale("es", "MX"))
+    val formatter = DateTimeFormatter.ofPattern(format, Locale("es", "MX"))
     localDate.format(formatter)
     return localDate.format(formatter).replaceFirstChar {
         if (it.isLowerCase()) it.titlecase(
