@@ -57,4 +57,13 @@ class EventsService {
         query.child("time").setValue(event.time)
         query.child("location").setValue(event.location)
     }
+
+    suspend fun updateEvent(userId: String, event: EventResponse) {
+        val query = database.child("events").child(userId).child(event.id!!)
+        query.child("title").setValue(event.title)
+        query.child("description").setValue(event.description)
+        query.child("date").setValue(event.date)
+        query.child("time").setValue(event.time)
+        query.child("location").setValue(event.location)
+    }
 }

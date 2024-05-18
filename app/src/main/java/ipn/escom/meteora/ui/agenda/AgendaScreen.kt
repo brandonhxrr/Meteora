@@ -54,6 +54,10 @@ fun AgendaScreen(modifier: Modifier = Modifier, navController: NavController? = 
     val userId = eventViewModel.userId.value
     val userEvents by eventViewModel.userEvents.observeAsState()
 
+    val eventDetailSheetState = rememberModalBottomSheetState()
+    var showDetailsheet by remember { mutableStateOf(false) }
+    var selectedEvent by remember { mutableStateOf<EventResponse?>(null) }
+
     LaunchedEffect(key1 = true) {
         eventViewModel.getEvents(userId!!)
     }
@@ -93,7 +97,11 @@ fun AgendaScreen(modifier: Modifier = Modifier, navController: NavController? = 
 
             item {
                 userEvents?.forEach { event ->
-                    EventItem(eventResponse = event)
+                    Log.d("AgendaScreen", "${event.id}")
+                    EventItem(eventResponse = event, onClick = {
+                        selectedEvent = event
+                        showDetailsheet = true
+                    })
                 }
             }
             item {
@@ -106,6 +114,22 @@ fun AgendaScreen(modifier: Modifier = Modifier, navController: NavController? = 
                             showBottomSheet = false
                         },
                         onEventAdded = {
+                            eventViewModel.getEvents(userId!!)
+                        }
+                    )
+                }
+            }
+
+            item {
+                if (showDetailsheet && selectedEvent != null) {
+                    EventDetailBottomSheet(
+                        eventResponse = selectedEvent!!,
+                        sheetState = eventDetailSheetState,
+                        scope = coroutineScope,
+                        onDismissRequest = {
+                            showDetailsheet = false
+                        },
+                        onEventUpdated = {
                             eventViewModel.getEvents(userId!!)
                         }
                     )

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.outlined.LocationOn
@@ -31,6 +30,7 @@ import ipn.escom.meteora.data.localities.availableLocalities
 
 @Composable
 fun DropdownMenuLocation(
+    enabled: Boolean = true,
     selectedLocation: String,
     onLocationSelected: (String) -> Unit
 ) {
@@ -58,7 +58,7 @@ fun DropdownMenuLocation(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { expanded = true }
+                    .clickable { if (enabled) expanded = true }
                     .padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {

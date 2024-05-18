@@ -9,7 +9,7 @@ import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.events.domain.EventsUseCase
 import kotlinx.coroutines.launch
 
-class EventViewModel : ViewModel() {
+class EventViewModel() : ViewModel() {
 
     private val eventsUseCase = EventsUseCase()
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -37,6 +37,14 @@ class EventViewModel : ViewModel() {
 
     private val _eventImageUrl = MutableLiveData<String>()
     val eventImageUrl: LiveData<String> = _eventImageUrl
+
+    fun initializeViewModel(event: EventResponse) {
+        _eventName.value = event.title
+        _eventDescription.value = event.description
+        _eventDate.value = event.date
+        _eventTime.value = event.time
+        _eventLocation.value = event.location
+    }
 
     init {
         _userId.value = auth.currentUser?.uid
@@ -74,6 +82,12 @@ class EventViewModel : ViewModel() {
     fun addEvent(userId: String, event: EventResponse) {
         viewModelScope.launch {
             eventsUseCase(userId, event)
+        }
+    }
+
+    fun updateEvent(userId: String, event: EventResponse) {
+        viewModelScope.launch {
+            eventsUseCase.updateEvent(userId, event)
         }
     }
 

@@ -28,7 +28,7 @@ import java.time.ZoneId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerField(date: Long, onDateSelected: (Long) -> Unit) {
+fun DatePickerField(date: Long, enabled: Boolean, onDateSelected: (Long) -> Unit) {
     var initialSelectedDateMillis by remember { mutableLongStateOf(date) }
 
     if (date == 0L) {
@@ -55,7 +55,7 @@ fun DatePickerField(date: Long, onDateSelected: (Long) -> Unit) {
 
     Box(
         modifier = Modifier
-            .clickable { isDatePickerOpen = true }
+            .clickable { if (enabled) isDatePickerOpen = true }
             .padding(vertical = 8.dp)
     ) {
         Text(

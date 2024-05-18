@@ -10,4 +10,6 @@ class EventsRepository {
     suspend fun getEvents(userId: String) = service.getEvents(userId)
 
     suspend fun addEvent(userId: String, event: EventResponse) = service.addEvent(userId, event)
+
+    suspend fun updateEvent(userId: String, event: EventResponse) = service.updateEvent(userId, event)
 }

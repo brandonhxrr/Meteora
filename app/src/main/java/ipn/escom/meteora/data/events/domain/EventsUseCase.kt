@@ -13,4 +13,8 @@ class EventsUseCase {
     suspend operator fun invoke(userId: String, event: EventResponse) {
         repository.addEvent(userId, event)
     }
+
+    suspend fun updateEvent(userId: String, event: EventResponse) {
+        repository.updateEvent(userId, event)
+    }
 }

@@ -4,17 +4,23 @@ import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -39,25 +45,24 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.auth.FirebaseAuth
 import ipn.escom.meteora.data.events.EventViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
+import ipn.escom.meteora.ui.theme.green
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewEventBottomSheet(
-    eventViewModel: EventViewModel,
+fun EventDetailBottomSheet(
+    eventResponse: EventResponse,
     sheetState: SheetState = rememberModalBottomSheetState(),
     scope: CoroutineScope,
     onDismissRequest: () -> Unit,
-    onEventAdded: () -> Unit
+    onEventUpdated: () -> Unit
 ) {
-
+    val eventViewModel = EventViewModel()
     val eventName: String by eventViewModel.eventName.observeAsState("")
     val eventDescription by eventViewModel.eventDescription.observeAsState("")
     val eventTime by eventViewModel.eventTime.observeAsState(0L)
@@ -65,13 +70,13 @@ fun NewEventBottomSheet(
     val userId: String = eventViewModel.userId.value!!
     val eventLocation by eventViewModel.eventLocation.observeAsState("")
     var showDialog by remember { mutableStateOf(false) }
-    var allDayEvent by remember {
-        mutableStateOf(false)
-    }
-    val auth = FirebaseAuth.getInstance()
-
+    var isEditable by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
+
+    eventViewModel.initializeViewModel(eventResponse)
+
+    var allDayEvent by remember { mutableStateOf(eventTime == 0L) }
 
     LaunchedEffect(interactionSource) {
         interactionSource.interactions.collect {
@@ -84,10 +89,12 @@ fun NewEventBottomSheet(
     }
 
     ModalBottomSheet(
-        onDismissRequest = onDismissRequest, sheetState = sheetState
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             IconButton(onClick = {
                 showDialog = true
@@ -96,32 +103,47 @@ fun NewEventBottomSheet(
             }
             Button(
                 onClick = {
-                    val event = EventResponse(
-                        title = eventName,
-                        description = eventDescription,
-                        date = eventDate,
-                        time = if (allDayEvent) 0L else eventTime,
-                        location = eventLocation
-                    )
-                    eventViewModel.addEvent(userId, event)
-                    onEventAdded()
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            onDismissRequest()
+                    if (isEditable) {
+                        val event = EventResponse(
+                            id = eventResponse.id,
+                            title = eventName,
+                            description = eventDescription,
+                            date = eventDate,
+                            time = if (allDayEvent) 0L else eventTime,
+                            location = eventLocation
+                        )
+                        eventViewModel.updateEvent(userId, event)
+                        onEventUpdated()
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                onDismissRequest()
+                            }
                         }
                     }
-                }, modifier = Modifier.padding(horizontal = 16.dp)
+                    isEditable = !isEditable
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if(isEditable) green else Color.Black,
+                    contentColor = Color.White
+                ),
+                modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-                Text("Guardar")
+                Icon(
+                    imageVector = if (isEditable) Icons.Rounded.Check else Icons.Rounded.Edit,
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(if (isEditable) "Guardar" else "Editar")
             }
         }
         LazyColumn(
-            modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
                 TextField(
                     value = eventName,
-                    onValueChange = { eventViewModel.onEventNameChanged(it) },
+                    onValueChange = { if (isEditable) eventViewModel.onEventNameChanged(it) },
                     placeholder = {
                         Text(
                             "Agregar título",
@@ -140,7 +162,12 @@ fun NewEventBottomSheet(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        disabledTextColor = MaterialTheme.colorScheme.onSurface, // Use the same text color
+                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant, // If you have leading icons
+                        disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant // If you have trailing icons
                     ),
                     textStyle = MaterialTheme.typography.bodySmall.copy(fontSize = 24.sp),
                     maxLines = 1,
@@ -148,44 +175,47 @@ fun NewEventBottomSheet(
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences
                     ),
-                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
-
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    enabled = isEditable
                 )
                 HorizontalDivider()
                 ListSelector()
                 HorizontalDivider()
 
-                EventDateTimePicker(allDayEvent = allDayEvent,
-                    onAllDayEventChanged = { allDayEvent = !allDayEvent },
+                EventDateTimePicker(
+                    allDayEvent = allDayEvent,
+                    onAllDayEventChanged = { if (isEditable) allDayEvent = !allDayEvent },
                     date = eventDate,
                     time = eventTime,
-                    onDateSelected = { date -> eventViewModel.onEventDateChanged(date) },
-                    onTimeSelected = { time -> eventViewModel.onEventTimeChanged(time) })
-
-
-                HorizontalDivider()
-
-                DropdownMenuLocation(selectedLocation = eventLocation,
-                    onLocationSelected = { location ->
-                        eventViewModel.onEventLocationChanged(
-                            location
-                        )
-                    })
+                    onDateSelected = { if (isEditable) eventViewModel.onEventDateChanged(it) },
+                    onTimeSelected = { if (isEditable) eventViewModel.onEventTimeChanged(it) },
+                    enabled = isEditable,
+                )
 
                 HorizontalDivider()
 
+                DropdownMenuLocation(
+                    enabled = isEditable,
+                    selectedLocation = eventLocation,
+                    onLocationSelected = { if (isEditable) eventViewModel.onEventLocationChanged(it) }
+                )
 
-                DescriptionField(eventDescription = eventDescription,
-                    onEventDescriptionChanged = { description ->
-                        eventViewModel.onEventDescriptionChanged(
-                            description
+                HorizontalDivider()
+
+                DescriptionField(
+                    enabled = isEditable,
+                    eventDescription = eventDescription,
+                    onEventDescriptionChanged = {
+                        if (isEditable) eventViewModel.onEventDescriptionChanged(
+                            it
                         )
-                    })
+                    }
+                )
             }
-
         }
         if (showDialog) {
-            AlertDialog(onDismissRequest = { showDialog = false },
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
                 title = { Text("Cancelar cambios") },
                 text = { Text("¿Está seguro de que desea cancelar los cambios?") },
                 confirmButton = {
@@ -196,7 +226,6 @@ fun NewEventBottomSheet(
                                 onDismissRequest()
                             }
                         }
-
                     }) {
                         Text("Sí")
                     }
@@ -205,7 +234,8 @@ fun NewEventBottomSheet(
                     TextButton(onClick = { showDialog = false }) {
                         Text("No")
                     }
-                })
+                }
+            )
         }
     }
 }

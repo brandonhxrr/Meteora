@@ -17,7 +17,6 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,22 +24,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import ipn.escom.meteora.utils.convertMillisToTimeFormat
-import ipn.escom.meteora.utils.getHourWithMinutesString
 import ipn.escom.meteora.utils.getHoursAndMinutesFromMillis
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
-import java.util.Calendar
 
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimePickerField(time: Long, onTimeSelected: (Long) -> Unit) {
+fun TimePickerField(time: Long, enabled: Boolean, onTimeSelected: (Long) -> Unit) {
     var initialSelectedTimeMillis by remember { mutableStateOf(time) }
 
-    if(time == 0L){
+    if (time == 0L) {
         initialSelectedTimeMillis = System.currentTimeMillis()
         onTimeSelected(initialSelectedTimeMillis)
     }
@@ -49,7 +45,7 @@ fun TimePickerField(time: Long, onTimeSelected: (Long) -> Unit) {
 
     Box(
         modifier = Modifier
-            .clickable { isTimePickerOpen = true }
+            .clickable { if (enabled) isTimePickerOpen = true }
             .padding(vertical = 8.dp)
     ) {
         Text(
@@ -93,7 +89,11 @@ fun TimePickerField(time: Long, onTimeSelected: (Long) -> Unit) {
                                 timePickerState.hour,
                                 timePickerState.minute
                             )
-                            val zonedDateTime = ZonedDateTime.of(LocalDate.now(), selectedLocalTime, ZoneId.systemDefault())
+                            val zonedDateTime = ZonedDateTime.of(
+                                LocalDate.now(),
+                                selectedLocalTime,
+                                ZoneId.systemDefault()
+                            )
                             val selectedTimeMillis = zonedDateTime.toInstant().toEpochMilli()
                             onTimeSelected(selectedTimeMillis)
                             isTimePickerOpen = false

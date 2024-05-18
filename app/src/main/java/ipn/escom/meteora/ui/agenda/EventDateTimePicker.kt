@@ -24,6 +24,7 @@ fun EventDateTimePicker(
     onAllDayEventChanged: (Boolean) -> Unit,
     date: Long,
     time: Long,
+    enabled: Boolean = true,
     onDateSelected: (Long) -> Unit,
     onTimeSelected: (Long) -> Unit
 ) {
@@ -58,9 +59,15 @@ fun EventDateTimePicker(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                DatePickerField(date = date, onDateSelected = { onDateSelected(it) })
+                DatePickerField(
+                    date = date,
+                    enabled = enabled,
+                    onDateSelected = { onDateSelected(it) })
                 if (!allDayEvent) {
-                    TimePickerField(time = time, onTimeSelected = { onTimeSelected(it) })
+                    TimePickerField(
+                        time = time,
+                        enabled = enabled,
+                        onTimeSelected = { onTimeSelected(it) })
                 }
             }
         }

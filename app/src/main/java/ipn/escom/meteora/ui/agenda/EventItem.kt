@@ -31,13 +31,14 @@ import ipn.escom.meteora.utils.convertMillisToTimeFormat
 import ipn.escom.meteora.utils.formatSelectedDate
 
 @Composable
-fun EventItem(eventResponse: EventResponse) {
+fun EventItem(eventResponse: EventResponse, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp)
             .clickable {
                 Log.d("EventItem", "${eventResponse.id}")
+                onClick()
             },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -131,6 +132,7 @@ fun EventItemPreview() {
             location = "Lugar de prueba",
             date = 1683993600000L, // 13 May 2023 00:00:00 GMT
             time = 3600000L // 1 hour in milliseconds
-        )
+        ),
+        onClick = {}
     )
 }
