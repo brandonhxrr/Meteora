@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.events.EventViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.ui.theme.green
@@ -57,6 +58,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDetailBottomSheet(
+    agendaViewModel: AgendaViewModel,
     eventResponse: EventResponse,
     sheetState: SheetState = rememberModalBottomSheetState(),
     scope: CoroutineScope,
@@ -121,7 +123,7 @@ fun EventDetailBottomSheet(
                             time = if (allDayEvent) 0L else eventTime,
                             location = eventLocation
                         )
-                        eventViewModel.updateEvent(userId, event)
+                        agendaViewModel.updateEvent(userId, event)
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
                                 onDismissRequest()
@@ -279,7 +281,7 @@ fun EventDetailBottomSheet(
                 text = { Text("¿Está seguro de que desea eliminar el evento?") },
                 confirmButton = {
                     TextButton(onClick = {
-                        eventViewModel.deleteEvent(userId, eventResponse.id!!)
+                        agendaViewModel.deleteEvent(userId, eventResponse.id!!)
                         showDeleteDialog = false
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {

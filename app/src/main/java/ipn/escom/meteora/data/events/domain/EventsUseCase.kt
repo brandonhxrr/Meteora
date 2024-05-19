@@ -18,7 +18,7 @@ class EventsUseCase {
         repository.updateEvent(userId, event)
     }
 
-    suspend fun deleteEvent(userId: String, eventId: String) {
+    fun deleteEvent(userId: String, eventId: String) {
         repository.deleteEvent(userId, eventId)
     }
 }

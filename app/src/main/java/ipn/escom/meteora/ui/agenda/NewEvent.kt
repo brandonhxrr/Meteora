@@ -47,6 +47,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
+import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.events.EventViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import kotlinx.coroutines.CoroutineScope
@@ -55,13 +56,13 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewEventBottomSheet(
-    eventViewModel: EventViewModel,
+    agendaViewModel: AgendaViewModel,
     sheetState: SheetState = rememberModalBottomSheetState(),
     scope: CoroutineScope,
     onDismissRequest: () -> Unit,
     onEventAdded: () -> Unit
 ) {
-
+    val eventViewModel = EventViewModel()
     val eventName: String by eventViewModel.eventName.observeAsState("")
     val eventDescription by eventViewModel.eventDescription.observeAsState("")
     val eventTime by eventViewModel.eventTime.observeAsState(0L)
@@ -107,7 +108,7 @@ fun NewEventBottomSheet(
                         time = if (allDayEvent) 0L else eventTime,
                         location = eventLocation
                     )
-                    eventViewModel.addEvent(userId, event)
+                    agendaViewModel.addEvent(userId, event)
                     onEventAdded()
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
