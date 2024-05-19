@@ -93,15 +93,28 @@ class PredictionsService {
                             val days = mutableListOf<DayPrediction>()
                             for (daySnapshot in monthSnapshot.children) {
                                 val day = daySnapshot.key?.toIntOrNull() ?: continue
-                                val stringPrediction =
+                                val stringPrediction = try {
                                     daySnapshot.getValue(StringPrediction::class.java)
-                                        ?: continue
-                                val prediction = Prediction(
-                                    maxt = stringPrediction.maxt.toDoubleOrNull() ?: 0.0,
-                                    mint = stringPrediction.mint.toDoubleOrNull() ?: 0.0,
-                                    rainfall = stringPrediction.rainfall.toDoubleOrNull() ?: 0.0
-                                )
+                                } catch (e: Exception) {
+                                    null
+                                }
+                                val prediction = if (stringPrediction != null) {
+                                    Prediction(
+                                        maxt = stringPrediction.maxt.toDoubleOrNull() ?: 0.0,
+                                        mint = stringPrediction.mint.toDoubleOrNull() ?: 0.0,
+                                        rainfall = stringPrediction.rainfall.toDoubleOrNull() ?: 0.0
+                                    )
+                                } else {
+                                    val fallbackPrediction = daySnapshot.getValue(Prediction::class.java)
+                                    Prediction(
+                                        maxt = fallbackPrediction?.maxt ?: 0.0,
+                                        mint = fallbackPrediction?.mint ?: 0.0,
+                                        rainfall = fallbackPrediction?.rainfall ?: 0.0
+                                    )
+                                }
+
                                 days.add(DayPrediction(day, prediction))
+
                             }
                             months.add(MonthPrediction(month, days))
                         }
