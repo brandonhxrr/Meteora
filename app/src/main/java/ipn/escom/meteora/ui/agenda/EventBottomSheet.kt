@@ -57,29 +57,28 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventDetailBottomSheet(
+fun EventBottomSheet(
     agendaViewModel: AgendaViewModel,
-    eventResponse: EventResponse,
+    eventResponse: EventResponse? = null,
     sheetState: SheetState = rememberModalBottomSheetState(),
     scope: CoroutineScope,
     onDismissRequest: () -> Unit
 ) {
-    val eventViewModel = EventViewModel()
+    val eventViewModel = remember { EventViewModel() }
     val eventName: String by eventViewModel.eventName.observeAsState("")
     val eventDescription by eventViewModel.eventDescription.observeAsState("")
     val eventTime by eventViewModel.eventTime.observeAsState(0L)
     val eventDate by eventViewModel.eventDate.observeAsState(0L)
     val userId: String = eventViewModel.userId.value!!
     val eventLocation by eventViewModel.eventLocation.observeAsState("")
-    var showDialog by remember { mutableStateOf(false) }
+    var showCancelDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var isEditable by remember { mutableStateOf(false) }
+    var isEditable by remember { mutableStateOf(eventResponse == null) }
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
+    var allDayEvent by remember { mutableStateOf(eventResponse?.time == 0L) }
 
-    eventViewModel.initializeViewModel(eventResponse)
-
-    var allDayEvent by remember { mutableStateOf(eventTime == 0L) }
+    eventResponse?.let { eventViewModel.initializeViewModel(it) }
 
     LaunchedEffect(interactionSource) {
         interactionSource.interactions.collect {
@@ -101,7 +100,7 @@ fun EventDetailBottomSheet(
         ) {
             IconButton(onClick = {
                 if (isEditable) {
-                    showDialog = true
+                    showCancelDialog = true
                 } else {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
@@ -114,23 +113,41 @@ fun EventDetailBottomSheet(
             }
             Button(
                 onClick = {
-                    if (isEditable) {
+                    if (eventResponse == null) {
                         val event = EventResponse(
-                            id = eventResponse.id,
                             title = eventName,
                             description = eventDescription,
                             date = eventDate,
                             time = if (allDayEvent) 0L else eventTime,
                             location = eventLocation
                         )
-                        agendaViewModel.updateEvent(userId, event)
+                        agendaViewModel.addEvent(userId, event)
+
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
                                 onDismissRequest()
                             }
                         }
+                    } else {
+                        if (isEditable) {
+                            val event = EventResponse(
+                                id = eventResponse.id,
+                                title = eventName,
+                                description = eventDescription,
+                                date = eventDate,
+                                time = if (allDayEvent) 0L else eventTime,
+                                location = eventLocation
+                            )
+                            agendaViewModel.updateEvent(userId, event)
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    onDismissRequest()
+                                }
+                            }
+                        } else {
+                            isEditable = true
+                        }
                     }
-                    isEditable = !isEditable
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (isEditable) green else Color.Black,
@@ -154,7 +171,11 @@ fun EventDetailBottomSheet(
             item {
                 TextField(
                     value = eventName,
-                    onValueChange = { if (isEditable) eventViewModel.onEventNameChanged(it) },
+                    onValueChange = {
+                        if (isEditable || eventResponse == null) eventViewModel.onEventNameChanged(
+                            it
+                        )
+                    },
                     placeholder = {
                         Text(
                             "Agregar título",
@@ -176,9 +197,9 @@ fun EventDetailBottomSheet(
                         unfocusedContainerColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
                         disabledContainerColor = Color.Transparent,
-                        disabledTextColor = MaterialTheme.colorScheme.onSurface, // Use the same text color
-                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant, // If you have leading icons
-                        disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant // If you have trailing icons
+                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     textStyle = MaterialTheme.typography.bodySmall.copy(fontSize = 24.sp),
                     maxLines = 1,
@@ -187,7 +208,7 @@ fun EventDetailBottomSheet(
                         capitalization = KeyboardCapitalization.Sentences
                     ),
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                    enabled = isEditable
+                    enabled = isEditable || eventResponse == null
                 )
                 HorizontalDivider()
                 ListSelector()
@@ -195,29 +216,43 @@ fun EventDetailBottomSheet(
 
                 EventDateTimePicker(
                     allDayEvent = allDayEvent,
-                    onAllDayEventChanged = { if (isEditable) allDayEvent = !allDayEvent },
+                    onAllDayEventChanged = {
+                        if (isEditable || eventResponse == null) allDayEvent = !allDayEvent
+                    },
                     date = eventDate,
                     time = eventTime,
-                    onDateSelected = { if (isEditable) eventViewModel.onEventDateChanged(it) },
-                    onTimeSelected = { if (isEditable) eventViewModel.onEventTimeChanged(it) },
-                    enabled = isEditable,
+                    onDateSelected = {
+                        if (isEditable || eventResponse == null) eventViewModel.onEventDateChanged(
+                            it
+                        )
+                    },
+                    onTimeSelected = {
+                        if (isEditable || eventResponse == null) eventViewModel.onEventTimeChanged(
+                            it
+                        )
+                    },
+                    enabled = isEditable || eventResponse == null
                 )
 
                 HorizontalDivider()
 
                 DropdownMenuLocation(
-                    enabled = isEditable,
+                    enabled = isEditable || eventResponse == null,
                     selectedLocation = eventLocation,
-                    onLocationSelected = { if (isEditable) eventViewModel.onEventLocationChanged(it) }
+                    onLocationSelected = {
+                        if (isEditable || eventResponse == null) eventViewModel.onEventLocationChanged(
+                            it
+                        )
+                    }
                 )
 
                 HorizontalDivider()
 
                 DescriptionField(
-                    enabled = isEditable,
+                    enabled = isEditable || eventResponse == null,
                     eventDescription = eventDescription,
                     onEventDescriptionChanged = {
-                        if (isEditable) eventViewModel.onEventDescriptionChanged(
+                        if (isEditable || eventResponse == null) eventViewModel.onEventDescriptionChanged(
                             it
                         )
                     }
@@ -225,38 +260,40 @@ fun EventDetailBottomSheet(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        onClick = {
-                            showDeleteDialog = true
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error,
-                            contentColor = MaterialTheme.colorScheme.onError
-                        ),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Delete,
-                            contentDescription = "Delete",
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Eliminar")
+                if (eventResponse != null) {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Button(
+                            onClick = {
+                                showDeleteDialog = true
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError
+                            ),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Delete,
+                                contentDescription = "Delete",
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Eliminar")
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
                     }
-                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
         }
-        if (showDialog) {
+        if (showCancelDialog) {
             AlertDialog(
-                onDismissRequest = { showDialog = false },
+                onDismissRequest = { showCancelDialog = false },
                 title = { Text("Cancelar cambios") },
                 text = { Text("¿Está seguro de que desea cancelar los cambios?") },
                 confirmButton = {
                     TextButton(onClick = {
-                        showDialog = false
+                        showCancelDialog = false
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
                                 onDismissRequest()
@@ -267,7 +304,7 @@ fun EventDetailBottomSheet(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDialog = false }) {
+                    TextButton(onClick = { showCancelDialog = false }) {
                         Text("No")
                     }
                 }
@@ -281,7 +318,7 @@ fun EventDetailBottomSheet(
                 text = { Text("¿Está seguro de que desea eliminar el evento?") },
                 confirmButton = {
                     TextButton(onClick = {
-                        agendaViewModel.deleteEvent(userId, eventResponse.id!!)
+                        agendaViewModel.deleteEvent(userId, eventResponse!!.id!!)
                         showDeleteDialog = false
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {

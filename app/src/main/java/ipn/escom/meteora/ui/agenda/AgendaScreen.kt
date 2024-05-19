@@ -33,14 +33,11 @@ import ipn.escom.meteora.data.events.data.network.response.EventResponse
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AgendaScreen(modifier: Modifier = Modifier) {
-    val modalBottomSheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
     val agendaViewModel = AgendaViewModel()
-    val userId = agendaViewModel.userId.value
     val userEvents by agendaViewModel.userEvents.observeAsState()
-
-    val eventDetailSheetState = rememberModalBottomSheetState()
     var showDetailSheet by remember { mutableStateOf(false) }
     var selectedEvent by remember { mutableStateOf<EventResponse?>(null) }
 
@@ -99,26 +96,23 @@ fun AgendaScreen(modifier: Modifier = Modifier) {
             }
             item {
                 if (showBottomSheet) {
-                    NewEventBottomSheet(
+                    EventBottomSheet(
                         agendaViewModel = agendaViewModel,
-                        sheetState = modalBottomSheetState,
+                        sheetState = sheetState,
                         scope = coroutineScope,
                         onDismissRequest = {
                             showBottomSheet = false
                         },
-                        onEventAdded = {
-                            agendaViewModel.getEvents(userId!!)
-                        }
                     )
                 }
             }
 
             item {
                 if (showDetailSheet && selectedEvent != null) {
-                    EventDetailBottomSheet(
+                    EventBottomSheet(
                         agendaViewModel = agendaViewModel,
                         eventResponse = selectedEvent!!,
-                        sheetState = eventDetailSheetState,
+                        sheetState = sheetState,
                         scope = coroutineScope,
                         onDismissRequest = {
                             showDetailSheet = false
