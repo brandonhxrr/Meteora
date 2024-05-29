@@ -98,3 +98,7 @@ val availableLocalities = listOf(
         longitude = -99.1033
     )
 )
+
+fun getLocalityKeyFromName(name: String): String {
+    return availableLocalities.find { it.name == name }?.key ?: ""
+}

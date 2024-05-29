@@ -2,6 +2,8 @@ package ipn.escom.meteora.data.events.data.network.response
 
 import ipn.escom.meteora.utils.getDayFromMillis
 import ipn.escom.meteora.utils.getHourOfDayFromLong
+import ipn.escom.meteora.utils.getMonthFromMillis
+import ipn.escom.meteora.utils.getYearFromMillis
 
 data class EventResponse (
     val id: String? = "",
@@ -15,12 +17,12 @@ data class EventResponse (
         return getDayFromMillis(date)
     }
 
-    fun getMonth(): String {
-        return ""// date.split("-")[1]
+    fun getMonth(): Int {
+        return getMonthFromMillis(date)
     }
 
-    fun getYear(): String {
-        return ""//date.split("-")[2]
+    fun getYear(): Int {
+        return getYearFromMillis(date)
     }
 }
 

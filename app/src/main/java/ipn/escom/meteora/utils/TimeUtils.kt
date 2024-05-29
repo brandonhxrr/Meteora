@@ -97,6 +97,16 @@ fun getDayFromMillis(millis: Long): Int {
     return localDate.dayOfMonth
 }
 
+fun getMonthFromMillis(millis: Long): Int {
+    val localDate = Instant.ofEpochMilli(millis).atZone(ZoneId.of("UTC")).toLocalDate()
+    return localDate.monthValue
+}
+
+fun getYearFromMillis(millis: Long): Int {
+    val localDate = Instant.ofEpochMilli(millis).atZone(ZoneId.of("UTC")).toLocalDate()
+    return localDate.year
+}
+
 fun getHoursAndMinutesFromMillis(millis: Long): Pair<Int, Int> {
     val calendar = Calendar.getInstance().apply {
         timeInMillis = millis

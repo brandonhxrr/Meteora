@@ -1,8 +1,11 @@
 package ipn.escom.meteora.ui.agenda
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +22,7 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.WbCloudy
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -51,10 +55,18 @@ import androidx.compose.ui.unit.sp
 import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.events.EventViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
+import ipn.escom.meteora.data.localities.getLocalityKeyFromName
+import ipn.escom.meteora.data.predictions.PredictionsViewModel
+import ipn.escom.meteora.data.predictions.data.network.response.Prediction
+import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
 import ipn.escom.meteora.ui.theme.green
+import ipn.escom.meteora.utils.getDayFromMillis
+import ipn.escom.meteora.utils.getMonthFromMillis
+import ipn.escom.meteora.utils.getYearFromMillis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventBottomSheet(
@@ -77,8 +89,20 @@ fun EventBottomSheet(
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
     var allDayEvent by remember { mutableStateOf(eventResponse?.time == 0L) }
+    val predictionsViewModel = PredictionsViewModel()
+    val predictions: PredictionsResponse? by predictionsViewModel.predictions.observeAsState(initial = PredictionsResponse())
+    var localityKey by remember { mutableStateOf(getLocalityKeyFromName(eventLocation)) }
 
     eventResponse?.let { eventViewModel.initializeViewModel(it) }
+
+    LaunchedEffect(key1 = eventLocation) {
+        if (eventLocation.isNotEmpty() && eventDate != 0L) {
+            localityKey = getLocalityKeyFromName(eventLocation)
+            predictionsViewModel.getPredictions(localityKey)
+            Log.d("EventBottomSheet", "LocalityKey111111: $localityKey")
+            Log.d("EventBottomSheet", "Predictions111111: $predictions")
+        }
+    }
 
     LaunchedEffect(interactionSource) {
         interactionSource.interactions.collect {
@@ -260,7 +284,65 @@ fun EventBottomSheet(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                if (predictions != null && predictions != PredictionsResponse()) {
+                    Log.d("EventBottomSheet", "LocalityKey: $localityKey")
+                    Log.d("EventBottomSheet", "Predictions: $predictions")
+
+                    val prediction = findPrediction(
+                        predictions!!,
+                        getYearFromMillis(eventDate),
+                        getMonthFromMillis(eventDate),
+                        getDayFromMillis(eventDate)
+                    )
+
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row {
+                            Icon(
+                                imageVector = Icons.Rounded.WbCloudy,
+                                contentDescription = "Weather"
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Pronóstico del clima")
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        if (prediction == null) {
+                            Text("No hay pronóstico disponible para esta fecha")
+                        } else {
+                            Text(
+                                text = "Temperatura máxima: ${
+                                    String.format(
+                                        "%.2f",
+                                        prediction.maxt
+                                    )
+                                } °",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Temperatura mínima: ${
+                                    String.format(
+                                        "%.2f",
+                                        prediction.mint
+                                    )
+                                } °",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Nivel de lluvia: ${
+                                    if (prediction.rainfall > 0.0) String.format(
+                                        "%.2f",
+                                        prediction.rainfall
+                                    ) else "0"
+                                } mm",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                }
+
                 if (eventResponse != null) {
+
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Spacer(modifier = Modifier.weight(1f))
                         Button(
@@ -337,4 +419,25 @@ fun EventBottomSheet(
             )
         }
     }
+}
+
+fun findPrediction(
+    predictionsResponse: PredictionsResponse,
+    year: Int,
+    month: Int,
+    day: Int
+): Prediction? {
+    for (localityPrediction in predictionsResponse.predictions) {
+        val yearPrediction = localityPrediction.years.find { it.year == year }
+        if (yearPrediction != null) {
+            val monthPrediction = yearPrediction.months.find { it.month == month }
+            if (monthPrediction != null) {
+                val dayPrediction = monthPrediction.days.find { it.day == day }
+                if (dayPrediction != null) {
+                    return dayPrediction.prediction
+                }
+            }
+        }
+    }
+    return null
 }
