@@ -16,7 +16,6 @@ class AgendaViewModel() : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     private val _userId = MutableLiveData<String>()
-    val userId: LiveData<String> = _userId
 
     private val _userEvents = MutableLiveData<List<EventResponse>>()
     val userEvents: LiveData<List<EventResponse>> = _userEvents
@@ -26,7 +25,7 @@ class AgendaViewModel() : ViewModel() {
         _userId.value?.let { getEvents(it) }
     }
 
-    fun getEvents(userId: String) {
+    private fun getEvents(userId: String) {
         viewModelScope.launch {
             val events = eventsUseCase(userId)
             _userEvents.postValue(events.sortedBy { it.date })

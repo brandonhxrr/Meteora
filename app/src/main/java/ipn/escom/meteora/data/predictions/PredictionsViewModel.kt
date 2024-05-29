@@ -1,5 +1,6 @@
 package ipn.escom.meteora.data.predictions
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,7 +13,7 @@ class PredictionsViewModel : ViewModel() {
     private val predictionsUseCase = PredictionsUseCase()
 
     private val _predictions = MutableLiveData<PredictionsResponse>()
-    val predictions: MutableLiveData<PredictionsResponse> = _predictions
+    val predictions: LiveData<PredictionsResponse> = _predictions
 
     fun getPredictions(localityKey: String) {
         viewModelScope.launch {

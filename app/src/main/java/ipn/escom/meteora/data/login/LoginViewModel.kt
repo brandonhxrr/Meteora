@@ -22,10 +22,7 @@ class LoginViewModel:ViewModel() {
         _isLoginEnabled.value = enableLogin(email, password)
     }
 
-    fun enableLogin(email: String, password: String) =
+    private fun enableLogin(email: String, password: String) =
         Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length >= 8
 
-    fun login(email:String, password:String){
-
-    }
 }

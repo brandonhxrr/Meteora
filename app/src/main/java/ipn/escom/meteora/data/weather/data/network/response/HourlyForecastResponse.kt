@@ -1,13 +1,5 @@
 package ipn.escom.meteora.data.weather.data.network.response
 
-import ipn.escom.meteora.data.weather.Clouds
-import ipn.escom.meteora.data.weather.Coord
-import ipn.escom.meteora.data.weather.Main
-import ipn.escom.meteora.data.weather.Rain
-import ipn.escom.meteora.data.weather.Sys
-import ipn.escom.meteora.data.weather.WeatherDetail
-import ipn.escom.meteora.data.weather.Wind
-
 data class HourlyForecastResponse(
     val cod: String,
     val message: Double,

@@ -32,7 +32,7 @@ class LocalityViewModel: ViewModel() {
         initialValue = _localities.value
     )
 
-    fun onSearchTextChange(text: String) {
+    fun onSearchTextChanged(text: String) {
         _searchText.value = text
     }
 

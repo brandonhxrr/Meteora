@@ -1,7 +1,5 @@
 package ipn.escom.meteora.data.weather.data.network.response
 
-import ipn.escom.meteora.data.weather.WeatherDetail
-
 data class DailyForecastResponse(
     val cod: String,
     val message: Double,

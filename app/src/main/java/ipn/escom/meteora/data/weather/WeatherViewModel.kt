@@ -1,5 +1,6 @@
 package ipn.escom.meteora.data.weather
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,13 +19,13 @@ class WeatherViewModel : ViewModel() {
     private val hourlyForecastUseCase = HourlyForecastUseCase()
 
     private val _weather = MutableLiveData<WeatherResponse?>()
-    val weather: MutableLiveData<WeatherResponse?> = _weather
+    val weather: LiveData<WeatherResponse?> = _weather
 
     private val _hourlyForecast = MutableLiveData<HourlyForecastResponse?>()
-    val hourlyForecast: MutableLiveData<HourlyForecastResponse?> = _hourlyForecast
+    val hourlyForecast: LiveData<HourlyForecastResponse?> = _hourlyForecast
 
     private val _dailyForecast = MutableLiveData<DailyForecastResponse?>()
-    val dailyForecast: MutableLiveData<DailyForecastResponse?> = _dailyForecast
+    val dailyForecast: LiveData<DailyForecastResponse?> = _dailyForecast
 
     fun getWeather(apiKey: String, lat: Double, lon: Double) {
         viewModelScope.launch {
