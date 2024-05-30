@@ -2,7 +2,6 @@ package ipn.escom.meteora
 
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,7 +52,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 }
 
 @Composable
@@ -111,9 +109,7 @@ fun Start(firebaseAnalytics: FirebaseAnalytics?) {
 
         composable("dailyForecast/{town}/{timestamp}") { backStackEntry ->
             val town = backStackEntry.arguments?.getString("town")
-            Log.d("town", town ?: "null")
             val timestamp = backStackEntry.arguments?.getString("timestamp")
-            Log.d("timestamp", timestamp ?: "null")
 
             WeatherDetailScreen(
                 town = town,
