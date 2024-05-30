@@ -1,11 +1,18 @@
-package ipn.escom.meteora.data.signup
+package ipn.escom.meteora.data.authentication.signup
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import ipn.escom.meteora.data.authentication.data.network.response.AuthenticationResponse
+import ipn.escom.meteora.data.authentication.domain.AuthenticationUseCase
 import ipn.escom.meteora.ui.login.PasswordSecurity
+import kotlinx.coroutines.launch
 
 class SignUpViewModel : ViewModel() {
+
+    private val authenticationUseCase = AuthenticationUseCase()
 
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> = _username
@@ -33,6 +40,9 @@ class SignUpViewModel : ViewModel() {
 
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String> = _errorMessage
+
+    private val _signUpSuccess = MutableLiveData<Boolean>()
+    val signUpSuccess: LiveData<Boolean> = _signUpSuccess
 
     fun onImageSelected(imageUri: String) {
         _selectedImageUri.value = imageUri
@@ -109,5 +119,27 @@ class SignUpViewModel : ViewModel() {
 
     fun hideError() {
         _showError.value = false
+    }
+
+    fun signUp(context: Context){
+        val username = _username.value.orEmpty()
+        val email = _email.value.orEmpty()
+        val password = _password.value.orEmpty()
+        val selectedImageUri = _selectedImageUri.value
+
+        _showSignUpIndicator.value = true
+
+        viewModelScope.launch{
+            val result = authenticationUseCase.signUp(context, username, email, password, selectedImageUri)
+            _showSignUpIndicator.value = false
+            if (result is AuthenticationResponse.Success) {
+                _showError.value = false
+                _signUpSuccess.value = true
+            } else if (result is AuthenticationResponse.Error) {
+                _errorMessage.value = result.message
+                _showError.value = true
+                _signUpSuccess.value = false
+            }
+        }
     }
 }

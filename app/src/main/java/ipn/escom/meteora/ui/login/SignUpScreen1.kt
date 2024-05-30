@@ -36,7 +36,7 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import ipn.escom.meteora.R
-import ipn.escom.meteora.data.signup.SignUpViewModel
+import ipn.escom.meteora.data.authentication.signup.SignUpViewModel
 import ipn.escom.meteora.ui.Screens
 
 @OptIn(ExperimentalGlideComposeApi::class)

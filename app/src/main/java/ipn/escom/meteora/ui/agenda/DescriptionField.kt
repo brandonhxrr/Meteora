@@ -46,7 +46,7 @@ fun DescriptionField(
         OutlinedTextField(
             value = eventDescription,
             onValueChange = { onEventDescriptionChanged(it) },
-            placeholder = { Text("Descripción", style = MaterialTheme.typography.bodyMedium) },
+            placeholder = { Text(if(!enabled && eventDescription.isEmpty()) "Sin descripción" else "Descripción", style = MaterialTheme.typography.bodyMedium) },
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.Top),

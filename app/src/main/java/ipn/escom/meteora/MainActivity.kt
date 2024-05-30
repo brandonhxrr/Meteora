@@ -18,8 +18,8 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import ipn.escom.meteora.data.login.LoginViewModel
-import ipn.escom.meteora.data.signup.SignUpViewModel
+import ipn.escom.meteora.data.authentication.login.LoginViewModel
+import ipn.escom.meteora.data.authentication.signup.SignUpViewModel
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.ui.Home
 import ipn.escom.meteora.ui.Screens
@@ -63,6 +63,8 @@ class MainActivity : ComponentActivity() {
 fun Start(firebaseAnalytics: FirebaseAnalytics?) {
     val navController = rememberNavController()
     val user = FirebaseAuth.getInstance().currentUser
+    val weatherViewModel = WeatherViewModel()
+    val signUpViewModel = SignUpViewModel()
 
     navController.addOnDestinationChangedListener { _, destination, _ ->
         val params = Bundle()
@@ -101,12 +103,10 @@ fun Start(firebaseAnalytics: FirebaseAnalytics?) {
         navController = navController,
         startDestination = Screens.Splash.name
     ) {
-        val signUpViewModel = SignUpViewModel()
 
         composable(Screens.Splash.name) {
             SplashScreen()
         }
-        val weatherViewModel = WeatherViewModel()
 
         composable(Screens.Home.name) {
             Home(navController = navController, weatherViewModel = weatherViewModel)

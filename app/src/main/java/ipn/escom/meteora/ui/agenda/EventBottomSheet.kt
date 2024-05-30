@@ -2,6 +2,7 @@ package ipn.escom.meteora.ui.agenda
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
@@ -92,6 +94,7 @@ fun EventBottomSheet(
     val predictionsViewModel = PredictionsViewModel()
     val predictions: PredictionsResponse? by predictionsViewModel.predictions.observeAsState(initial = PredictionsResponse())
     var localityKey by remember { mutableStateOf(getLocalityKeyFromName(eventLocation)) }
+    val context = LocalContext.current
 
     eventResponse?.let { eventViewModel.initializeViewModel(it) }
 
@@ -137,39 +140,47 @@ fun EventBottomSheet(
             }
             Button(
                 onClick = {
-                    if (eventResponse == null) {
-                        val event = EventResponse(
-                            title = eventName,
-                            description = eventDescription,
-                            date = eventDate,
-                            time = if (allDayEvent) 0L else eventTime,
-                            location = eventLocation
-                        )
-                        agendaViewModel.addEvent(userId, event)
-
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                onDismissRequest()
-                            }
-                        }
+                    if (eventName.isBlank() || eventLocation.isBlank()) {
+                        Toast.makeText(
+                            context,
+                            "Completa todos los campos requeridos",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
-                        if (isEditable) {
+                        if (eventResponse == null) {
                             val event = EventResponse(
-                                id = eventResponse.id,
                                 title = eventName,
                                 description = eventDescription,
                                 date = eventDate,
                                 time = if (allDayEvent) 0L else eventTime,
                                 location = eventLocation
                             )
-                            agendaViewModel.updateEvent(userId, event)
+                            agendaViewModel.addEvent(userId, event)
+
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
                                 if (!sheetState.isVisible) {
                                     onDismissRequest()
                                 }
                             }
                         } else {
-                            isEditable = true
+                            if (isEditable) {
+                                val event = EventResponse(
+                                    id = eventResponse.id,
+                                    title = eventName,
+                                    description = eventDescription,
+                                    date = eventDate,
+                                    time = if (allDayEvent) 0L else eventTime,
+                                    location = eventLocation
+                                )
+                                agendaViewModel.updateEvent(userId, event)
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        onDismissRequest()
+                                    }
+                                }
+                            } else {
+                                isEditable = true
+                            }
                         }
                     }
                 },
@@ -368,6 +379,7 @@ fun EventBottomSheet(
                 }
             }
         }
+
         if (showCancelDialog) {
             AlertDialog(
                 onDismissRequest = { showCancelDialog = false },

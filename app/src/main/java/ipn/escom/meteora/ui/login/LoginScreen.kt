@@ -15,6 +15,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -23,8 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,7 +32,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import ipn.escom.meteora.R
-import ipn.escom.meteora.data.login.LoginViewModel
+import ipn.escom.meteora.data.authentication.login.LoginViewModel
 import ipn.escom.meteora.ui.Screens
 
 @Composable
@@ -42,6 +41,27 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
     val email: String by loginViewModel.email.observeAsState(initial = "")
     val password: String by loginViewModel.password.observeAsState(initial = "")
     val isLoginEnabled: Boolean by loginViewModel.isLoginEnabled.observeAsState(initial = false)
+    val signInSuccess: Boolean by loginViewModel.signInSuccess.observeAsState(initial = false)
+    val errorMessage: String by loginViewModel.errorMessage.observeAsState(initial = "")
+    val errorCounter: Int by loginViewModel.errorCounter.observeAsState(initial = 0)
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = signInSuccess, block = {
+        if (signInSuccess) {
+            navController?.navigate(Screens.Home.name) {
+                popUpTo(Screens.Login.name) {
+                    inclusive = true
+                }
+            }
+        }
+    })
+
+    LaunchedEffect(key1 = errorCounter, block = {
+        if (errorMessage.isNotEmpty()) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+        }
+    })
+
 
     Column(
         modifier = Modifier
@@ -62,7 +82,7 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        LoginButton(email, password, isLoginEnabled, navController)
+        LoginButton(isLoginEnabled, loginViewModel)
 
         OrDivider()
 
@@ -94,25 +114,15 @@ fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) 
 
 @Composable
 fun LoginButton(
-    email: String,
-    password: String,
     loginEnabled: Boolean,
-    navController: NavController?
+    loginViewModel: LoginViewModel
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val context = LocalContext.current
 
     Button(
         onClick = {
             keyboardController?.hide()
-
-            loginWithFirebase(email, password, context) {
-                navController?.navigate(Screens.Home.name) {
-                    popUpTo(Screens.Login.name) {
-                        inclusive = true
-                    }
-                }
-            }
+            loginViewModel.signIn()
         },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Black,

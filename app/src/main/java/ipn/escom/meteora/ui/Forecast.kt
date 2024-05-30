@@ -59,7 +59,6 @@ fun Forecast(
     }
 
     if (refreshState.isRefreshing) {
-
         LaunchedEffect(true) {
             weatherViewModel.getWeather(
                 apiKey = apiKey, lat = location?.latitude!!, lon = location.longitude
@@ -86,7 +85,6 @@ fun Forecast(
         weatherViewModel.getDailyForecast(
             apiKey = apiKey, lat = location.latitude, lon = location.longitude
         )
-
         weatherViewModel.getHourlyForecast(
             apiKey = apiKey, lat = location.latitude, lon = location.longitude
         )
