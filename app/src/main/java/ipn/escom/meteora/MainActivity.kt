@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -29,6 +30,8 @@ import ipn.escom.meteora.ui.login.Login
 import ipn.escom.meteora.ui.login.SignUp1
 import ipn.escom.meteora.ui.login.SignUp2
 import ipn.escom.meteora.ui.theme.MeteoraTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -37,9 +40,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        FirebaseApp.initializeApp(applicationContext)
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
-        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
+        lifecycleScope.launch(Dispatchers.Default) {
+            FirebaseApp.initializeApp(applicationContext)
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+            firebaseAnalytics = FirebaseAnalytics.getInstance(this@MainActivity)
+        }
 
         setContent {
             MeteoraTheme {
@@ -66,6 +71,32 @@ fun Start(firebaseAnalytics: FirebaseAnalytics?) {
         firebaseAnalytics!!.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, params)
     }
 
+    val timer = object : CountDownTimer(1500, 1000) {
+        override fun onTick(millisUntilFinished: Long) {
+
+        }
+
+        override fun onFinish() {
+            if (navController.currentBackStackEntry?.destination?.route == Screens.Splash.name) {
+                if (user != null) {
+                    navController.navigate(Screens.Home.name) {
+                        popUpTo(Screens.Splash.name) {
+                            inclusive = true
+                        }
+                    }
+                } else {
+                    navController.navigate(Screens.Login.name) {
+                        popUpTo(Screens.Splash.name) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    timer.start()
+
     NavHost(
         navController = navController,
         startDestination = Screens.Splash.name
@@ -74,32 +105,6 @@ fun Start(firebaseAnalytics: FirebaseAnalytics?) {
 
         composable(Screens.Splash.name) {
             SplashScreen()
-            val timer = object : CountDownTimer(1500, 1000) {
-                override fun onTick(millisUntilFinished: Long) {
-
-                }
-
-                override fun onFinish() {
-                    if (navController.currentBackStackEntry?.destination?.route == Screens.Splash.name) {
-                        if (user != null) {
-                            navController.navigate(Screens.Home.name) {
-                                popUpTo(Screens.Splash.name) {
-                                    inclusive = true
-                                }
-                            }
-                        } else {
-                            navController.navigate(Screens.Login.name) {
-                                popUpTo(Screens.Splash.name) {
-                                    inclusive = true
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            timer.start()
-
         }
         val weatherViewModel = WeatherViewModel()
 
