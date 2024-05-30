@@ -32,11 +32,13 @@ import ipn.escom.meteora.data.events.data.network.response.EventResponse
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AgendaScreen(modifier: Modifier = Modifier) {
+fun AgendaScreen(
+    modifier: Modifier = Modifier,
+    agendaViewModel: AgendaViewModel = AgendaViewModel()
+) {
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
-    val agendaViewModel = remember { AgendaViewModel() }
     val upcomingEvents by agendaViewModel.upcomingEvents.observeAsState()
     val pastEvents by agendaViewModel.pastEvents.observeAsState()
     var showDetailSheet by remember { mutableStateOf(false) }
@@ -83,7 +85,7 @@ fun AgendaScreen(modifier: Modifier = Modifier) {
                 })
             }
 
-            if(pastEvents?.isNotEmpty() == true) {
+            if (pastEvents?.isNotEmpty() == true) {
                 item {
                     Text(
                         "Eventos pasados",

@@ -102,3 +102,7 @@ val availableLocalities = listOf(
 fun getLocalityKeyFromName(name: String): String {
     return availableLocalities.find { it.name == name }?.key ?: ""
 }
+
+fun getLocalityNameFromKey(key: String): String {
+    return availableLocalities.find { it.key == key }?.name ?: ""
+}

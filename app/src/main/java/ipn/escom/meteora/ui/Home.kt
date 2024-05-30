@@ -46,6 +46,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.localities.LocalityViewModel
 import ipn.escom.meteora.data.localities.SearchBarWithDialog
 import ipn.escom.meteora.data.predictions.PredictionsViewModel
@@ -71,6 +72,7 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
     val state = rememberPullToRefreshState()
 
     val localitiesViewModel = LocalityViewModel()
+    val agendaViewModel = AgendaViewModel()
 
     LaunchedEffect(true) {
         hasInternetAccess = isNetworkAvailable(context)
@@ -185,14 +187,18 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                     }
 
                     2 -> {
-                        AgendaScreen(modifier = Modifier.padding(it))
+                        AgendaScreen(
+                            modifier = Modifier.padding(it),
+                            agendaViewModel = agendaViewModel
+                        )
                     }
 
                     3 -> {
                         PredictionsScreen(
                             modifier = Modifier.padding(it),
                             location = location,
-                            predictionsViewModel = PredictionsViewModel()
+                            predictionsViewModel = PredictionsViewModel(),
+                            agendaViewModel = agendaViewModel
                         )
                     }
                 }

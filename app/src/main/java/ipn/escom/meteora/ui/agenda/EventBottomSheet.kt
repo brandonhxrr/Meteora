@@ -86,6 +86,7 @@ fun EventBottomSheet(
     var showCancelDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var isEditable by remember { mutableStateOf(eventResponse == null) }
+    val isNewEvent by remember { mutableStateOf(eventResponse?.title?.isEmpty() ?: true) }
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
     var allDayEvent by remember { mutableStateOf(eventResponse?.time == 0L) }
@@ -124,7 +125,7 @@ fun EventBottomSheet(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             IconButton(onClick = {
-                if (isEditable) {
+                if (isEditable || isNewEvent) {
                     showCancelDialog = true
                 } else {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -145,7 +146,7 @@ fun EventBottomSheet(
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        if (eventResponse == null) {
+                        if (eventResponse == null || isNewEvent) {
                             val event = EventResponse(
                                 title = eventName,
                                 description = eventDescription,
@@ -183,18 +184,18 @@ fun EventBottomSheet(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isEditable) green else Color.Black,
+                    containerColor = if (isEditable || isNewEvent) green else Color.Black,
                     contentColor = Color.White
                 ),
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
                 Icon(
-                    imageVector = if (isEditable) Icons.Rounded.Check else Icons.Rounded.Edit,
+                    imageVector = if (isEditable || isNewEvent) Icons.Rounded.Check else Icons.Rounded.Edit,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(if (isEditable) "Guardar" else "Editar")
+                Text(if (isEditable || isNewEvent) "Guardar" else "Editar")
             }
         }
         LazyColumn(
@@ -205,7 +206,7 @@ fun EventBottomSheet(
                 TextField(
                     value = eventName,
                     onValueChange = {
-                        if (isEditable || eventResponse == null) eventViewModel.onEventNameChanged(
+                        if (isEditable || isNewEvent || eventResponse == null) eventViewModel.onEventNameChanged(
                             it
                         )
                     },
@@ -241,7 +242,7 @@ fun EventBottomSheet(
                         capitalization = KeyboardCapitalization.Sentences
                     ),
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                    enabled = isEditable || eventResponse == null
+                    enabled = isEditable || isNewEvent || eventResponse == null
                 )
                 HorizontalDivider()
                 ListSelector()
@@ -250,30 +251,31 @@ fun EventBottomSheet(
                 EventDateTimePicker(
                     allDayEvent = allDayEvent,
                     onAllDayEventChanged = {
-                        if (isEditable || eventResponse == null) allDayEvent = !allDayEvent
+                        if (isEditable || isNewEvent || eventResponse == null) allDayEvent =
+                            !allDayEvent
                     },
                     date = eventDate,
                     time = eventTime,
                     onDateSelected = {
-                        if (isEditable || eventResponse == null) eventViewModel.onEventDateChanged(
+                        if (isEditable || isNewEvent || eventResponse == null) eventViewModel.onEventDateChanged(
                             it
                         )
                     },
                     onTimeSelected = {
-                        if (isEditable || eventResponse == null) eventViewModel.onEventTimeChanged(
+                        if (isEditable || isNewEvent || eventResponse == null) eventViewModel.onEventTimeChanged(
                             it
                         )
                     },
-                    enabled = isEditable || eventResponse == null
+                    enabled = isEditable || isNewEvent || eventResponse == null
                 )
 
                 HorizontalDivider()
 
                 DropdownMenuLocation(
-                    enabled = isEditable || eventResponse == null,
+                    enabled = isEditable || isNewEvent || eventResponse == null,
                     selectedLocation = eventLocation,
                     onLocationSelected = {
-                        if (isEditable || eventResponse == null) eventViewModel.onEventLocationChanged(
+                        if (isEditable || isNewEvent || eventResponse == null) eventViewModel.onEventLocationChanged(
                             it
                         )
                     }
@@ -282,10 +284,10 @@ fun EventBottomSheet(
                 HorizontalDivider()
 
                 DescriptionField(
-                    enabled = isEditable || eventResponse == null,
+                    enabled = isEditable || isNewEvent || eventResponse == null,
                     eventDescription = eventDescription,
                     onEventDescriptionChanged = {
-                        if (isEditable || eventResponse == null) eventViewModel.onEventDescriptionChanged(
+                        if (isEditable || isNewEvent || eventResponse == null) eventViewModel.onEventDescriptionChanged(
                             it
                         )
                     }
@@ -309,7 +311,7 @@ fun EventBottomSheet(
                     }
                 }
 
-                if (eventResponse != null) {
+                if (eventResponse != null && !isNewEvent) {
 
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Spacer(modifier = Modifier.weight(1f))

@@ -23,6 +23,7 @@ import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,30 +42,49 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.events.data.network.response.EventResponse
+import ipn.escom.meteora.data.localities.getLocalityNameFromKey
 import ipn.escom.meteora.data.predictions.data.network.response.MonthPrediction
 import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
 import ipn.escom.meteora.utils.getMonthName
+import java.util.Calendar
 
 @Composable
-fun PredictionsCard(predictionsResponse: PredictionsResponse) {
+fun PredictionsCard(
+    predictionsResponse: PredictionsResponse,
+    onDayClick: (EventResponse) -> Unit
+) {
     val localityPredictions = predictionsResponse.predictions
 
     localityPredictions.forEach { prediction ->
+        val localityName = prediction.locality
         prediction.years.forEach { yearPrediction ->
             yearPrediction.months.forEach { monthPrediction ->
                 var expanded by remember { mutableStateOf(false) }
 
                 MonthPredictionCard(
+                    localityName = localityName,
                     monthPrediction = monthPrediction,
+                    year = yearPrediction.year,
                     expanded = expanded,
-                    onClick = { expanded = !expanded })
+                    onClick = { expanded = !expanded },
+                    onDayClick = onDayClick
+                )
             }
         }
     }
 }
 
+
 @Composable
-fun MonthPredictionCard(monthPrediction: MonthPrediction, expanded: Boolean, onClick: () -> Unit) {
+fun MonthPredictionCard(
+    localityName: String,
+    monthPrediction: MonthPrediction,
+    year: Int,
+    expanded: Boolean,
+    onClick: () -> Unit,
+    onDayClick: (EventResponse) -> Unit
+) {
     val scale: Float by animateFloatAsState(if (expanded) 0.95f else 1f, label = "")
 
     Card(
@@ -116,35 +136,54 @@ fun MonthPredictionCard(monthPrediction: MonthPrediction, expanded: Boolean, onC
                 animationSpec = tween(300, delayMillis = (50 * index).coerceAtMost(300)), label = ""
             )
             DailyPredictionCard(
+                localityName = localityName,
                 maxt = dayPrediction.prediction.maxt,
                 mint = dayPrediction.prediction.mint,
                 rainfall = dayPrediction.prediction.rainfall,
                 day = dayPrediction.day,
-                modifier = Modifier.offset(x = offset * delayOffset.value)
+                month = monthPrediction.month,
+                year = year,
+                modifier = Modifier.offset(x = offset * delayOffset.value),
+                onClick = onDayClick
             )
         }
     }
 }
 
+
 @Composable
 fun DailyPredictionCard(
+    localityName: String,
     maxt: Double,
     mint: Double,
     rainfall: Double,
     day: Int,
-    modifier: Modifier
+    month: Int,
+    year: Int,
+    modifier: Modifier,
+    onClick: (EventResponse) -> Unit
 ) {
+    val dateInMillis = Calendar.getInstance().apply {
+        set(year, month - 1, day)
+    }.timeInMillis
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable {
-
+                val eventResponse = EventResponse(
+                    id = null,
+                    title = "",
+                    description = "",
+                    date = dateInMillis,
+                    time = 0L,
+                    location = getLocalityNameFromKey(localityName)
+                )
+                onClick(eventResponse)
             },
-        colors = CardColors(
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-            disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.38f)
+            contentColor = MaterialTheme.colorScheme.onSurface
         )
     ) {
         Row(
@@ -186,7 +225,7 @@ fun DailyPredictionCard(
             )
             Spacer(modifier = Modifier.padding(8.dp))
             Icon(
-                imageVector = Icons.Rounded.Thermostat, // Replace with your icon
+                imageVector = Icons.Rounded.Thermostat,
                 contentDescription = "Min Temperature",
                 modifier = Modifier.size(16.dp)
             )
