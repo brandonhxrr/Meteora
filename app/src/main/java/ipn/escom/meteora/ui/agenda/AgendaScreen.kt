@@ -36,8 +36,9 @@ fun AgendaScreen(modifier: Modifier = Modifier) {
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
-    val agendaViewModel = AgendaViewModel()
-    val userEvents by agendaViewModel.userEvents.observeAsState()
+    val agendaViewModel = remember { AgendaViewModel() }
+    val upcomingEvents by agendaViewModel.upcomingEvents.observeAsState()
+    val pastEvents by agendaViewModel.pastEvents.observeAsState()
     var showDetailSheet by remember { mutableStateOf(false) }
     var selectedEvent by remember { mutableStateOf<EventResponse?>(null) }
 
@@ -74,26 +75,35 @@ fun AgendaScreen(modifier: Modifier = Modifier) {
                 }
             }
 
-            item {
+            items(upcomingEvents?.size ?: 0) { index ->
+                val event = upcomingEvents!![index]
+                EventItem(eventResponse = event, onClick = {
+                    selectedEvent = event
+                    showDetailSheet = true
+                })
+            }
 
-                if (userEvents.isNullOrEmpty()) {
+            if(pastEvents?.isNotEmpty() == true) {
+                item {
                     Text(
-                        "No hay eventos próximos",
-                        style = MaterialTheme.typography.bodyMedium,
+                        "Eventos pasados",
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier
                             .padding(16.dp)
                             .fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Start
                     )
-                } else {
-                    userEvents?.forEach { event ->
-                        EventItem(eventResponse = event, onClick = {
-                            selectedEvent = event
-                            showDetailSheet = true
-                        })
-                    }
+                }
+
+                items(pastEvents?.size ?: 0) { index ->
+                    val event = pastEvents!![index]
+                    EventItem(eventResponse = event, onClick = {
+                        selectedEvent = event
+                        showDetailSheet = true
+                    })
                 }
             }
+
             item {
                 if (showBottomSheet) {
                     EventBottomSheet(

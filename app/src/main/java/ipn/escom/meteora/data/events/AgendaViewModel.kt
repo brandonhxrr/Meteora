@@ -1,6 +1,5 @@
 package ipn.escom.meteora.data.events
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,6 +19,14 @@ class AgendaViewModel() : ViewModel() {
     private val _userEvents = MutableLiveData<List<EventResponse>>()
     val userEvents: LiveData<List<EventResponse>> = _userEvents
 
+    private val _upcomingEvents = MutableLiveData<List<EventResponse>>()
+    val upcomingEvents: LiveData<List<EventResponse>> = _upcomingEvents
+
+    private val _pastEvents = MutableLiveData<List<EventResponse>>()
+    val pastEvents: LiveData<List<EventResponse>> = _pastEvents
+
+    private var isAscending = true
+
     init {
         _userId.value = auth.currentUser?.uid
         _userId.value?.let { getEvents(it) }
@@ -28,7 +35,8 @@ class AgendaViewModel() : ViewModel() {
     private fun getEvents(userId: String) {
         viewModelScope.launch {
             val events = eventsUseCase(userId)
-            _userEvents.postValue(events.sortedBy { it.date })
+            _userEvents.postValue(events)
+            updateEventLists(events, isAscending)
         }
     }
 
@@ -49,21 +57,25 @@ class AgendaViewModel() : ViewModel() {
     fun deleteEvent(userId: String, eventId: String) {
         eventsUseCase.deleteEvent(userId, eventId)
         val updatedEvents = _userEvents.value?.filter { it.id != eventId }
-        Log.d("EventViewModel", "Updated events: $updatedEvents")
-        Log.d("EventViewModel", "User events: ${_userEvents.value}")
         _userEvents.postValue(updatedEvents ?: emptyList())
+        updateEventLists(updatedEvents ?: emptyList(), isAscending)
     }
 
     fun onEventOrderChanged(ascending: Boolean) {
-        viewModelScope.launch {
-            val sortedList = if (ascending) {
-                _userEvents.value?.sortedBy { it.date }
-            } else {
-                _userEvents.value?.sortedByDescending { it.date }
-            }
-            sortedList?.let {
-                _userEvents.postValue(it)
-            }
+        isAscending = ascending
+        _userEvents.value?.let { events ->
+            updateEventLists(events, ascending)
         }
+    }
+
+    private fun updateEventLists(events: List<EventResponse>, ascending: Boolean) {
+        val currentTime = System.currentTimeMillis()
+        val sortedEvents = if (ascending) {
+            events.sortedBy { it.date }
+        } else {
+            events.sortedByDescending { it.date }
+        }
+        _upcomingEvents.postValue(sortedEvents.filter { it.date >= currentTime })
+        _pastEvents.postValue(sortedEvents.filter { it.date < currentTime })
     }
 }
