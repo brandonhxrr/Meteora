@@ -105,14 +105,6 @@ class SignUpViewModel : ViewModel() {
             password
         ) == PasswordSecurity.STRONG
 
-    fun enableSignUpIndicator() {
-        _showSignUpIndicator.value = true
-    }
-
-    fun disableSignUpIndicator() {
-        _showSignUpIndicator.value = false
-    }
-
     fun showError() {
         _showError.value = true
     }

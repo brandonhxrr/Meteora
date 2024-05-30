@@ -37,8 +37,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import ipn.escom.meteora.R
 import ipn.escom.meteora.data.predictions.data.network.response.MonthPrediction
 import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
 import ipn.escom.meteora.utils.getMonthName
@@ -164,7 +166,7 @@ fun DailyPredictionCard(
             }
             Spacer(modifier = Modifier.padding(8.dp))
             Icon(
-                imageVector = Icons.Rounded.Thermostat, // Replace with your icon
+                imageVector = Icons.Rounded.Thermostat,
                 contentDescription = "Max Temperature",
                 modifier = Modifier.size(16.dp)
             )
@@ -174,7 +176,7 @@ fun DailyPredictionCard(
             )
             Spacer(modifier = Modifier.padding(8.dp))
             Icon(
-                imageVector = Icons.Rounded.WaterDrop, // Replace with your icon
+                painter = painterResource(id = R.drawable.rain),
                 contentDescription = "Rainfall",
                 modifier = Modifier.size(16.dp)
             )

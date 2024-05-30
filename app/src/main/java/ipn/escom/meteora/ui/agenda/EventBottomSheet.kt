@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +22,6 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.WbCloudy
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -293,7 +291,7 @@ fun EventBottomSheet(
                     }
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
 
                 if (predictions != null && predictions != PredictionsResponse()) {
                     Log.d("EventBottomSheet", "LocalityKey: $localityKey")
@@ -306,49 +304,8 @@ fun EventBottomSheet(
                         getDayFromMillis(eventDate)
                     )
 
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row {
-                            Icon(
-                                imageVector = Icons.Rounded.WbCloudy,
-                                contentDescription = "Weather"
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Pronóstico del clima")
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        if (prediction == null) {
-                            Text("No hay pronóstico disponible para esta fecha")
-                        } else {
-                            Text(
-                                text = "Temperatura máxima: ${
-                                    String.format(
-                                        "%.2f",
-                                        prediction.maxt
-                                    )
-                                } °",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Temperatura mínima: ${
-                                    String.format(
-                                        "%.2f",
-                                        prediction.mint
-                                    )
-                                } °",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "Nivel de lluvia: ${
-                                    if (prediction.rainfall > 0.0) String.format(
-                                        "%.2f",
-                                        prediction.rainfall
-                                    ) else "0"
-                                } mm",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
+                    if (prediction != null) {
+                        WeatherPreview(prediction = prediction)
                     }
                 }
 

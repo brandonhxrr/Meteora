@@ -16,9 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Umbrella
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.Icon
@@ -36,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -43,6 +42,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import ipn.escom.meteora.R
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.data.weather.data.network.response.DailyForecast
 import ipn.escom.meteora.data.weather.data.network.response.HourlyForecast
@@ -282,7 +282,7 @@ fun DailyForecastCard(dailyForecast: DailyForecast, selected: Boolean, onClick: 
             if (dailyForecast.pop > 0.0) {
                 Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
                     Icon(
-                        imageVector = Icons.Rounded.Umbrella,
+                        painter = painterResource(id = R.drawable.rain),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(14.dp)
