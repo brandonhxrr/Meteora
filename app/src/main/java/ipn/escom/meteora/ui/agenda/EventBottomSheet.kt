@@ -1,8 +1,11 @@
 package ipn.escom.meteora.ui.agenda
 
-import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.provider.CalendarContract
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -44,14 +48,17 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ipn.escom.meteora.R
 import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.events.EventViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
@@ -60,13 +67,15 @@ import ipn.escom.meteora.data.predictions.PredictionsViewModel
 import ipn.escom.meteora.data.predictions.data.network.response.Prediction
 import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
 import ipn.escom.meteora.ui.theme.green
+import ipn.escom.meteora.utils.combineDateAndTime
 import ipn.escom.meteora.utils.getDayFromMillis
 import ipn.escom.meteora.utils.getMonthFromMillis
 import ipn.escom.meteora.utils.getYearFromMillis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
 
-@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventBottomSheet(
@@ -198,6 +207,7 @@ fun EventBottomSheet(
                 Text(if (isEditable || isNewEvent) "Guardar" else "Editar")
             }
         }
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -313,8 +323,57 @@ fun EventBottomSheet(
 
                 if (eventResponse != null && !isNewEvent) {
 
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Spacer(modifier = Modifier.weight(1f))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = {
+                                val eventDateTime = combineDateAndTime(
+                                    eventDate,
+                                    if (allDayEvent) 0L else eventTime
+                                )
+                                val endTime = if (allDayEvent) {
+                                    val endDate = Instant.ofEpochMilli(eventDate)
+                                        .atZone(ZoneId.of("UTC"))
+                                        .toLocalDate()
+                                        .plusDays(1)
+                                        .atStartOfDay(ZoneId.of("UTC"))
+                                        .toInstant()
+                                    endDate.toEpochMilli()
+                                } else {
+                                    eventDateTime + 3600000L
+                                }
+                                addEventToGoogleCalendar(
+                                    context = context,
+                                    title = eventName,
+                                    description = eventDescription,
+                                    location = eventLocation,
+                                    startTime = eventDateTime,
+                                    endTime = endTime,
+                                    allDay = allDayEvent
+                                )
+                            }
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.google_calendar),
+                                    contentDescription = "Google Calendar Icon",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Agregar al calendario",
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
                         Button(
                             onClick = {
                                 showDeleteDialog = true
@@ -333,7 +392,6 @@ fun EventBottomSheet(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Eliminar")
                         }
-                        Spacer(modifier = Modifier.weight(1f))
                     }
                 }
             }
@@ -389,6 +447,33 @@ fun EventBottomSheet(
                 }
             )
         }
+    }
+}
+
+fun addEventToGoogleCalendar(
+    context: Context,
+    title: String,
+    description: String,
+    location: String,
+    startTime: Long,
+    endTime: Long,
+    allDay: Boolean
+) {
+    Log.d("EventBottomSheet", "All day: $allDay")
+    val intent = Intent(Intent.ACTION_INSERT).apply {
+        data = CalendarContract.Events.CONTENT_URI
+        putExtra(CalendarContract.Events.TITLE, title)
+        putExtra(CalendarContract.Events.DESCRIPTION, description)
+        putExtra(CalendarContract.Events.EVENT_LOCATION, location)
+        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startTime)
+        putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime)
+        putExtra(CalendarContract.Events.ALL_DAY, allDay)
+    }
+    if (intent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(intent)
+    } else {
+        Toast.makeText(context, "No se encontró una aplicación de calendario", Toast.LENGTH_SHORT)
+            .show()
     }
 }
 

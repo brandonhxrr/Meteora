@@ -2,10 +2,8 @@ package ipn.escom.meteora.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.capitalize
 import ipn.escom.meteora.R
 import java.text.SimpleDateFormat
-import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -14,7 +12,6 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
-import java.time.temporal.ChronoUnit
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -69,7 +66,10 @@ fun getDateString(time: Long): String {
 fun getDayOfWeekFromLong(time: Long): String {
     val zoneId = ZoneId.systemDefault()
     val dateTime = LocalDateTime.ofEpochSecond(time, 0, ZoneOffset.UTC)
-    return dateTime.atZone(ZoneOffset.UTC).withZoneSameInstant(zoneId).dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
+    return dateTime.atZone(ZoneOffset.UTC).withZoneSameInstant(zoneId).dayOfWeek.getDisplayName(
+        TextStyle.FULL,
+        Locale.getDefault()
+    )
         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
 }
 
@@ -116,6 +116,23 @@ fun getHoursAndMinutesFromMillis(millis: Long): Pair<Int, Int> {
     return Pair(hours, minutes)
 }
 
+fun combineDateAndTime(dateMillis: Long, timeMillis: Long): Long {
+    val utcZoneId = ZoneId.of("UTC")
+    val localZoneId = ZoneId.systemDefault()
+    val date = Instant.ofEpochMilli(dateMillis).atZone(utcZoneId).toLocalDate()
+
+    val time = if (timeMillis != 0L) {
+        Instant.ofEpochMilli(timeMillis).atZone(localZoneId).toLocalTime()
+    } else {
+        LocalTime.MIDNIGHT
+    }
+
+    val dateTime = LocalDateTime.of(date, time)
+
+    return dateTime.atZone(localZoneId).withZoneSameInstant(utcZoneId).toInstant().toEpochMilli()
+}
+
+
 fun Long.getHoursAndMinutesDiff(other: Long): Pair<Int, Int> {
     val diffInSeconds = kotlin.math.abs(this - other)
     val hours = (diffInSeconds / 3600).toInt()
@@ -123,7 +140,10 @@ fun Long.getHoursAndMinutesDiff(other: Long): Pair<Int, Int> {
     return Pair(hours, minutes)
 }
 
-fun formatSelectedDate(selectedDayMillis: Long, format: String? = "EEE, d 'de' MMMM 'de' yyyy"): String {
+fun formatSelectedDate(
+    selectedDayMillis: Long,
+    format: String? = "EEE, d 'de' MMMM 'de' yyyy"
+): String {
     val localDate = Instant.ofEpochMilli(selectedDayMillis).atZone(ZoneId.of("UTC")).toLocalDate()
     val formatter = DateTimeFormatter.ofPattern(format, Locale("es", "MX"))
     localDate.format(formatter)
