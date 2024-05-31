@@ -36,9 +36,8 @@ import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.data.weather.data.network.response.DailyForecastResponse
 import ipn.escom.meteora.data.weather.data.network.response.HourlyForecastResponse
 import ipn.escom.meteora.data.weather.data.network.response.WeatherResponse
-import ipn.escom.meteora.utils.getCurrentTime
+import ipn.escom.meteora.utils.getHourWithMinutesString
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,23 +73,21 @@ fun Forecast(
     if (refreshState.isRefreshing) {
         LaunchedEffect(true) {
             location?.let {
-                coroutineScope.launch {
-                    weatherViewModel.getWeather(
-                        apiKey = apiKey,
-                        lat = it.latitude,
-                        lon = it.longitude
-                    )
-                    weatherViewModel.getDailyForecast(
-                        apiKey = apiKey,
-                        lat = it.latitude,
-                        lon = it.longitude
-                    )
-                    weatherViewModel.getHourlyForecast(
-                        apiKey = apiKey,
-                        lat = it.latitude,
-                        lon = it.longitude
-                    )
-                }
+                weatherViewModel.getWeather(
+                    apiKey = apiKey,
+                    lat = it.latitude,
+                    lon = it.longitude
+                )
+                weatherViewModel.getDailyForecast(
+                    apiKey = apiKey,
+                    lat = it.latitude,
+                    lon = it.longitude
+                )
+                weatherViewModel.getHourlyForecast(
+                    apiKey = apiKey,
+                    lat = it.latitude,
+                    lon = it.longitude
+                )
             }
             delay(1500)
             refreshState.endRefresh()
@@ -109,7 +106,7 @@ fun Forecast(
                     ParameterCard(title = "", modifier = Modifier.padding(horizontal = 16.dp)) {
                         CurrentWeatherContent(
                             location = weather.name,
-                            time = getCurrentTime(),
+                            time = getHourWithMinutesString(weather.dt),//getCurrentTime(),
                             temperature = weather.main.temp,
                             feelsLike = weather.main.feelsLike,
                             description = WeatherCondition(weather).getDescription(),

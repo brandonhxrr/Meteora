@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +57,7 @@ import ipn.escom.meteora.utils.RequestLocationPermission
 import ipn.escom.meteora.utils.getLocation
 import ipn.escom.meteora.utils.getPostalCode
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
@@ -66,6 +68,7 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
     var postalCode by remember { mutableStateOf<String?>(null) }
     val isLocationPermissionGranted = remember { mutableStateOf(false) }
     var selectedItem by remember { mutableIntStateOf(0) }
+    val coroutineScope = rememberCoroutineScope()
     var hasInternetAccess: Boolean by remember {
         mutableStateOf(isNetworkAvailable2(context))
     }
@@ -109,11 +112,20 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
             TopAppBar(title = {
                 SearchBarWithDialog(
                     postalCode = postalCode ?: "",
-                    localityViewModel = localitiesViewModel
-                ) {
-                    location = it
+                    localityViewModel = localitiesViewModel,
+                    onLocationSelected = {
+                        location = it
 
-                }
+                    },
+                    onLocationClear = {
+                        coroutineScope.launch {
+                            location = getLocation(
+                                fusedLocationClient,
+                                isLocationPermissionGranted,
+                                context
+                            )
+                        }
+                    })
                 Spacer(modifier = Modifier.width(8.dp))
             },
                 actions = {

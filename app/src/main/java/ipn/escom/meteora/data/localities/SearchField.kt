@@ -39,7 +39,8 @@ import ipn.escom.meteora.utils.getLocalityFromPostalCode
 fun SearchBarWithDialog(
     localityViewModel: LocalityViewModel,
     postalCode: String,
-    onLocationSelected: (Location) -> Unit
+    onLocationSelected: (Location) -> Unit,
+    onLocationClear: () -> Unit
 ) {
     val context = LocalContext.current
     val searchText by localityViewModel.searchText.collectAsState(initial = "")
@@ -51,6 +52,10 @@ fun SearchBarWithDialog(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     var showSuggestions by remember { mutableStateOf(false) }
+
+    if(searchText.isEmpty()) {
+        onLocationClear()
+    }
 
     TextField(
         value = searchText,
@@ -78,12 +83,13 @@ fun SearchBarWithDialog(
             Icon(Icons.Rounded.NearMe, contentDescription = "Search")
         },
         trailingIcon = {
-            if (searchText.isNotEmpty() && isSearching) {
+            if (isSearching) {
                 IconButton(modifier = Modifier.size(50.dp),
                     onClick = {
                         localityViewModel.onSearchTextChanged("")
                         keyboardController?.hide()
                         focusManager.clearFocus()
+                        localityViewModel.onSearchingChanged(false)
                     }) {
                     Icon(Icons.Filled.Clear, contentDescription = "Clear")
                 }

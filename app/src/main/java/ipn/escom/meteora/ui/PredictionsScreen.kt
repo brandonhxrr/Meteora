@@ -42,18 +42,19 @@ import ipn.escom.meteora.data.predictions.data.network.response.PredictionsRespo
 import ipn.escom.meteora.ui.agenda.EventBottomSheet
 import ipn.escom.meteora.utils.getLocalityFromPostalCode
 import ipn.escom.meteora.utils.getPostalCode
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PredictionsScreen(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     location: Location? = null,
     predictionsViewModel: PredictionsViewModel,
     agendaViewModel: AgendaViewModel
 ) {
     val context = LocalContext.current
-    val predictions by predictionsViewModel.predictions.observeAsState()
+    val predictions by predictionsViewModel.predictions.observeAsState(initial = PredictionsResponse())
     var selectedTab by remember { mutableIntStateOf(1) }
     var postalCode: String? by remember { mutableStateOf("") }
 
@@ -63,15 +64,22 @@ fun PredictionsScreen(
     val sheetState = rememberModalBottomSheetState()
 
     LaunchedEffect(key1 = location) {
-        postalCode = getPostalCode(context, location)
-        Log.d("PredictionsScreen", "Postal code: $postalCode")
-        val localityName = getLocalityFromPostalCode(context = context, postalCode = postalCode)
-        loadPredictions(localityName, predictionsViewModel)
+        location?.let {
+            try {
+                postalCode = getPostalCode(context, location)
+                Log.d("PredictionsScreen", "Postal code: $postalCode")
+                val localityName =
+                    getLocalityFromPostalCode(context = context, postalCode = postalCode)
+                loadPredictions(localityName, predictionsViewModel)
+            } catch (e: Exception) {
+                Log.e("PredictionsScreen", "Error fetching postal code or locality: ${e.message}")
+            }
+        }
     }
 
     val today = LocalDate.now()
 
-    val pastPredictions = predictions?.predictions?.map { localityPrediction ->
+    val pastPredictions = predictions.predictions.map { localityPrediction ->
         val filteredYears = localityPrediction.years.map { yearPrediction ->
             val filteredMonths = yearPrediction.months.mapNotNull { monthPrediction ->
                 val filteredDays = monthPrediction.days.filter { dayPrediction ->
@@ -84,11 +92,11 @@ fun PredictionsScreen(
             yearPrediction.copy(months = filteredMonths)
         }
         localityPrediction.copy(years = filteredYears)
-    }?.let { pastLocalityPredictions ->
+    }.let { pastLocalityPredictions ->
         PredictionsResponse(predictions = pastLocalityPredictions)
     }
 
-    val futurePredictions = predictions?.predictions?.map { localityPrediction ->
+    val futurePredictions = predictions.predictions.map { localityPrediction ->
         val filteredYears = localityPrediction.years.map { yearPrediction ->
             val filteredMonths = yearPrediction.months.mapNotNull { monthPrediction ->
                 val filteredDays = monthPrediction.days.filter { dayPrediction ->
@@ -101,7 +109,7 @@ fun PredictionsScreen(
             yearPrediction.copy(months = filteredMonths)
         }
         localityPrediction.copy(years = filteredYears)
-    }?.let { futureLocalityPredictions ->
+    }.let { futureLocalityPredictions ->
         PredictionsResponse(predictions = futureLocalityPredictions)
     }
 
@@ -155,7 +163,7 @@ fun PredictionsScreen(
         ) { tab ->
             when (tab) {
                 0 ->
-                    if (pastPredictions != null) {
+                    if (pastPredictions.predictions.isNotEmpty()) {
                         LazyColumn(modifier = Modifier.fillMaxSize()) {
                             item {
                                 PredictionsCard(
@@ -168,15 +176,32 @@ fun PredictionsScreen(
                             }
                         }
                     } else {
-                        Column {
-                            PredictionsEmpty() {
-
+                        PredictionsEmpty {
+                            coroutineScope.launch {
+                                location?.let {
+                                    try {
+                                        Log.d(
+                                            "PredictionsScreen",
+                                            "Locality: ${location.latitude}, ${location.longitude}"
+                                        )
+                                        postalCode = getPostalCode(context, location)
+                                        Log.d("PredictionsScreen", "Postal code: $postalCode")
+                                        val localityName =
+                                            getLocalityFromPostalCode(context, postalCode)
+                                        loadPredictions(localityName, predictionsViewModel)
+                                    } catch (e: Exception) {
+                                        Log.e(
+                                            "PredictionsScreen",
+                                            "Error fetching postal code or locality: ${e.message}"
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
 
                 1 ->
-                    if (futurePredictions != null) {
+                    if (futurePredictions.predictions.isNotEmpty()) {
                         LazyColumn(modifier = Modifier.fillMaxSize()) {
                             item {
                                 PredictionsCard(
@@ -189,9 +214,26 @@ fun PredictionsScreen(
                             }
                         }
                     } else {
-                        Column {
-                            PredictionsEmpty() {
-
+                        PredictionsEmpty {
+                            coroutineScope.launch {
+                                location?.let {
+                                    try {
+                                        Log.d(
+                                            "PredictionsScreen",
+                                            "Locality: ${location.latitude}, ${location.longitude}"
+                                        )
+                                        postalCode = getPostalCode(context, location)
+                                        Log.d("PredictionsScreen", "Postal code: $postalCode")
+                                        val localityName =
+                                            getLocalityFromPostalCode(context, postalCode)
+                                        loadPredictions(localityName, predictionsViewModel)
+                                    } catch (e: Exception) {
+                                        Log.e(
+                                            "PredictionsScreen",
+                                            "Error fetching postal code or locality: ${e.message}"
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -216,14 +258,13 @@ suspend fun loadPredictions(
     localityName: String?,
     predictionsViewModel: PredictionsViewModel
 ) {
-
     Log.d("PredictionsScreen", "Locality name: $localityName")
     val locality = availableLocalities.find { it.name == localityName }
     if (locality != null) {
         try {
             predictionsViewModel.getPredictions(locality.key)
         } catch (e: Exception) {
-            // handle error
+            Log.e("PredictionsScreen", "Error loading predictions: ${e.message}")
         }
     }
 }

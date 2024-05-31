@@ -46,17 +46,17 @@ class WeatherViewModel(context: Context) : ViewModel() {
         _weather.value = savedWeather?.toWeatherResponse() ?: WeatherResponse()
 
         val savedHourlyForecast = hourlyForecastUseCase.getSavedHourlyForecast()
-        _hourlyForecast.value = savedHourlyForecast?.toHourlyForecastResponse() ?: HourlyForecastResponse()
+        _hourlyForecast.value =
+            savedHourlyForecast?.toHourlyForecastResponse() ?: HourlyForecastResponse()
 
         val savedDailyForecast = dailyForecastUseCase.getSavedDailyForecast()
-        _dailyForecast.value = savedDailyForecast?.toDailyForecastResponse() ?: DailyForecastResponse()
+        _dailyForecast.value =
+            savedDailyForecast?.toDailyForecastResponse() ?: DailyForecastResponse()
     }
 
     fun getWeather(apiKey: String, lat: Double, lon: Double) {
         viewModelScope.launch {
             val response = weatherUseCase(apiKey, lat, lon)
-            _weather.value = response
-
             if (response != WeatherResponse()) {
                 _weather.value = response
                 weatherUseCase.saveWeather(response)
@@ -75,7 +75,8 @@ class WeatherViewModel(context: Context) : ViewModel() {
                 hourlyForecastUseCase.saveHourlyForecast(response)
             } else {
                 val savedHourlyForecast = hourlyForecastUseCase.getSavedHourlyForecast()
-                _hourlyForecast.value = savedHourlyForecast?.toHourlyForecastResponse() ?: HourlyForecastResponse()
+                _hourlyForecast.value =
+                    savedHourlyForecast?.toHourlyForecastResponse() ?: HourlyForecastResponse()
             }
 
         }
@@ -89,7 +90,8 @@ class WeatherViewModel(context: Context) : ViewModel() {
                 dailyForecastUseCase.saveDailyForecast(response)
             } else {
                 val savedDailyForecast = dailyForecastUseCase.getSavedDailyForecast()
-                _dailyForecast.value = savedDailyForecast?.toDailyForecastResponse() ?: DailyForecastResponse()
+                _dailyForecast.value =
+                    savedDailyForecast?.toDailyForecastResponse() ?: DailyForecastResponse()
             }
         }
     }
