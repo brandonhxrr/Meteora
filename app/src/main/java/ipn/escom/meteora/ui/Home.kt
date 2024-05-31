@@ -67,7 +67,7 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
     val isLocationPermissionGranted = remember { mutableStateOf(false) }
     var selectedItem by remember { mutableIntStateOf(0) }
     var hasInternetAccess: Boolean by remember {
-        mutableStateOf(true)
+        mutableStateOf(isNetworkAvailable2(context))
     }
     val state = rememberPullToRefreshState()
 
@@ -75,7 +75,7 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
     val agendaViewModel = AgendaViewModel()
 
     LaunchedEffect(true) {
-        hasInternetAccess = isNetworkAvailable(context)
+        hasInternetAccess = isInternetAvailable()
     }
 
     RequestLocationPermission(isLocationPermissionGranted)
@@ -87,7 +87,7 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
 
     if (state.isRefreshing) {
         LaunchedEffect(true) {
-            hasInternetAccess = isNetworkAvailable(context)
+            hasInternetAccess = isInternetAvailable()
             delay(1500)
             state.endRefresh()
         }
@@ -171,7 +171,7 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            if (hasInternetAccess) {
+            if (true) {
                 when (selectedItem) {
                     0 -> {
                         Forecast(

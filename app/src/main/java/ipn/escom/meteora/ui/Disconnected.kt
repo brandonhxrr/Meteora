@@ -51,7 +51,7 @@ suspend fun isInternetAvailable(): Boolean = withContext(Dispatchers.IO) {
         urlConnection.connectTimeout = 3000
         urlConnection.connect()
         urlConnection.responseCode == 200
-    } catch (e: IOException) {
+    } catch (e: Exception) {
         Log.e("Internet", "Internet error: $e")
         false
     }
@@ -76,6 +76,13 @@ suspend fun isNetworkAvailable(context: Context): Boolean = withContext(Dispatch
         Log.e("Network", "Network error: $e")
         return@withContext false
     }
+}
+
+fun isNetworkAvailable2(context: Context): Boolean {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager.activeNetwork ?: return false
+    val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 }
 
 

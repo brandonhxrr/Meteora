@@ -12,6 +12,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import ipn.escom.meteora.R
 import ipn.escom.meteora.ui.isInternetAvailable
 import ipn.escom.meteora.ui.isNetworkAvailable
+import ipn.escom.meteora.ui.isNetworkAvailable2
 import kotlinx.coroutines.tasks.await
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -23,7 +24,7 @@ suspend fun getLocation(
     isLocationPermissionGranted: MutableState<Boolean>,
     context: Context
 ): Location? {
-    if (isLocationPermissionGranted.value && isNetworkAvailable(context) && isInternetAvailable()) {
+    if (isLocationPermissionGranted.value && isNetworkAvailable2(context)) {
         try {
             return fusedLocationClient.lastLocation.await()
         } catch (e: Exception) {

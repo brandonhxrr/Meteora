@@ -1,7 +1,6 @@
 package ipn.escom.meteora.ui
 
 import android.location.Location
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,9 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,63 +33,68 @@ import androidx.navigation.NavController
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.weather.WeatherCondition
 import ipn.escom.meteora.data.weather.WeatherViewModel
+import ipn.escom.meteora.data.weather.data.network.response.DailyForecastResponse
+import ipn.escom.meteora.data.weather.data.network.response.HourlyForecastResponse
 import ipn.escom.meteora.data.weather.data.network.response.WeatherResponse
 import ipn.escom.meteora.utils.getCurrentTime
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Forecast(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     weatherViewModel: WeatherViewModel,
     location: Location? = null,
     navController: NavController? = null
 ) {
     val apiKey = stringResource(id = R.string.OpenWeatherAPIKEY)
     val refreshState = rememberPullToRefreshState()
-    val hourlyForecast by weatherViewModel.hourlyForecast.observeAsState(initial = null)
-    val dailyForecast by weatherViewModel.dailyForecast.observeAsState(initial = null)
-    val weather by weatherViewModel.weather.observeAsState(
-        initial = WeatherResponse()
-    )
+    val hourlyForecast by weatherViewModel.hourlyForecast.observeAsState(initial = HourlyForecastResponse())
+    val dailyForecast by weatherViewModel.dailyForecast.observeAsState(initial = DailyForecastResponse())
+    val weather by weatherViewModel.weather.observeAsState(initial = WeatherResponse())
+    val coroutineScope = rememberCoroutineScope()
 
-    val weatherCondition = weather?.let {
-        WeatherCondition(
-            weather = it
-        )
+    LaunchedEffect(location) {
+        location?.let {
+            weatherViewModel.getWeather(apiKey = apiKey, lat = it.latitude, lon = it.longitude)
+            weatherViewModel.getDailyForecast(
+                apiKey = apiKey,
+                lat = it.latitude,
+                lon = it.longitude
+            )
+            weatherViewModel.getHourlyForecast(
+                apiKey = apiKey,
+                lat = it.latitude,
+                lon = it.longitude
+            )
+        }
     }
 
     if (refreshState.isRefreshing) {
         LaunchedEffect(true) {
-            weatherViewModel.getWeather(
-                apiKey = apiKey, lat = location?.latitude!!, lon = location.longitude
-            )
-
-            weatherViewModel.getDailyForecast(
-                apiKey = apiKey, lat = location.latitude, lon = location.longitude
-            )
-
-            weatherViewModel.getHourlyForecast(
-                apiKey = apiKey, lat = location.latitude, lon = location.longitude
-            )
-
+            location?.let {
+                coroutineScope.launch {
+                    weatherViewModel.getWeather(
+                        apiKey = apiKey,
+                        lat = it.latitude,
+                        lon = it.longitude
+                    )
+                    weatherViewModel.getDailyForecast(
+                        apiKey = apiKey,
+                        lat = it.latitude,
+                        lon = it.longitude
+                    )
+                    weatherViewModel.getHourlyForecast(
+                        apiKey = apiKey,
+                        lat = it.latitude,
+                        lon = it.longitude
+                    )
+                }
+            }
             delay(1500)
             refreshState.endRefresh()
         }
-
-    }
-
-    if (location != null) {
-        weatherViewModel.getWeather(
-            apiKey = apiKey, lat = location.latitude, lon = location.longitude
-        )
-        weatherViewModel.getDailyForecast(
-            apiKey = apiKey, lat = location.latitude, lon = location.longitude
-        )
-        weatherViewModel.getHourlyForecast(
-            apiKey = apiKey, lat = location.latitude, lon = location.longitude
-        )
-        Log.d("Forecast", "Location: ${location.latitude}, ${location.longitude}")
     }
 
     LazyColumn(
@@ -102,12 +108,12 @@ fun Forecast(
                     Spacer(modifier = Modifier.height(16.dp))
                     ParameterCard(title = "", modifier = Modifier.padding(horizontal = 16.dp)) {
                         CurrentWeatherContent(
-                            location = weather!!.name,
+                            location = weather.name,
                             time = getCurrentTime(),
-                            temperature = weather!!.main.temp,
-                            feelsLike = weather!!.main.feelsLike,
-                            description = weatherCondition!!.getDescription(),
-                            animatedIcon = weatherCondition.getAnimatedIcon()
+                            temperature = weather.main.temp,
+                            feelsLike = weather.main.feelsLike,
+                            description = WeatherCondition(weather).getDescription(),
+                            animatedIcon = WeatherCondition(weather).getAnimatedIcon()
                         )
                     }
 
@@ -131,15 +137,15 @@ fun Forecast(
                             .height(140.dp)
                     ) {
                         WindCardContent(
-                            windSpeed = weather!!.wind.speed,
-                            windDirection = weather!!.wind.deg,
+                            windSpeed = weather.wind.speed,
+                            windDirection = weather.wind.deg,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         HumidityCard(
-                            humity = weather!!.main.humidity,
+                            humity = weather.main.humidity,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
@@ -149,9 +155,9 @@ fun Forecast(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     SunriseSunsetCardContent(
-                        sunriseHour = weather!!.sys.sunrise,
-                        sunsetHour = weather!!.sys.sunset,
-                        currentTime = weather!!.dt,
+                        sunriseHour = weather.sys.sunrise,
+                        sunsetHour = weather.sys.sunset,
+                        currentTime = weather.dt,
                     )
 
                     Text(
@@ -159,7 +165,7 @@ fun Forecast(
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier.padding(20.dp)
                     )
-                    DailyWeather(weather!!.name, dailyForecast, navController)
+                    DailyWeather(weather.name, dailyForecast, navController)
                 }
                 PullToRefreshContainer(
                     state = refreshState, modifier = Modifier.align(Alignment.TopCenter)
@@ -172,5 +178,6 @@ fun Forecast(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ForecastPreview() {
-    Forecast(modifier = Modifier, WeatherViewModel())
+    val context = LocalContext.current
+    Forecast(modifier = Modifier, WeatherViewModel(context))
 }

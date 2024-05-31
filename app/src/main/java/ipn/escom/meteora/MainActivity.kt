@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
@@ -62,8 +63,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Start(firebaseAnalytics: FirebaseAnalytics?) {
     val navController = rememberNavController()
+    val context = LocalContext.current
     val user = FirebaseAuth.getInstance().currentUser
-    val weatherViewModel = WeatherViewModel()
+    val weatherViewModel = WeatherViewModel(context)
     val signUpViewModel = SignUpViewModel()
 
     navController.addOnDestinationChangedListener { _, destination, _ ->

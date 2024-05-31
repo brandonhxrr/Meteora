@@ -53,7 +53,7 @@ fun HourlyWeather(hourlyForecastResponse: HourlyForecastResponse? = null) {
     var selectedForecast by remember { mutableStateOf<HourlyForecast?>(null) }
 
     LazyRow(contentPadding = PaddingValues(start = 16.dp, end = 16.dp)) {
-        if (hourlyForecastResponse != null) {
+        if (hourlyForecastResponse != null && hourlyForecastResponse != HourlyForecastResponse()) {
             items(24) { index ->
                 HourlyWeatherCard(hourlyForecastResponse.list[index]) {
                     selectedForecast = hourlyForecastResponse.list[index]
