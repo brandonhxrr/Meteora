@@ -230,3 +230,7 @@ val gradientLightEnd = Color(0xFF91EAE4)
 
 val gradientDarkStart = Color(0xFF50577A)
 val gradientDarkEnd= Color(0xFF262D33)
+
+val colorMaxTemperature = Color(0xFFFC4100)
+val colorRainfall = Color(0xFF3E6D9C)
+val colorMinTemperature = Color(0xFF615EFC)
