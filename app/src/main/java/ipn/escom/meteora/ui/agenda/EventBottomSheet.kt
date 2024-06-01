@@ -66,6 +66,7 @@ import ipn.escom.meteora.data.localities.getLocalityKeyFromName
 import ipn.escom.meteora.data.predictions.PredictionsViewModel
 import ipn.escom.meteora.data.predictions.data.network.response.Prediction
 import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
+import ipn.escom.meteora.ui.login.AlertMessage
 import ipn.escom.meteora.ui.theme.green
 import ipn.escom.meteora.utils.combineDateAndTime
 import ipn.escom.meteora.utils.getDayFromMillis
@@ -319,6 +320,7 @@ fun EventBottomSheet(
                     if (prediction != null) {
                         WeatherPreview(prediction = prediction)
                     }
+                    AlertMessage("Las predicciones son generadas con modelos de Aprendizaje automático (IA), por lo que pueden ser no totalmente precisas.")
                 }
 
                 if (eventResponse != null && !isNewEvent) {

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.WbCloudy
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.ButtonDefaults
@@ -60,6 +61,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import ipn.escom.meteora.R
 import ipn.escom.meteora.ui.Screens
+import ipn.escom.meteora.ui.theme.indigo
+import ipn.escom.meteora.ui.theme.indigoLight
 
 @Composable
 fun Header(title: String, subtitle: String = "") {
@@ -331,6 +334,49 @@ fun ErrorMessage(errorMessage: String) {
             }
         }
     }
+}
+
+@Composable
+fun AlertMessage(message: String) {
+    if (message.isNotEmpty()) {
+        Box(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.small)
+                    .border(1.dp, indigo, MaterialTheme.shapes.small),
+                color = indigoLight,
+                contentColor = indigo
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Info,
+                        contentDescription = "Info",
+                        modifier = Modifier.padding(8.dp)
+                    )
+                    Text(
+                        text = message,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .align(Alignment.CenterVertically),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AlertPreview() {
+    AlertMessage("Las predicciones son generadas con modelos de Aprendizaje automático (IA), por lo que pueden ser no totalmente precisas.")
 }
 
 @Composable

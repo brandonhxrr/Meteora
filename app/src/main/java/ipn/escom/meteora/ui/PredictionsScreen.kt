@@ -42,9 +42,10 @@ import ipn.escom.meteora.data.localities.availableLocalities
 import ipn.escom.meteora.data.predictions.PredictionsViewModel
 import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
 import ipn.escom.meteora.ui.agenda.EventBottomSheet
-import ipn.escom.meteora.ui.theme.colorMaxTemperature
-import ipn.escom.meteora.ui.theme.colorMinTemperature
-import ipn.escom.meteora.ui.theme.colorRainfall
+import ipn.escom.meteora.ui.login.AlertMessage
+import ipn.escom.meteora.ui.theme.blue
+import ipn.escom.meteora.ui.theme.indigo
+import ipn.escom.meteora.ui.theme.orange
 import ipn.escom.meteora.utils.getLocalityFromPostalCode
 import ipn.escom.meteora.utils.getPostalCode
 import kotlinx.coroutines.launch
@@ -221,6 +222,7 @@ fun PredictionsScreen(
                         if (pastPredictions.predictions.isNotEmpty()) {
                             LazyColumn(modifier = Modifier.fillMaxSize()) {
                                 item {
+                                    AlertMessage("Las predicciones son generadas con modelos de Aprendizaje automático (IA), por lo que pueden ser no totalmente precisas.")
                                     PredictionsCard(
                                         predictionsResponse = pastPredictions,
                                         onDayClick = { eventResponse ->
@@ -251,6 +253,7 @@ fun PredictionsScreen(
                         if (futurePredictions.predictions.isNotEmpty()) {
                             LazyColumn(modifier = Modifier.fillMaxSize()) {
                                 item {
+                                    AlertMessage("Las predicciones son generadas con modelos de Aprendizaje automático (IA), por lo que pueden ser no totalmente precisas.")
                                     PredictionsCard(
                                         predictionsResponse = futurePredictions,
                                         onDayClick = { eventResponse ->
@@ -280,6 +283,8 @@ fun PredictionsScreen(
                     2 -> {
                         LazyColumn(modifier = Modifier.fillMaxSize()) {
                             item {
+                                AlertMessage("Las predicciones son generadas con modelos de Aprendizaje automático (IA), por lo que pueden ser no totalmente precisas.")
+
                                 Text(
                                     "Temperatura máxima",
                                     style = MaterialTheme.typography.titleMedium,
@@ -288,7 +293,7 @@ fun PredictionsScreen(
                                         .fillMaxWidth(),
                                 )
                                 maxTemperatureEntries = getMaxTemperatureEntries(predictions)
-                                SimpleLineChart(maxTemperatureEntries, colorMaxTemperature)
+                                SimpleLineChart(maxTemperatureEntries, orange)
                             }
 
                             item {
@@ -300,7 +305,7 @@ fun PredictionsScreen(
                                         .fillMaxWidth(),
                                 )
                                 minTemperatureEntries = getMinTemperatureEntries(predictions)
-                                SimpleLineChart(minTemperatureEntries, colorMinTemperature)
+                                SimpleLineChart(minTemperatureEntries, indigo)
                             }
 
                             item {
@@ -312,7 +317,7 @@ fun PredictionsScreen(
                                         .fillMaxWidth(),
                                 )
                                 rainEntries = getRainEntries(predictions)
-                                SimpleLineChart(rainEntries, colorRainfall)
+                                SimpleLineChart(rainEntries, blue)
                             }
                         }
                     }
