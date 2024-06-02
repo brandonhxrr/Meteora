@@ -28,8 +28,8 @@ val availableLocalities = listOf(
     Locality(
         key = "CUAJIMALPA DE MORELOS",
         name = "Cuajimalpa de Morelos",
-        latitude = 19.3588,
-        longitude = -99.3224
+        latitude = 19.3599300,
+        longitude = -99.2938800
     ),
     Locality(
         key = "CUAUHTEMOC",
@@ -56,8 +56,8 @@ val availableLocalities = listOf(
         longitude = -99.0616
     ),
     Locality(
-        key = "MAGDALENA CONTRERAS",
-        name = "Magdalena Contreras",
+        key = "LA MAGDALENA CONTRERAS",
+        name = "La Magdalena Contreras",
         latitude = 19.3139,
         longitude = -99.2415
     ),
@@ -70,8 +70,8 @@ val availableLocalities = listOf(
     Locality(
         key = "MILPA ALTA",
         name = "Milpa Alta",
-        latitude = 19.1249,
-        longitude = -99.0054
+        latitude = 19.191190,
+        longitude = -99.023790
     ),
     Locality(
         key = "TLAHUAC",
@@ -82,8 +82,8 @@ val availableLocalities = listOf(
     Locality(
         key = "TLALPAN",
         name = "Tlalpan",
-        latitude = 19.1967,
-        longitude = -99.2109
+        latitude = 19.29513,
+        longitude = -99.16206
     ),
     Locality(
         key = "VENUSTIANO CARRANZA",
