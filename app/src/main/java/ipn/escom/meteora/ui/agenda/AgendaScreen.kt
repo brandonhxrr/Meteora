@@ -28,9 +28,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.ui.theme.getBackground
@@ -40,6 +42,7 @@ import ipn.escom.meteora.ui.theme.getOnBackground
 @Composable
 fun AgendaScreen(
     modifier: Modifier = Modifier,
+    preferencesViewModel: PreferencesViewModel,
     agendaViewModel: AgendaViewModel = AgendaViewModel()
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -138,6 +141,7 @@ fun AgendaScreen(
                         agendaViewModel = agendaViewModel,
                         sheetState = sheetState,
                         scope = coroutineScope,
+                        preferencesViewModel = preferencesViewModel,
                         onDismissRequest = {
                             showBottomSheet = false
                         },
@@ -152,6 +156,7 @@ fun AgendaScreen(
                         eventResponse = selectedEvent!!,
                         sheetState = sheetState,
                         scope = coroutineScope,
+                        preferencesViewModel = preferencesViewModel,
                         onDismissRequest = {
                             showDetailSheet = false
                             selectedEvent = null
@@ -166,5 +171,5 @@ fun AgendaScreen(
 @Preview(showBackground = true)
 @Composable
 fun AgendaScreenPreview() {
-    AgendaScreen()
+    AgendaScreen(preferencesViewModel = PreferencesViewModel(LocalContext.current))
 }

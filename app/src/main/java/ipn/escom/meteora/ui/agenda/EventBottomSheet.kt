@@ -59,6 +59,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.events.EventViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
@@ -66,6 +67,8 @@ import ipn.escom.meteora.data.localities.getLocalityKeyFromName
 import ipn.escom.meteora.data.predictions.PredictionsViewModel
 import ipn.escom.meteora.data.predictions.data.network.response.Prediction
 import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
+import ipn.escom.meteora.data.predictions.data.network.response.StringPrediction
+import ipn.escom.meteora.data.predictions.data.network.response.StringPredictionsResponse
 import ipn.escom.meteora.ui.login.AlertMessage
 import ipn.escom.meteora.ui.theme.green
 import ipn.escom.meteora.utils.combineDateAndTime
@@ -84,6 +87,7 @@ fun EventBottomSheet(
     eventResponse: EventResponse? = null,
     sheetState: SheetState = rememberModalBottomSheetState(),
     scope: CoroutineScope,
+    preferencesViewModel: PreferencesViewModel,
     onDismissRequest: () -> Unit
 ) {
     val eventViewModel = remember { EventViewModel() }
@@ -100,8 +104,8 @@ fun EventBottomSheet(
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
     var allDayEvent by remember { mutableStateOf(eventResponse?.time == 0L) }
-    val predictionsViewModel = PredictionsViewModel()
-    val predictions: PredictionsResponse? by predictionsViewModel.predictions.observeAsState(initial = PredictionsResponse())
+    val predictionsViewModel = PredictionsViewModel(preferencesViewModel)
+    val predictions: StringPredictionsResponse? by predictionsViewModel.predictions.observeAsState(initial = StringPredictionsResponse())
     var localityKey by remember { mutableStateOf(getLocalityKeyFromName(eventLocation)) }
     val context = LocalContext.current
 
@@ -306,7 +310,7 @@ fun EventBottomSheet(
 
                 HorizontalDivider()
 
-                if (predictions != null && predictions != PredictionsResponse()) {
+                if (predictions != null && predictions != StringPredictionsResponse()) {
                     Log.d("EventBottomSheet", "LocalityKey: $localityKey")
                     Log.d("EventBottomSheet", "Predictions: $predictions")
 
@@ -482,11 +486,11 @@ fun addEventToGoogleCalendar(
 }
 
 fun findPrediction(
-    predictionsResponse: PredictionsResponse,
+    predictionsResponse: StringPredictionsResponse,
     year: Int,
     month: Int,
     day: Int
-): Prediction? {
+): StringPrediction? {
     for (localityPrediction in predictionsResponse.predictions) {
         val yearPrediction = localityPrediction.years.find { it.year == year }
         if (yearPrediction != null) {

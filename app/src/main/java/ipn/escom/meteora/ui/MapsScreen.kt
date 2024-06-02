@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +47,7 @@ import com.google.maps.android.compose.TileOverlay
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberTileOverlayState
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.ui.theme.getOnBackground
 import java.io.InputStream
 import java.net.HttpURLConnection
@@ -63,7 +65,12 @@ const val humidityPalette =
     "0:db1200;20:965700;40:ede100;60:8bd600;80:00a808;100:000099;100.1:000099"
 
 @Composable
-fun MapsScreen(modifier: Modifier, location: Location?, apiKey: String) {
+fun MapsScreen(
+    modifier: Modifier,
+    location: Location?,
+    apiKey: String,
+    preferencesViewModel: PreferencesViewModel
+) {
     var selectedIndex by remember { mutableIntStateOf(0) }
     val options = listOf("Temperatura", "Lluvia", "Viento", "Nubosidad", "Humedad")
     val icons = listOf(
@@ -114,7 +121,7 @@ fun MapsScreen(modifier: Modifier, location: Location?, apiKey: String) {
                     .align(Alignment.TopEnd)
                     .padding(16.dp)
             ) {
-                Legend(selectedMap = selectedIndex)
+                Legend(selectedMap = selectedIndex, preferencesViewModel)
             }
         }
     }
@@ -217,53 +224,95 @@ class HttpTileProvider(
 }
 
 @Composable
-fun Legend(selectedMap: Int) {
+fun Legend(selectedMap: Int, preferencesViewModel: PreferencesViewModel) {
     var isExpanded by remember { mutableStateOf(false) }
+    val useMetric by preferencesViewModel.useMetric.observeAsState(initial = true)
+
+    val tempColors = listOf(
+        Color(0xFF821692),
+        Color(0xFF821692),
+        Color(0xFF821692),
+        Color(0xFF821692),
+        Color(0xFF8257DB),
+        Color(0xFF208CEC),
+        Color(0xFF20C4E8),
+        Color(0xFF23DDDD),
+        Color(0xFFC2FF28),
+        Color(0xFFFFF028),
+        Color(0xFFFFC228),
+        Color(0xFFFF5500),
+        Color(0xFFAA0000),
+        Color(0xFF880000),
+        Color(0xFF660000),
+        Color(0xFF440000)
+    )
+    val tempValuesCelsius = listOf(
+        "-65",
+        "-55",
+        "-45",
+        "-40",
+        "-30",
+        "-20",
+        "-10",
+        "0",
+        "10",
+        "20",
+        "25",
+        "30",
+        "35",
+        "40",
+        "45",
+        "50"
+    )
+    val tempValuesFahrenheit = tempValuesCelsius.map { celsius ->
+        ((celsius.toInt() * 9 / 5) + 32).toString()
+    }
+
+    val rainColors = listOf(
+        Color(0xFFE0F7FA),
+        Color(0xFF80DEEA),
+        Color(0xFF26C6DA),
+        Color(0xFF00BCD4),
+        Color(0xFF7B1FA2),
+        Color(0xFF4A148C),
+        Color(0xFF000000)
+    )
+
+    val rainValues = listOf(
+        "Muy débil",
+        "Débil",
+        "Moderada",
+        "Fuerte",
+        "Muy fuerte",
+        "Extrema",
+        "Violenta"
+    )
+
+    val windColors = listOf(
+        Color(0xFFFFFF00),
+        Color(0xEECECC66),
+        Color(0xB364BCB3),
+        Color(0x3F213BCC),
+        Color(0x744CACE6),
+        Color(0x4600AFFF),
+        Color(0x0D1126FF)
+    )
+    val windValuesMetric = listOf(
+        "1", "5", "15", "25", "50", "100", "200"
+    )
+    val windValuesImperial = windValuesMetric.map { ms ->
+        (ms.toDouble() * 2.23694).toString()
+    }
 
     val (unit, legendData) = when (selectedMap) {
-        0 -> "°C" to listOf(
-            "-65" to Color(0xFF821692),
-            "-55" to Color(0xFF821692),
-            "-45" to Color(0xFF821692),
-            "-40" to Color(0xFF821692),
-            "-30" to Color(0xFF8257DB),
-            "-20" to Color(0xFF208CEC),
-            "-10" to Color(0xFF20C4E8),
-            "0" to Color(0xFF23DDDD),
-            "10" to Color(0xFFC2FF28),
-            "20" to Color(0xFFFFF028),
-            "25" to Color(0xFFFFC228),
-            "30" to Color(0xFFFF5500),
-            "35" to Color(0xFFAA0000),
-            "40" to Color(0xFF880000),
-            "45" to Color(0xFF660000),
-            "50" to Color(0xFF440000)
+        0 -> if (useMetric) "°C" to tempValuesCelsius.zip(tempColors) else "°F" to tempValuesFahrenheit.zip(
+            tempColors
         )
 
-        1 -> "mm/s" to listOf(
-            "0.000005" to Color(0xFFE0F7FA),
-            "0.000009" to Color(0xFFB2EBF2),
-            "0.000014" to Color(0xFF80DEEA),
-            "0.000023" to Color(0xFF4DD0E1),
-            "0.000046" to Color(0xFF26C6DA),
-            "0.000092" to Color(0xFF00BCD4),
-            "0.000231" to Color(0xFF7B1FA2),
-            "0.000463" to Color(0xFF6A1B9A),
-            "0.000694" to Color(0xFF4A148C),
-            "0.000926" to Color(0xFF311B92),
-            "0.001388" to Color(0xFF1A237E),
-            "0.002315" to Color(0xFF000000),
-            "0.023150" to Color(0xFF000000)
-        )
+        1 -> "" to rainValues.zip(rainColors)
 
-        2 -> "m/s" to listOf(
-            "1" to Color(0xFFFFFF00),
-            "5" to Color(0xEECECC66),
-            "15" to Color(0xB364BCB3),
-            "25" to Color(0x3F213BCC),
-            "50" to Color(0x744CACE6),
-            "100" to Color(0x4600AFFF),
-            "200" to Color(0x0D1126FF)
+        2 -> if (useMetric) "m/s" to windValuesMetric.zip(windColors) else "mph" to windValuesImperial.zip(
+            windColors
         )
 
         3 -> "%" to listOf(
@@ -339,3 +388,4 @@ fun Legend(selectedMap: Int) {
         }
     }
 }
+

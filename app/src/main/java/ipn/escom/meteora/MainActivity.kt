@@ -19,6 +19,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.data.authentication.login.LoginViewModel
 import ipn.escom.meteora.data.authentication.signup.SignUpViewModel
 import ipn.escom.meteora.data.weather.WeatherViewModel
@@ -65,7 +66,8 @@ fun Start(firebaseAnalytics: FirebaseAnalytics?) {
     val navController = rememberNavController()
     val context = LocalContext.current
     val user = FirebaseAuth.getInstance().currentUser
-    val weatherViewModel = WeatherViewModel(context)
+    val preferencesViewModel = PreferencesViewModel(context)
+    val weatherViewModel = WeatherViewModel(context, preferencesViewModel)
     val signUpViewModel = SignUpViewModel()
 
     navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -111,7 +113,11 @@ fun Start(firebaseAnalytics: FirebaseAnalytics?) {
         }
 
         composable(Screens.Home.name) {
-            Home(navController = navController, weatherViewModel = weatherViewModel)
+            Home(
+                navController = navController,
+                weatherViewModel = weatherViewModel,
+                preferencesViewModel = preferencesViewModel
+            )
         }
 
         composable("dailyForecast/{town}/{timestamp}") { backStackEntry ->
@@ -139,7 +145,7 @@ fun Start(firebaseAnalytics: FirebaseAnalytics?) {
         }
 
         composable(Screens.User.name) {
-            UserScreen(navController = navController)
+            UserScreen(navController = navController, preferencesViewModel = preferencesViewModel)
         }
     }
 }

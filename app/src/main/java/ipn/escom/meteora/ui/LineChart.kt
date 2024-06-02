@@ -19,6 +19,7 @@ import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.common.shader.DynamicShader
 import com.patrykandpatrick.vico.core.common.shader.TopBottomShader
 import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
+import ipn.escom.meteora.data.predictions.data.network.response.StringPredictionsResponse
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -75,7 +76,7 @@ fun SimpleLineChart(entries: List<Pair<Float, LocalDate>>, color: Color) {
 }
 
 
-fun getMaxTemperatureEntries(predictionsResponse: PredictionsResponse): List<Pair<Float, LocalDate>> {
+fun getMaxTemperatureEntries(predictionsResponse: StringPredictionsResponse): List<Pair<Float, LocalDate>> {
     val entries = mutableListOf<Pair<Float, LocalDate>>()
     predictionsResponse.predictions.forEach { localityPrediction ->
         localityPrediction.years.forEach { yearPrediction ->
@@ -92,7 +93,7 @@ fun getMaxTemperatureEntries(predictionsResponse: PredictionsResponse): List<Pai
     return entries
 }
 
-fun getMinTemperatureEntries(predictionsResponse: PredictionsResponse): List<Pair<Float, LocalDate>> {
+fun getMinTemperatureEntries(predictionsResponse: StringPredictionsResponse): List<Pair<Float, LocalDate>> {
     val entries = mutableListOf<Pair<Float, LocalDate>>()
     predictionsResponse.predictions.forEach { localityPrediction ->
         localityPrediction.years.forEach { yearPrediction ->
@@ -109,7 +110,7 @@ fun getMinTemperatureEntries(predictionsResponse: PredictionsResponse): List<Pai
     return entries
 }
 
-fun getRainEntries(predictionsResponse: PredictionsResponse): List<Pair<Float, LocalDate>> {
+fun getRainEntries(predictionsResponse: StringPredictionsResponse): List<Pair<Float, LocalDate>> {
     val entries = mutableListOf<Pair<Float, LocalDate>>()
     predictionsResponse.predictions.forEach { localityPrediction ->
         localityPrediction.years.forEach { yearPrediction ->

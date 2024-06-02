@@ -9,17 +9,18 @@ import ipn.escom.meteora.data.weather.data.network.response.WeatherResponse
 class WeatherRepository(context: Context) {
     private val api = WeatherService(context)
 
-    suspend fun getWeather(apiKey: String, lat: Double, lon: Double): WeatherResponse =
-        api.getWeather(apiKey, lat, lon)
+    suspend fun getWeather(apiKey: String, lat: Double, lon: Double, units: String): WeatherResponse =
+        api.getWeather(apiKey, lat, lon, units)
 
     suspend fun getHourlyForecast(
         apiKey: String,
         lat: Double,
-        lon: Double
-    ): HourlyForecastResponse = api.getHourlyForecast(apiKey, lat, lon)
+        lon: Double,
+        units: String
+    ): HourlyForecastResponse = api.getHourlyForecast(apiKey, lat, lon, units)
 
-    suspend fun getDailyForecast(apiKey: String, lat: Double, lon: Double): DailyForecastResponse =
-        api.getDailyForecast(apiKey, lat, lon)
+    suspend fun getDailyForecast(apiKey: String, lat: Double, lon: Double, units: String): DailyForecastResponse =
+        api.getDailyForecast(apiKey, lat, lon, units)
 
     suspend fun saveWeather(weather: WeatherResponse) = api.saveWeather(weather)
 

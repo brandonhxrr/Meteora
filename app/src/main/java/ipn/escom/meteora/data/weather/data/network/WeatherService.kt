@@ -28,17 +28,17 @@ class WeatherService(context: Context) {
 
     private val weatherDao = db.weatherDao()
 
-    suspend fun getWeather(apiKey: String, lat: Double, lon: Double): WeatherResponse {
+    suspend fun getWeather(apiKey: String, lat: Double, lon: Double, units: String): WeatherResponse {
         return withContext(Dispatchers.IO) {
             try {
                 val response =
-                    retrofitAPI.create(WeatherClient::class.java).getWeather(lat, lon, apiKey)
+                    retrofitAPI.create(WeatherClient::class.java).getWeather(lat, lon, apiKey, units)
                 Log.d("WeatherService", "getWeather: ${response.body()}")
                 response.body() ?: WeatherResponse()
             } catch (e: SocketTimeoutException) {
                 Log.e("WeatherService", "Timeout al conectar a la API")
                 delay(2000)
-                getWeather(apiKey, lat, lon)
+                getWeather(apiKey, lat, lon, units)
                 WeatherResponse()
             } catch (e: UnknownHostException) {
                 Log.e("WeatherService", "No internet connection: ${e.message}")
@@ -53,19 +53,20 @@ class WeatherService(context: Context) {
     suspend fun getHourlyForecast(
         apiKey: String,
         lat: Double,
-        lon: Double
+        lon: Double,
+        units: String
     ): HourlyForecastResponse {
         return withContext(Dispatchers.IO) {
             try {
                 val response =
                     retrofitPro.create(WeatherClient::class.java)
-                        .getHourlyForecast(lat, lon, apiKey)
+                        .getHourlyForecast(lat, lon, apiKey, units)
                 Log.d("WeatherService", "getHourlyForecast: ${response.body()}")
                 response.body() ?: HourlyForecastResponse()
             } catch (e: SocketTimeoutException) {
                 Log.e("WeatherService", "Timeout al conectar a la API")
                 delay(2000)
-                getHourlyForecast(apiKey, lat, lon)
+                getHourlyForecast(apiKey, lat, lon, units)
                 HourlyForecastResponse()
             } catch (e: UnknownHostException) {
                 Log.e("WeatherService", "No internet connection: ${e.message}")
@@ -80,19 +81,20 @@ class WeatherService(context: Context) {
     suspend fun getDailyForecast(
         apiKey: String,
         lat: Double,
-        lon: Double
+        lon: Double,
+        units: String
     ): DailyForecastResponse {
         return withContext(Dispatchers.IO) {
             try {
                 val response =
                     retrofitPro.create(WeatherClient::class.java)
-                        .getDailyForecast(lat, lon, apiKey)
+                        .getDailyForecast(lat, lon, apiKey, units)
                 Log.d("WeatherService", "getDailyForecast: ${response.body()}")
                 response.body()?: DailyForecastResponse()
             } catch (e: SocketTimeoutException) {
                 Log.e("WeatherService", "Timeout al conectar a la API")
                 delay(2000)
-                getDailyForecast(apiKey, lat, lon)
+                getDailyForecast(apiKey, lat, lon, units)
                 DailyForecastResponse()
             } catch (e: UnknownHostException) {
                 Log.e("WeatherService", "No internet connection: ${e.message}")

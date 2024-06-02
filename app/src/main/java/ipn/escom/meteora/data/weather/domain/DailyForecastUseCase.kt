@@ -7,8 +7,8 @@ import ipn.escom.meteora.data.weather.data.network.response.DailyForecastRespons
 class DailyForecastUseCase(context: Context) {
     private val repository = WeatherRepository(context)
 
-    suspend operator fun invoke(apiKey: String, lat: Double, lon: Double): DailyForecastResponse {
-        return repository.getDailyForecast(apiKey, lat, lon)
+    suspend operator fun invoke(apiKey: String, lat: Double, lon: Double, units: String): DailyForecastResponse {
+        return repository.getDailyForecast(apiKey, lat, lon, units)
     }
 
     suspend fun saveDailyForecast(dailyForecast: DailyForecastResponse) =

@@ -26,15 +26,12 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -42,19 +39,21 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import ipn.escom.meteora.data.PreferencesViewModel
+import ipn.escom.meteora.ui.theme.getBackground
 import ipn.escom.meteora.ui.theme.getOnBackground
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun UserScreen(navController: NavController? = null) {
+fun UserScreen(navController: NavController? = null, preferencesViewModel: PreferencesViewModel) {
     val currentUser = FirebaseAuth.getInstance().currentUser
-    var useMetric by remember { mutableStateOf(true) }
-    var showDecimals by remember { mutableStateOf(true) }
+    val useMetric by preferencesViewModel.useMetric.observeAsState(initial = true)
+    val showDecimals by preferencesViewModel.showDecimals.observeAsState(initial = false)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(getBackground())
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
@@ -79,43 +78,45 @@ fun UserScreen(navController: NavController? = null) {
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        GlideImage(
-            model = currentUser?.photoUrl,
-            contentDescription = "Profile picture",
+        Card(
             modifier = Modifier
-                .size(100.dp)
-                .align(Alignment.CenterHorizontally)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
-        )
+                .fillMaxWidth()
+                .padding(vertical = 16.dp, horizontal = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = getOnBackground())
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            GlideImage(
+                model = currentUser?.photoUrl,
+                contentDescription = "Profile picture",
+                modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = currentUser?.displayName ?: "",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Text(
-            text = currentUser?.displayName ?: "",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = currentUser?.email ?: "",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(bottom = 32.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = currentUser?.email ?: "",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 32.dp)
+            )
+        }
 
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 8.dp),
             colors = CardDefaults.cardColors(containerColor = getOnBackground())
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -133,13 +134,13 @@ fun UserScreen(navController: NavController? = null) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Sistema de unidades",
+                        text = "Sistema métrico (°C)",
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )
                     Switch(
                         checked = useMetric,
-                        onCheckedChange = { useMetric = it }
+                        onCheckedChange = { preferencesViewModel.setUseMetric(it) }
                     )
                 }
 
@@ -156,7 +157,7 @@ fun UserScreen(navController: NavController? = null) {
                     )
                     Switch(
                         checked = showDecimals,
-                        onCheckedChange = { showDecimals = it }
+                        onCheckedChange = { preferencesViewModel.setShowDecimals(it) }
                     )
                 }
             }
@@ -175,17 +176,12 @@ fun UserScreen(navController: NavController? = null) {
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            shape = MaterialTheme.shapes.small
         ) {
             Icon(imageVector = Icons.AutoMirrored.Rounded.Logout, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = "Cerrar sesión", style = MaterialTheme.typography.bodyMedium)
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun UserScreenPreview() {
-    UserScreen()
 }

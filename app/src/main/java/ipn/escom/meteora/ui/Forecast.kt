@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.data.weather.WeatherCondition
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.data.weather.data.network.response.DailyForecastResponse
@@ -176,5 +177,8 @@ fun Forecast(
 @Composable
 fun ForecastPreview() {
     val context = LocalContext.current
-    Forecast(modifier = Modifier, WeatherViewModel(context))
+    Forecast(
+        modifier = Modifier,
+        WeatherViewModel(context, PreferencesViewModel(context))
+    )
 }

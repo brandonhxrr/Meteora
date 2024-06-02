@@ -8,8 +8,8 @@ class WeatherUseCase(context: Context) {
 
     private val repository = WeatherRepository(context)
 
-    suspend operator fun invoke(apiKey: String, lat: Double, lon: Double): WeatherResponse {
-        return repository.getWeather(apiKey, lat, lon)
+    suspend operator fun invoke(apiKey: String, lat: Double, lon: Double, units: String): WeatherResponse {
+        return repository.getWeather(apiKey, lat, lon, units)
     }
 
     suspend fun saveWeather(weather: WeatherResponse) = repository.saveWeather(weather)

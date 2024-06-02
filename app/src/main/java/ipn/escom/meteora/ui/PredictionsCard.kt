@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,17 +45,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.localities.getLocalityNameFromKey
 import ipn.escom.meteora.data.predictions.data.network.response.MonthPrediction
+import ipn.escom.meteora.data.predictions.data.network.response.MonthStringPrediction
 import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
+import ipn.escom.meteora.data.predictions.data.network.response.StringPredictionsResponse
 import ipn.escom.meteora.ui.theme.getOnBackground
 import ipn.escom.meteora.utils.getMonthName
 import java.util.Calendar
 
 @Composable
 fun PredictionsCard(
-    predictionsResponse: PredictionsResponse, onDayClick: (EventResponse) -> Unit
+    predictionsResponse: StringPredictionsResponse, onDayClick: (EventResponse) -> Unit
 ) {
     val localityPredictions = predictionsResponse.predictions
 
@@ -81,7 +85,7 @@ fun PredictionsCard(
 @Composable
 fun MonthPredictionCard(
     localityName: String,
-    monthPrediction: MonthPrediction,
+    monthPrediction: MonthStringPrediction,
     year: Int,
     expanded: Boolean,
     onClick: () -> Unit,
@@ -154,9 +158,9 @@ fun MonthPredictionCard(
 @Composable
 fun DailyPredictionCard(
     localityName: String,
-    maxt: Double,
-    mint: Double,
-    rainfall: Double,
+    maxt: String,
+    mint: String,
+    rainfall: String,
     day: Int,
     month: Int,
     year: Int,
@@ -205,7 +209,7 @@ fun DailyPredictionCard(
                     color = getOnBackground()
                 )
             }
-            Spacer(modifier = Modifier.padding(16.dp))
+            Spacer(modifier = Modifier.padding(14.dp))
             Row {
                 Icon(
                     imageVector = Icons.Rounded.ExpandLess,
@@ -214,7 +218,7 @@ fun DailyPredictionCard(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "${String.format("%.2f", maxt)}°",
+                    text = "$maxt°",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -230,7 +234,7 @@ fun DailyPredictionCard(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "${if (rainfall > 0.0) String.format("%.2f", rainfall) else "0"} mm",
+                    text = "$rainfall mm",
                     style = MaterialTheme.typography.bodyMedium
                 )
 
@@ -246,7 +250,7 @@ fun DailyPredictionCard(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "${String.format("%.2f", mint)}°",
+                    text = "$mint°",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }

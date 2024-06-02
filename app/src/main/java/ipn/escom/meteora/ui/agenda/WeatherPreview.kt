@@ -21,12 +21,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.R
-import ipn.escom.meteora.data.predictions.data.network.response.Prediction
+import ipn.escom.meteora.data.predictions.data.network.response.StringPrediction
 
 @SuppressLint("DefaultLocale")
 @Composable
 fun WeatherPreview(
-    prediction: Prediction
+    prediction: StringPrediction
 ) {
     Row(
         modifier = Modifier
@@ -49,12 +49,7 @@ fun WeatherPreview(
                 .padding(start = 16.dp)
         )
         Text(
-            text = "${
-                String.format(
-                    "%.2f",
-                    prediction.maxt
-                )
-            } °",
+            text = "${prediction.maxt} °",
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .weight(1f),
@@ -87,12 +82,7 @@ fun WeatherPreview(
                 .padding(start = 16.dp)
         )
         Text(
-            text = "${
-                if (prediction.rainfall > 0.0) String.format(
-                    "%.2f",
-                    prediction.rainfall
-                ) else "0"
-            } mm",
+            text = "${prediction.rainfall} mm",
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .weight(1f),
@@ -124,12 +114,7 @@ fun WeatherPreview(
                 .padding(start = 16.dp)
         )
         Text(
-            text = "${
-                String.format(
-                    "%.2f",
-                    prediction.mint
-                )
-            } °",
+            text = "${prediction.mint}°",
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .weight(1f),
@@ -144,10 +129,10 @@ fun WeatherPreview(
 fun WeatherPreviewPreview() {
     Column {
         WeatherPreview(
-            prediction = Prediction(
-                maxt = 30.0,
-                mint = 20.0,
-                rainfall = 0.0
+            prediction = StringPrediction(
+                maxt = "30.0",
+                mint = "20.0",
+                rainfall = "0.0"
             )
         )
     }

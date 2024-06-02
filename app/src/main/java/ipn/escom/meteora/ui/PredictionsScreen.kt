@@ -44,11 +44,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.localities.availableLocalities
 import ipn.escom.meteora.data.predictions.PredictionsViewModel
 import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
+import ipn.escom.meteora.data.predictions.data.network.response.StringPredictionsResponse
 import ipn.escom.meteora.ui.agenda.EventBottomSheet
 import ipn.escom.meteora.ui.login.AlertMessage
 import ipn.escom.meteora.ui.theme.blue
@@ -65,11 +67,12 @@ import java.time.LocalDate
 fun PredictionsScreen(
     modifier: Modifier = Modifier,
     location: Location? = null,
+    preferencesViewModel: PreferencesViewModel,
     predictionsViewModel: PredictionsViewModel,
     agendaViewModel: AgendaViewModel
 ) {
     val context = LocalContext.current
-    val predictions by predictionsViewModel.predictions.observeAsState(initial = PredictionsResponse())
+    val predictions by predictionsViewModel.predictions.observeAsState(initial = StringPredictionsResponse())
     var selectedIndex by remember { mutableIntStateOf(0) }
     var postalCode: String? by remember { mutableStateOf("") }
 
@@ -98,7 +101,7 @@ fun PredictionsScreen(
         }
     }
 
-    if (predictions == PredictionsResponse()) {
+    if (predictions == StringPredictionsResponse()) {
         PredictionsEmpty {
             coroutineScope.launch {
                 location?.let {
@@ -143,7 +146,7 @@ fun PredictionsScreen(
             }
             localityPrediction.copy(years = filteredYears)
         }.let { pastLocalityPredictions ->
-            PredictionsResponse(predictions = pastLocalityPredictions)
+            StringPredictionsResponse(predictions = pastLocalityPredictions)
         }
 
         val futurePredictions = predictions.predictions.map { localityPrediction ->
@@ -164,7 +167,7 @@ fun PredictionsScreen(
             }
             localityPrediction.copy(years = filteredYears)
         }.let { futureLocalityPredictions ->
-            PredictionsResponse(predictions = futureLocalityPredictions)
+            StringPredictionsResponse(predictions = futureLocalityPredictions)
         }
 
         Column(modifier = modifier.fillMaxSize()) {
@@ -359,6 +362,7 @@ fun PredictionsScreen(
                 eventResponse = selectedEventResponse,
                 sheetState = sheetState,
                 scope = coroutineScope,
+                preferencesViewModel = preferencesViewModel,
                 onDismissRequest = {
                     showBottomSheet = false
                 }

@@ -1,7 +1,6 @@
 package ipn.escom.meteora.ui
 
 import android.location.Location
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,6 +49,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.localities.LocalityViewModel
 import ipn.escom.meteora.data.localities.SearchBarWithDialog
@@ -58,7 +58,6 @@ import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.ui.agenda.AgendaScreen
 import ipn.escom.meteora.ui.theme.getBackground
 import ipn.escom.meteora.ui.theme.getOnBackground
-import ipn.escom.meteora.ui.theme.lightBackground
 import ipn.escom.meteora.utils.RequestLocationPermission
 import ipn.escom.meteora.utils.getLocation
 import ipn.escom.meteora.utils.getPostalCode
@@ -67,7 +66,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
+fun Home(
+    navController: NavController?,
+    weatherViewModel: WeatherViewModel?,
+    preferencesViewModel: PreferencesViewModel
+) {
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     var location by remember { mutableStateOf<Location?>(null) }
@@ -121,24 +124,24 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                     containerColor = getBackground()
                 ),
                 title = {
-                SearchBarWithDialog(
-                    postalCode = postalCode ?: "",
-                    localityViewModel = localitiesViewModel,
-                    onLocationSelected = {
-                        location = it
+                    SearchBarWithDialog(
+                        postalCode = postalCode ?: "",
+                        localityViewModel = localitiesViewModel,
+                        onLocationSelected = {
+                            location = it
 
-                    },
-                    onLocationClear = {
-                        coroutineScope.launch {
-                            location = getLocation(
-                                fusedLocationClient,
-                                isLocationPermissionGranted,
-                                context
-                            )
-                        }
-                    })
-                Spacer(modifier = Modifier.width(8.dp))
-            },
+                        },
+                        onLocationClear = {
+                            coroutineScope.launch {
+                                location = getLocation(
+                                    fusedLocationClient,
+                                    isLocationPermissionGranted,
+                                    context
+                                )
+                            }
+                        })
+                    Spacer(modifier = Modifier.width(8.dp))
+                },
                 actions = {
                     IconButton(
                         onClick = {
@@ -190,7 +193,8 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                         colors = NavigationBarItemDefaults.colors(
                             indicatorColor = MaterialTheme.colorScheme.primary,
                             selectedIconColor = getOnBackground()
-                        ))
+                        )
+                    )
                 }
             }
         }
@@ -200,48 +204,47 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            if (true) {
-                when (selectedItem) {
-                    0 -> {
-                        Forecast(
-                            modifier = Modifier.padding(it),
-                            weatherViewModel!!,
-                            location,
-                            navController
-                        )
-                    }
 
-                    1 -> {
-                        MapsScreen(
-                            modifier = Modifier.padding(it),
-                            location = location,
-                            apiKey = stringResource(
-                                id = R.string.OpenWeatherAPIKEY
-                            )
-                        )
-                    }
-
-                    2 -> {
-                        AgendaScreen(
-                            modifier = Modifier.padding(it),
-                            agendaViewModel = agendaViewModel
-                        )
-                    }
-
-                    3 -> {
-                        PredictionsScreen(
-                            modifier = Modifier.padding(it),
-                            location = location,
-                            predictionsViewModel = PredictionsViewModel(),
-                            agendaViewModel = agendaViewModel
-                        )
-                    }
+            when (selectedItem) {
+                0 -> {
+                    Forecast(
+                        modifier = Modifier.padding(it),
+                        weatherViewModel = weatherViewModel!!,
+                        location = location,
+                        navController = navController
+                    )
                 }
-            } else {
-                DisconnectedScreen {
-                    state.startRefresh()
+
+                1 -> {
+                    MapsScreen(
+                        modifier = Modifier.padding(it),
+                        location = location,
+                        apiKey = stringResource(
+                            id = R.string.OpenWeatherAPIKEY
+                        ),
+                        preferencesViewModel = preferencesViewModel
+                    )
+                }
+
+                2 -> {
+                    AgendaScreen(
+                        modifier = Modifier.padding(it),
+                        preferencesViewModel = preferencesViewModel,
+                        agendaViewModel = agendaViewModel
+                    )
+                }
+
+                3 -> {
+                    PredictionsScreen(
+                        modifier = Modifier.padding(it),
+                        location = location,
+                        preferencesViewModel = preferencesViewModel,
+                        predictionsViewModel = PredictionsViewModel(preferencesViewModel),
+                        agendaViewModel = agendaViewModel
+                    )
                 }
             }
+
             PullToRefreshContainer(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -255,5 +258,5 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
-    Home(null, null)
+    Home(null, null, PreferencesViewModel(LocalContext.current))
 }

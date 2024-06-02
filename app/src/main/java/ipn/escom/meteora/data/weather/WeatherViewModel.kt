@@ -1,10 +1,13 @@
 package ipn.escom.meteora.data.weather
 
 import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.data.weather.data.network.response.DailyForecastResponse
 import ipn.escom.meteora.data.weather.data.network.response.HourlyForecastResponse
 import ipn.escom.meteora.data.weather.data.network.response.WeatherResponse
@@ -16,7 +19,7 @@ import ipn.escom.meteora.utils.toHourlyForecastResponse
 import ipn.escom.meteora.utils.toWeatherResponse
 import kotlinx.coroutines.launch
 
-class WeatherViewModel(context: Context) : ViewModel() {
+class WeatherViewModel(context: Context, private val preferencesViewModel: PreferencesViewModel) : ViewModel() {
 
     private val weatherUseCase = WeatherUseCase(context)
     private val dailyForecastUseCase = DailyForecastUseCase(context)
@@ -56,7 +59,10 @@ class WeatherViewModel(context: Context) : ViewModel() {
 
     fun getWeather(apiKey: String, lat: Double, lon: Double) {
         viewModelScope.launch {
-            val response = weatherUseCase(apiKey, lat, lon)
+            val useMetric = preferencesViewModel.useMetric.value ?: true
+            val units = if (useMetric) "metric" else "imperial"
+
+            val response = weatherUseCase(apiKey, lat, lon, units)
             if (response != WeatherResponse()) {
                 _weather.value = response
                 weatherUseCase.saveWeather(response)
@@ -69,7 +75,10 @@ class WeatherViewModel(context: Context) : ViewModel() {
 
     fun getHourlyForecast(apiKey: String, lat: Double, lon: Double) {
         viewModelScope.launch {
-            val response = hourlyForecastUseCase(apiKey, lat, lon)
+            val useMetric = preferencesViewModel.useMetric.value ?: true
+            val units = if (useMetric) "metric" else "imperial"
+
+            val response = hourlyForecastUseCase(apiKey, lat, lon, units)
             if (response != HourlyForecastResponse()) {
                 _hourlyForecast.value = response
                 hourlyForecastUseCase.saveHourlyForecast(response)
@@ -84,7 +93,10 @@ class WeatherViewModel(context: Context) : ViewModel() {
 
     fun getDailyForecast(apiKey: String, lat: Double, lon: Double) {
         viewModelScope.launch {
-            val response = dailyForecastUseCase(apiKey, lat, lon)
+            val useMetric = preferencesViewModel.useMetric.value ?: true
+            val units = if (useMetric) "metric" else "imperial"
+
+            val response = dailyForecastUseCase(apiKey, lat, lon, units)
             if (response != DailyForecastResponse()) {
                 _dailyForecast.value = response
                 dailyForecastUseCase.saveDailyForecast(response)
