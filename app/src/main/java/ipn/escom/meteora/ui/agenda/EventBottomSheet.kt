@@ -370,6 +370,8 @@ fun EventBottomSheet(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = "Agregar al calendario",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -392,7 +394,7 @@ fun EventBottomSheet(
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Eliminar")
+                            Text("Eliminar", style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }

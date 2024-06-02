@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
+import ipn.escom.meteora.ui.theme.getOnBackground
 import ipn.escom.meteora.utils.convertMillisToTimeFormat
 import ipn.escom.meteora.utils.formatSelectedDate
 
@@ -41,7 +42,7 @@ fun EventItem(eventResponse: EventResponse, onClick: () -> Unit) {
                 onClick()
             },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = getOnBackground(),
         ),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(2.dp)

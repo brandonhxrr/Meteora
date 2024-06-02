@@ -273,11 +273,12 @@ fun MeteoraTheme(
         darkTheme -> darkScheme
         else -> lightScheme
     }
+    val background = getBackground()
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.surface.toArgb()
+            window.statusBarColor = background.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
         }
     }
@@ -287,4 +288,27 @@ fun MeteoraTheme(
         typography = Typography,
         content = content
     )
+}
+
+/*@Composable
+fun getBackground(): Color {
+    return MaterialTheme.colorScheme.surface
+}
+
+@Composable
+fun getOnBackground(): Color {
+    return MaterialTheme.colorScheme.surfaceContainer
+}*/
+@Composable
+fun getBackground(): Color {
+    return if (isSystemInDarkTheme()) {
+        MaterialTheme.colorScheme.surface
+    } else lightBackground
+}
+
+@Composable
+fun getOnBackground(): Color {
+    return if (isSystemInDarkTheme()) {
+        MaterialTheme.colorScheme.surfaceContainer
+    } else lightOnBackground
 }

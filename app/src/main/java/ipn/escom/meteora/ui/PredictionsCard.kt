@@ -47,6 +47,7 @@ import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.localities.getLocalityNameFromKey
 import ipn.escom.meteora.data.predictions.data.network.response.MonthPrediction
 import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
+import ipn.escom.meteora.ui.theme.getOnBackground
 import ipn.escom.meteora.utils.getMonthName
 import java.util.Calendar
 
@@ -94,6 +95,10 @@ fun MonthPredictionCard(
             .padding(vertical = 8.dp, horizontal = 16.dp)
             .clickable(onClick = onClick)
             .scale(scale),
+        colors = CardDefaults.cardColors(
+            containerColor = getOnBackground(),
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
     ) {
         Row(
             modifier = Modifier

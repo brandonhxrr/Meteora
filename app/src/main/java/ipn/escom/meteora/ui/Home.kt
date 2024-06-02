@@ -1,6 +1,7 @@
 package ipn.escom.meteora.ui
 
 import android.location.Location
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,9 +21,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -53,6 +56,9 @@ import ipn.escom.meteora.data.localities.SearchBarWithDialog
 import ipn.escom.meteora.data.predictions.PredictionsViewModel
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.ui.agenda.AgendaScreen
+import ipn.escom.meteora.ui.theme.getBackground
+import ipn.escom.meteora.ui.theme.getOnBackground
+import ipn.escom.meteora.ui.theme.lightBackground
 import ipn.escom.meteora.utils.RequestLocationPermission
 import ipn.escom.meteora.utils.getLocation
 import ipn.escom.meteora.utils.getPostalCode
@@ -108,8 +114,13 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
     )
 
     Scaffold(
+        containerColor = getBackground(),
         topBar = {
-            TopAppBar(title = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = getBackground()
+                ),
+                title = {
                 SearchBarWithDialog(
                     postalCode = postalCode ?: "",
                     localityViewModel = localitiesViewModel,
@@ -157,7 +168,9 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                 })
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = getOnBackground(),
+            ) {
                 items.forEachIndexed { index, item ->
                     NavigationBarItem(
                         selected = selectedItem == index,
@@ -173,7 +186,11 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                                 text = stringResource(id = item),
                                 style = MaterialTheme.typography.bodySmall
                             )
-                        })
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = MaterialTheme.colorScheme.primary,
+                            selectedIconColor = getOnBackground()
+                        ))
                 }
             }
         }

@@ -29,6 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
+import ipn.escom.meteora.ui.theme.getBackground
+import ipn.escom.meteora.ui.theme.getOnBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,8 +47,12 @@ fun AgendaScreen(
     var selectedEvent by remember { mutableStateOf<EventResponse?>(null) }
 
     Scaffold(
+        containerColor = getBackground(),
         floatingActionButton = {
-            FloatingActionButton(onClick = {
+            FloatingActionButton(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = getOnBackground(),
+                onClick = {
                 showBottomSheet = true
             }) {
                 Icon(Icons.Rounded.Add, contentDescription = "Add event")

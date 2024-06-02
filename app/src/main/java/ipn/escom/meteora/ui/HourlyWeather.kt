@@ -43,6 +43,7 @@ import ipn.escom.meteora.data.weather.data.network.response.HourlyForecast
 import ipn.escom.meteora.data.weather.data.network.response.HourlyForecastResponse
 import ipn.escom.meteora.data.weather.getAnimatedIcon
 import ipn.escom.meteora.data.weather.getDescription
+import ipn.escom.meteora.ui.theme.getOnBackground
 import ipn.escom.meteora.utils.getDayOfWeekFromLong
 import ipn.escom.meteora.utils.getHourWithMinutesString
 import ipn.escom.meteora.utils.getOnlyDateString
@@ -77,7 +78,7 @@ fun HourlyWeatherCard(hourlyForecast: HourlyForecast, onClick: () -> Unit) {
             .height(150.dp)
             .clickable(onClick = onClick),
         colors = CardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = getOnBackground(),
             contentColor = MaterialTheme.colorScheme.onSurface,
             disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
             disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.38f)

@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
+import ipn.escom.meteora.ui.theme.getOnBackground
 import ipn.escom.meteora.utils.getLocalityFromPostalCode
 
 @Composable
@@ -103,7 +104,9 @@ fun SearchBarWithDialog(
         },
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedContainerColor = getOnBackground(),
+            unfocusedContainerColor = getOnBackground()
         )
     )
 

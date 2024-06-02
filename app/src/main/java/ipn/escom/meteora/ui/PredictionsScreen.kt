@@ -8,17 +8,23 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -32,10 +38,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import ipn.escom.meteora.R
 import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.localities.availableLocalities
@@ -44,6 +52,7 @@ import ipn.escom.meteora.data.predictions.data.network.response.PredictionsRespo
 import ipn.escom.meteora.ui.agenda.EventBottomSheet
 import ipn.escom.meteora.ui.login.AlertMessage
 import ipn.escom.meteora.ui.theme.blue
+import ipn.escom.meteora.ui.theme.getOnBackground
 import ipn.escom.meteora.ui.theme.indigo
 import ipn.escom.meteora.ui.theme.orange
 import ipn.escom.meteora.utils.getLocalityFromPostalCode
@@ -61,7 +70,7 @@ fun PredictionsScreen(
 ) {
     val context = LocalContext.current
     val predictions by predictionsViewModel.predictions.observeAsState(initial = PredictionsResponse())
-    var selectedTab by remember { mutableIntStateOf(1) }
+    var selectedIndex by remember { mutableIntStateOf(0) }
     var postalCode: String? by remember { mutableStateOf("") }
 
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -159,48 +168,43 @@ fun PredictionsScreen(
         }
 
         Column(modifier = modifier.fillMaxSize()) {
-            TabRow(selectedTabIndex = selectedTab,
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(2.dp),
-                divider = { HorizontalDivider(color = MaterialTheme.colorScheme.background) }) {
-                Tab(
-                    selected = selectedTab == 0,
-                    onClick = { selectedTab = 0 }
-                ) {
-                    Text(
-                        text = "Pasadas",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-                Tab(
-                    selected = selectedTab == 1,
-                    onClick = { selectedTab = 1 }
-                ) {
-                    Text(
-                        text = "Futuras",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-                Tab(
-                    selected = selectedTab == 2,
-                    onClick = { selectedTab = 2 }
-                ) {
-                    Text(
-                        text = "Gráficas",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyMedium
+                    .padding(8.dp)
+                    .horizontalScroll(rememberScrollState())
+            ) {
+                val options = listOf("Pasadas", "Gráficas", "Futuras")
+                val icons = listOf(
+                    R.drawable.ic_past,
+                    R.drawable.ic_graph,
+                    R.drawable.ic_future
+                )
+
+                options.forEachIndexed { index, label ->
+                    FilterChip(
+                        selected = index == selectedIndex,
+                        onClick = { selectedIndex = index },
+                        label = { Text(text = label, style = MaterialTheme.typography.bodySmall) },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = icons[index]),
+                                contentDescription = label,
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
+                        modifier = Modifier.padding(end = 8.dp),
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            containerColor = getOnBackground(),
+                            selectedLabelColor = getOnBackground()
+                        )
                     )
                 }
             }
 
             AnimatedContent(
-                targetState = selectedTab,
+                targetState = selectedIndex,
                 transitionSpec = {
                     slideInHorizontally(
                         initialOffsetX = { -it },
@@ -249,7 +253,72 @@ fun PredictionsScreen(
                             }
                         }
 
-                    1 ->
+                    1 -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            item {
+                                AlertMessage("Las predicciones son generadas con modelos de Aprendizaje automático (IA), por lo que pueden ser no totalmente precisas.")
+                                Text(
+                                    "Temperatura máxima",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .fillMaxWidth(),
+                                )
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    colors = CardDefaults.cardColors(containerColor = getOnBackground())
+                                ) {
+                                    maxTemperatureEntries = getMaxTemperatureEntries(predictions)
+                                    SimpleLineChart(maxTemperatureEntries, orange)
+                                }
+                            }
+
+                            item {
+                                Text(
+                                    "Temperatura mínima",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .fillMaxWidth(),
+                                )
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    colors = CardDefaults.cardColors(containerColor = getOnBackground())
+                                ) {
+                                    minTemperatureEntries = getMinTemperatureEntries(predictions)
+                                    SimpleLineChart(minTemperatureEntries, indigo)
+                                }
+                            }
+
+                            item {
+                                Text(
+                                    "Nivel de lluvia",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .fillMaxWidth(),
+                                )
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    colors = CardDefaults.cardColors(containerColor = getOnBackground())
+                                ) {
+                                    rainEntries = getRainEntries(predictions)
+                                    SimpleLineChart(rainEntries, blue)
+                                }
+                            }
+                        }
+                    }
+
+                    2 ->
                         if (futurePredictions.predictions.isNotEmpty()) {
                             LazyColumn(modifier = Modifier.fillMaxSize()) {
                                 item {
@@ -279,48 +348,6 @@ fun PredictionsScreen(
                                 )
                             }
                         }
-
-                    2 -> {
-                        LazyColumn(modifier = Modifier.fillMaxSize()) {
-                            item {
-                                AlertMessage("Las predicciones son generadas con modelos de Aprendizaje automático (IA), por lo que pueden ser no totalmente precisas.")
-
-                                Text(
-                                    "Temperatura máxima",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth(),
-                                )
-                                maxTemperatureEntries = getMaxTemperatureEntries(predictions)
-                                SimpleLineChart(maxTemperatureEntries, orange)
-                            }
-
-                            item {
-                                Text(
-                                    "Temperatura mínima",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth(),
-                                )
-                                minTemperatureEntries = getMinTemperatureEntries(predictions)
-                                SimpleLineChart(minTemperatureEntries, indigo)
-                            }
-
-                            item {
-                                Text(
-                                    "Nivel de lluvia",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .fillMaxWidth(),
-                                )
-                                rainEntries = getRainEntries(predictions)
-                                SimpleLineChart(rainEntries, blue)
-                            }
-                        }
-                    }
                 }
             }
         }

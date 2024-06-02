@@ -348,9 +348,9 @@ fun AlertMessage(message: String) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(MaterialTheme.shapes.small)
-                    .border(1.dp, indigo, MaterialTheme.shapes.small),
-                color = indigoLight,
-                contentColor = indigo
+                    .border(1.dp, MaterialTheme.colorScheme.primary, MaterialTheme.shapes.small),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                contentColor = MaterialTheme.colorScheme.primary
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth()
@@ -371,12 +371,6 @@ fun AlertMessage(message: String) {
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AlertPreview() {
-    AlertMessage("Las predicciones son generadas con modelos de Aprendizaje automático (IA), por lo que pueden ser no totalmente precisas.")
 }
 
 @Composable

@@ -3,16 +3,23 @@ package ipn.escom.meteora.ui
 import android.location.Location
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,6 +46,7 @@ import com.google.maps.android.compose.TileOverlay
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberTileOverlayState
 import ipn.escom.meteora.R
+import ipn.escom.meteora.ui.theme.getOnBackground
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -87,7 +95,12 @@ fun MapsScreen(modifier: Modifier, location: Location?, apiKey: String) {
                             modifier = Modifier.size(20.dp)
                         )
                     },
-                    modifier = Modifier.padding(end = 8.dp)
+                    modifier = Modifier.padding(end = 8.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        containerColor = getOnBackground(),
+                        selectedLabelColor = getOnBackground()
+                    )
                 )
             }
         }
@@ -204,6 +217,8 @@ class HttpTileProvider(
 
 @Composable
 fun Legend(selectedMap: Int) {
+    var isExpanded by remember { mutableStateOf(false) }
+
     val (unit, legendData) = when (selectedMap) {
         0 -> "°C" to listOf(
             "-65" to Color(0xFF821692),
@@ -280,33 +295,46 @@ fun Legend(selectedMap: Int) {
         modifier = Modifier
             .padding(8.dp)
             .clip(MaterialTheme.shapes.medium)
-            .background(Color.White.copy(alpha = 0.8f))
+            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
             .padding(8.dp)
     ) {
-        Text(
-            text = unit,
-            modifier = Modifier.padding(bottom = 8.dp).align(Alignment.End),
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.End
-        )
-        legendData.forEach { (value, color) ->
-            Row(
-                modifier = Modifier.padding(4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(15.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                )
-                Text(
-                    text = value,
-                    modifier = Modifier.padding(start = 8.dp),
-                    style = MaterialTheme.typography.bodySmall
-                )
+        Row(
+            modifier = Modifier
+                .clickable { isExpanded = !isExpanded }
+                .padding(bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = if (isExpanded) Icons.AutoMirrored.Rounded.KeyboardArrowRight else Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
+                contentDescription = null
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = unit,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.End
+            )
+        }
+        if (isExpanded) {
+            legendData.forEach { (value, color) ->
+                Row(
+                    modifier = Modifier.padding(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(15.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                    )
+                    Text(
+                        text = value,
+                        modifier = Modifier.padding(start = 8.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
     }
 }
-
