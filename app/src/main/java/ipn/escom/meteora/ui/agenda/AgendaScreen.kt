@@ -1,5 +1,7 @@
 package ipn.escom.meteora.ui.agenda
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -45,6 +49,7 @@ fun AgendaScreen(
     val pastEvents by agendaViewModel.pastEvents.observeAsState()
     var showDetailSheet by remember { mutableStateOf(false) }
     var selectedEvent by remember { mutableStateOf<EventResponse?>(null) }
+    var isExpanded: Boolean by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = getBackground(),
@@ -64,6 +69,7 @@ fun AgendaScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
+                .animateContentSize()
         ) {
             item {
                 Row(
@@ -72,7 +78,7 @@ fun AgendaScreen(
                 ) {
                     Text(
                         "Próximos eventos",
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier
                             .padding(16.dp)
                             .align(Alignment.CenterVertically)
@@ -91,24 +97,38 @@ fun AgendaScreen(
                 })
             }
 
+
+
             if (pastEvents?.isNotEmpty() == true) {
                 item {
-                    Text(
-                        "Eventos pasados",
-                        style = MaterialTheme.typography.titleMedium,
+                    Row(
                         modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Start
-                    )
+                            .fillMaxWidth()
+                            .clickable { isExpanded = !isExpanded }
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Eventos pasados",
+                            style = MaterialTheme.typography.titleSmall,
+                            textAlign = TextAlign.Start
+                        )
+                        Icon(
+                            imageVector = if (isExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                            contentDescription = if (isExpanded) "Cerrar" else "Abrir"
+                        )
+                    }
                 }
 
-                items(pastEvents?.size ?: 0) { index ->
-                    val event = pastEvents!![index]
-                    EventItem(eventResponse = event, onClick = {
-                        selectedEvent = event
-                        showDetailSheet = true
-                    })
+                if(isExpanded){
+                    items(pastEvents?.size ?: 0) { index ->
+                        val event = pastEvents!![index]
+                        EventItem(eventResponse = event, onClick = {
+                            selectedEvent = event
+                            showDetailSheet = true
+                        })
+                    }
                 }
             }
 
