@@ -195,7 +195,13 @@ fun Home(navController: NavController?, weatherViewModel: WeatherViewModel?) {
                     }
 
                     1 -> {
-                        Maps(modifier = Modifier.padding(it))
+                        MapsScreen(
+                            modifier = Modifier.padding(it),
+                            location = location,
+                            apiKey = stringResource(
+                                id = R.string.OpenWeatherAPIKEY
+                            )
+                        )
                     }
 
                     2 -> {

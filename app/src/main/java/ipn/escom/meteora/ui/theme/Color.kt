@@ -218,18 +218,9 @@ val surfaceContainerDarkHighContrast = Color(0xFF1E1F25)
 val surfaceContainerHighDarkHighContrast = Color(0xFF282A2F)
 val surfaceContainerHighestDarkHighContrast = Color(0xFF33353A)
 
-val seed = Color(0xFF3C79F5)
 val amber = Color(0xFFFFD600)
 val amberLight = Color(0xFFF8EB9E)
-val gray = Color(0xFF50577A)
 val green = Color(0xFF34AB53)
-
-val gradientLightStart = Color(0xFF7F7FD5)
-val gradientLightMedium = Color(0xFF86A8E7)
-val gradientLightEnd = Color(0xFF91EAE4)
-
-val gradientDarkStart = Color(0xFF50577A)
-val gradientDarkEnd= Color(0xFF262D33)
 
 val orange = Color(0xFFFC4100)
 val blue = Color(0xFF3E6D9C)

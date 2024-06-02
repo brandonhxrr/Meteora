@@ -4,6 +4,7 @@ plugins {
     id("com.google.gms.google-services")
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -17,6 +18,7 @@ android {
         versionCode = 1
         versionName = "1.0"
         resValue("string", "OpenWeatherAPIKEY", (project.findProperty("OpenWeatherAPIKEY") as String?) ?: "")
+        resValue("string", "MAPS_API_KEY", (project.findProperty("MAPS_API_KEY") as String?) ?: "")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -41,6 +43,7 @@ android {
         jvmTarget = "17"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
     composeOptions {
@@ -95,6 +98,8 @@ dependencies {
     implementation("com.patrykandpatrick.vico:compose:2.0.0-alpha.20")
     implementation("com.patrykandpatrick.vico:compose-m3:2.0.0-alpha.20")
     implementation("com.patrykandpatrick.vico:core:2.0.0-alpha.20")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.maps.android:maps-compose:4.4.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
     ksp("com.google.devtools.ksp:symbol-processing-api:1.9.0-1.0.13")
@@ -109,4 +114,12 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "local.defaults.properties"
+
+    ignoreList.add("keyToIgnore")
+    ignoreList.add("sdk.*")
 }

@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -215,9 +216,10 @@ fun DailyPredictionCard(
             )
             Spacer(modifier = Modifier.padding(8.dp))
             Icon(
-                painter = painterResource(id = R.drawable.rain),
+                painter = painterResource(id = R.drawable.ic_rain),
                 contentDescription = "Rainfall",
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(16.dp),
+                tint = Color.Unspecified
             )
             Text(
                 text = "${if (rainfall > 0.0) String.format("%.2f", rainfall) else "0"} mm",
