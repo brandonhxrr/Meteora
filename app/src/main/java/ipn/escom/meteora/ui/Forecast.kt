@@ -46,6 +46,7 @@ fun Forecast(
     modifier: Modifier = Modifier,
     weatherViewModel: WeatherViewModel,
     location: Location? = null,
+    preferencesViewModel: PreferencesViewModel,
     navController: NavController? = null
 ) {
     val apiKey = stringResource(id = R.string.OpenWeatherAPIKEY)
@@ -53,7 +54,7 @@ fun Forecast(
     val hourlyForecast by weatherViewModel.hourlyForecast.observeAsState(initial = HourlyForecastResponse())
     val dailyForecast by weatherViewModel.dailyForecast.observeAsState(initial = DailyForecastResponse())
     val weather by weatherViewModel.weather.observeAsState(initial = WeatherResponse())
-    val coroutineScope = rememberCoroutineScope()
+    val showDecimals by preferencesViewModel.showDecimals.observeAsState(initial = false)
 
     LaunchedEffect(location) {
         location?.let {
@@ -106,6 +107,7 @@ fun Forecast(
                     Spacer(modifier = Modifier.height(16.dp))
                     ParameterCard(title = "", modifier = Modifier.padding(horizontal = 16.dp)) {
                         CurrentWeatherContent(
+                            showDecimals = showDecimals,
                             location = weather.name,
                             time = getHourWithMinutesString(weather.dt),//getCurrentTime(),
                             temperature = weather.main.temp,
@@ -121,7 +123,7 @@ fun Forecast(
                         modifier = Modifier.padding(20.dp)
                     )
 
-                    HourlyWeather(hourlyForecast)
+                    HourlyWeather(showDecimals, hourlyForecast)
 
                     Text(
                         text = "Condiciones diarias",
@@ -163,7 +165,7 @@ fun Forecast(
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier.padding(20.dp)
                     )
-                    DailyWeather(weather.name, dailyForecast, navController)
+                    DailyWeather(showDecimals, weather.name, dailyForecast, navController)
                 }
                 PullToRefreshContainer(
                     state = refreshState, modifier = Modifier.align(Alignment.TopCenter)
@@ -179,6 +181,7 @@ fun ForecastPreview() {
     val context = LocalContext.current
     Forecast(
         modifier = Modifier,
-        WeatherViewModel(context, PreferencesViewModel(context))
+        preferencesViewModel = PreferencesViewModel(context),
+        weatherViewModel = WeatherViewModel(context, PreferencesViewModel(context))
     )
 }

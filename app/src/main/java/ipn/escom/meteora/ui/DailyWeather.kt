@@ -30,6 +30,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.weather.data.network.response.DailyForecast
 import ipn.escom.meteora.data.weather.data.network.response.DailyForecastResponse
+import ipn.escom.meteora.data.weather.data.network.response.formatTemperature
 import ipn.escom.meteora.data.weather.getAnimatedIcon
 import ipn.escom.meteora.ui.theme.getOnBackground
 import ipn.escom.meteora.utils.getDayOfWeekFromLong
@@ -37,6 +38,7 @@ import ipn.escom.meteora.utils.getOnlyDateString
 
 @Composable
 fun DailyWeather(
+    showDecimals: Boolean,
     town: String,
     dailyForecastResponse: DailyForecastResponse? = null,
     navController: NavController?
@@ -47,14 +49,14 @@ fun DailyWeather(
             .padding(horizontal = 16.dp)
     ) {
         dailyForecastResponse?.list?.drop(1)?.forEach {
-            DailyWeatherCard(town, it, navController)
+            DailyWeatherCard(showDecimals, town, it, navController)
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
 @Composable
-fun DailyWeatherCard(town: String, dailyForecast: DailyForecast, navController: NavController?) {
+fun DailyWeatherCard(showDecimals: Boolean, town: String, dailyForecast: DailyForecast, navController: NavController?) {
     Card(modifier = Modifier
         .fillMaxWidth()
         .clickable {
@@ -92,7 +94,7 @@ fun DailyWeatherCard(town: String, dailyForecast: DailyForecast, navController: 
             }
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "${dailyForecast.temp.max} °C / ${dailyForecast.temp.min} °C",
+                text = "${formatTemperature(dailyForecast.temp.max, showDecimals)} / ${formatTemperature(dailyForecast.temp.min, showDecimals)}",
                 modifier = Modifier.align(Alignment.CenterVertically),
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1

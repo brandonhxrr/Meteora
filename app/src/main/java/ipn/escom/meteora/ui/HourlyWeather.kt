@@ -41,6 +41,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.weather.data.network.response.HourlyForecast
 import ipn.escom.meteora.data.weather.data.network.response.HourlyForecastResponse
+import ipn.escom.meteora.data.weather.data.network.response.formatTemperature
 import ipn.escom.meteora.data.weather.getAnimatedIcon
 import ipn.escom.meteora.data.weather.getDescription
 import ipn.escom.meteora.ui.theme.getOnBackground
@@ -49,7 +50,7 @@ import ipn.escom.meteora.utils.getHourWithMinutesString
 import ipn.escom.meteora.utils.getOnlyDateString
 
 @Composable
-fun HourlyWeather(hourlyForecastResponse: HourlyForecastResponse? = null) {
+fun HourlyWeather(showDecimals: Boolean = false, hourlyForecastResponse: HourlyForecastResponse? = null) {
 
     var showDialog by remember { mutableStateOf(false) }
     var selectedForecast by remember { mutableStateOf<HourlyForecast?>(null) }
@@ -57,7 +58,7 @@ fun HourlyWeather(hourlyForecastResponse: HourlyForecastResponse? = null) {
     LazyRow(contentPadding = PaddingValues(start = 16.dp, end = 16.dp)) {
         if (hourlyForecastResponse != null && hourlyForecastResponse != HourlyForecastResponse()) {
             items(24) { index ->
-                HourlyWeatherCard(hourlyForecastResponse.list[index]) {
+                HourlyWeatherCard(showDecimals, hourlyForecastResponse.list[index]) {
                     selectedForecast = hourlyForecastResponse.list[index]
                     showDialog = true
                 }
@@ -71,7 +72,7 @@ fun HourlyWeather(hourlyForecastResponse: HourlyForecastResponse? = null) {
 }
 
 @Composable
-fun HourlyWeatherCard(hourlyForecast: HourlyForecast, onClick: () -> Unit) {
+fun HourlyWeatherCard(showDecimals: Boolean = false, hourlyForecast: HourlyForecast, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .width(90.dp)
@@ -93,7 +94,7 @@ fun HourlyWeatherCard(hourlyForecast: HourlyForecast, onClick: () -> Unit) {
                 LottieCompositionSpec.RawRes(getAnimatedIcon(hourlyForecast.weather[0].icon))
             )
             Text(
-                text = "${hourlyForecast.main.temp}°", modifier = Modifier
+                text = formatTemperature(hourlyForecast.main.temp, showDecimals), modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(bottom = 4.dp), style = MaterialTheme.typography.bodyMedium
             )

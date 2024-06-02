@@ -209,6 +209,7 @@ fun Home(
                 0 -> {
                     Forecast(
                         modifier = Modifier.padding(it),
+                        preferencesViewModel = preferencesViewModel,
                         weatherViewModel = weatherViewModel!!,
                         location = location,
                         navController = navController

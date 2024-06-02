@@ -74,3 +74,6 @@ data class Sys(
     val sunrise: Long = 0,
     val sunset: Long = 0
 )
+
+fun formatTemperature(temp: Double, showDecimals: Boolean) = "${if(showDecimals) temp else temp.toInt()}°"
+fun formatRain(rain: Double) = "$rain mm"
