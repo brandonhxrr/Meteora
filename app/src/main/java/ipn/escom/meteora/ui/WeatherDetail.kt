@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +50,7 @@ import ipn.escom.meteora.data.weather.data.network.response.DailyForecast
 import ipn.escom.meteora.data.weather.data.network.response.HourlyForecast
 import ipn.escom.meteora.data.weather.getAnimatedIcon
 import ipn.escom.meteora.data.weather.getDescription
+import ipn.escom.meteora.ui.theme.getBackground
 import ipn.escom.meteora.utils.getDayFromLong
 import ipn.escom.meteora.utils.getDayOfWeekFromLong
 import ipn.escom.meteora.utils.getFormattedDate
@@ -87,6 +89,7 @@ fun WeatherDetailScreen(
     val scrollState = rememberLazyListState()
 
     Scaffold(
+        containerColor = getBackground(),
         topBar = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { navController.navigateUp() }) {
@@ -106,30 +109,27 @@ fun WeatherDetailScreen(
                 .fillMaxSize()
         ) {
             item {
-                if (dailyForecast != null) {
+                LazyRow(modifier = Modifier.padding(16.dp), state = scrollState) {
+                    items(dailyForecastList.size) { index ->
+                        DailyForecastCard(
+                            dailyForecast = dailyForecastList[index],
+                            selected = dailyForecastList[index] == selectedDayForecast
+                        ) {
+                            selectedDayForecast = dailyForecastList[index]
 
-                    LazyRow(modifier = Modifier.padding(16.dp), state = scrollState) {
-                        items(dailyForecastList.size) { index ->
-                            DailyForecastCard(
-                                dailyForecast = dailyForecastList[index],
-                                selected = dailyForecastList[index] == selectedDayForecast
-                            ) {
-                                selectedDayForecast = dailyForecastList[index]
-
-                                selectedHourlyForecast =
-                                    hourlyForecast?.list?.filter { filteredForecast ->
-                                        getLocalDateString(filteredForecast.dt) == getLocalDateString(
-                                            selectedDayForecast?.dt ?: 0
-                                        )
-                                    }
-                                selectedIndex = index
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
+                            selectedHourlyForecast =
+                                hourlyForecast?.list?.filter { filteredForecast ->
+                                    getLocalDateString(filteredForecast.dt) == getLocalDateString(
+                                        selectedDayForecast?.dt ?: 0
+                                    )
+                                }
+                            selectedIndex = index
                         }
+                        Spacer(modifier = Modifier.width(8.dp))
                     }
-                    LaunchedEffect(key1 = selectedIndex) {
-                        scrollState.animateScrollToItem(selectedIndex)
-                    }
+                }
+                LaunchedEffect(key1 = selectedIndex) {
+                    scrollState.animateScrollToItem(selectedIndex)
                 }
             }
             item {
@@ -239,11 +239,9 @@ fun DailyForecastCard(dailyForecast: DailyForecast, selected: Boolean, onClick: 
             .width(80.dp)
             .height(120.dp)
             .clickable(onClick = onClick),
-        colors = CardColors(
-            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
             contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-            disabledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.38f)
         )
     ) {
         Column(

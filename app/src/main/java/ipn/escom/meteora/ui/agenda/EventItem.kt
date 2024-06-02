@@ -44,8 +44,7 @@ fun EventItem(eventResponse: EventResponse, onClick: () -> Unit) {
         colors = CardDefaults.cardColors(
             containerColor = getOnBackground(),
         ),
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(2.dp)
+        shape = RoundedCornerShape(8.dp)
     ) {
         Row(
             modifier = Modifier
