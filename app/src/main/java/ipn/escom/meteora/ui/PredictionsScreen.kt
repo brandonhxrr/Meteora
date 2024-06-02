@@ -197,6 +197,7 @@ fun PredictionsScreen(
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primary,
                             containerColor = getOnBackground(),
+                            labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
                             selectedLabelColor = getOnBackground()
                         )
                     )

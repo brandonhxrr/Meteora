@@ -1,5 +1,7 @@
 package ipn.escom.meteora.ui
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
@@ -9,6 +11,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,13 +19,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
-import androidx.compose.material.icons.rounded.Thermostat
-import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -37,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -53,8 +54,7 @@ import java.util.Calendar
 
 @Composable
 fun PredictionsCard(
-    predictionsResponse: PredictionsResponse,
-    onDayClick: (EventResponse) -> Unit
+    predictionsResponse: PredictionsResponse, onDayClick: (EventResponse) -> Unit
 ) {
     val localityPredictions = predictionsResponse.predictions
 
@@ -87,17 +87,14 @@ fun MonthPredictionCard(
     onClick: () -> Unit,
     onDayClick: (EventResponse) -> Unit
 ) {
-    val scale: Float by animateFloatAsState(if (expanded) 0.95f else 1f, label = "")
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .padding(8.dp)
             .clickable(onClick = onClick)
-            .scale(scale),
-        colors = CardDefaults.cardColors(
-            containerColor = getOnBackground(),
-            contentColor = MaterialTheme.colorScheme.onSurface
+            .animateContentSize(), colors = CardDefaults.cardColors(
+            containerColor = getOnBackground(), contentColor = MaterialTheme.colorScheme.onSurface
         )
     ) {
         Row(
@@ -113,8 +110,7 @@ fun MonthPredictionCard(
                     .weight(1f),
             )
             val rotation: Float by animateFloatAsState(if (expanded) 180f else 0f, label = "")
-            Icon(
-                imageVector = Icons.Rounded.ExpandMore,
+            Icon(imageVector = Icons.Rounded.ExpandMore,
                 contentDescription = "Expand button",
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
@@ -122,24 +118,21 @@ fun MonthPredictionCard(
                     .clickable {
                         onClick()
                     }
-                    .rotate(rotation)
-            )
+                    .rotate(rotation))
         }
     }
     if (expanded) {
         val enterTransition = rememberInfiniteTransition(label = "")
         val delayOffset = enterTransition.animateFloat(
-            initialValue = 0f,
-            targetValue = 1f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1000, delayMillis = 300),
-                repeatMode = RepeatMode.Restart
+            initialValue = 0f, targetValue = 1f, animationSpec = infiniteRepeatable(
+                animation = tween(1000, delayMillis = 300), repeatMode = RepeatMode.Restart
             ), label = ""
         )
         monthPrediction.days.forEachIndexed { index, dayPrediction ->
             val offset by animateDpAsState(
                 targetValue = if (expanded) 0.dp else (-100).dp,
-                animationSpec = tween(300, delayMillis = (50 * index).coerceAtMost(300)), label = ""
+                animationSpec = tween(300, delayMillis = (50 * index).coerceAtMost(300)),
+                label = ""
             )
             DailyPredictionCard(
                 localityName = localityName,
@@ -157,6 +150,7 @@ fun MonthPredictionCard(
 }
 
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun DailyPredictionCard(
     localityName: String,
@@ -175,6 +169,7 @@ fun DailyPredictionCard(
 
     Card(
         modifier = modifier
+            .padding(horizontal = 12.dp)
             .fillMaxWidth()
             .clickable {
                 val eventResponse = EventResponse(
@@ -186,60 +181,76 @@ fun DailyPredictionCard(
                     location = getLocalityNameFromKey(localityName)
                 )
                 onClick(eventResponse)
-            },
-        colors = CardDefaults.cardColors(
+            }, colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface
         )
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Box(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)),
+                    .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "$day",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = getOnBackground()
                 )
             }
-            Spacer(modifier = Modifier.padding(8.dp))
-            Icon(
-                imageVector = Icons.Rounded.Thermostat,
-                contentDescription = "Max Temperature",
-                modifier = Modifier.size(16.dp)
-            )
-            Text(
-                text = "${String.format("%.2f", maxt)}°",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(modifier = Modifier.padding(8.dp))
-            Icon(
-                painter = painterResource(id = R.drawable.ic_rain),
-                contentDescription = "Rainfall",
-                modifier = Modifier.size(16.dp),
-                tint = Color.Unspecified
-            )
-            Text(
-                text = "${if (rainfall > 0.0) String.format("%.2f", rainfall) else "0"} mm",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(modifier = Modifier.padding(8.dp))
-            Icon(
-                imageVector = Icons.Rounded.Thermostat,
-                contentDescription = "Min Temperature",
-                modifier = Modifier.size(16.dp)
-            )
-            Text(
-                text = "${String.format("%.2f", mint)}°",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Spacer(modifier = Modifier.padding(16.dp))
+            Row {
+                Icon(
+                    imageVector = Icons.Rounded.ExpandLess,
+                    contentDescription = "Max Temperature",
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "${String.format("%.2f", maxt)}°",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Row {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_rain),
+                    contentDescription = "Rainfall",
+                    modifier = Modifier.size(16.dp),
+                    tint = Color.Unspecified
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "${if (rainfall > 0.0) String.format("%.2f", rainfall) else "0"} mm",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Row {
+                Icon(
+                    imageVector = Icons.Rounded.ExpandMore,
+                    contentDescription = "Min Temperature",
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "${String.format("%.2f", mint)}°",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
         }
         HorizontalDivider()
     }

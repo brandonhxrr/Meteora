@@ -99,6 +99,7 @@ fun MapsScreen(modifier: Modifier, location: Location?, apiKey: String) {
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = MaterialTheme.colorScheme.primary,
                         containerColor = getOnBackground(),
+                        labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         selectedLabelColor = getOnBackground()
                     )
                 )
