@@ -123,7 +123,7 @@ fun Forecast(
                         modifier = Modifier.padding(20.dp)
                     )
 
-                    HourlyWeather(showDecimals, hourlyForecast)
+                    HourlyWeather(showDecimals, hourlyForecast.list.take(24))
 
                     Text(
                         text = "Condiciones diarias",

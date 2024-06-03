@@ -50,16 +50,15 @@ import ipn.escom.meteora.utils.getHourWithMinutesString
 import ipn.escom.meteora.utils.getOnlyDateString
 
 @Composable
-fun HourlyWeather(showDecimals: Boolean = false, hourlyForecastResponse: HourlyForecastResponse? = null) {
-
+fun HourlyWeather(showDecimals: Boolean = false, hourlyForecastList: List<HourlyForecast>?) {
     var showDialog by remember { mutableStateOf(false) }
     var selectedForecast by remember { mutableStateOf<HourlyForecast?>(null) }
 
     LazyRow(contentPadding = PaddingValues(start = 16.dp, end = 16.dp)) {
-        if (hourlyForecastResponse != null && hourlyForecastResponse != HourlyForecastResponse()) {
-            items(24) { index ->
-                HourlyWeatherCard(showDecimals, hourlyForecastResponse.list[index]) {
-                    selectedForecast = hourlyForecastResponse.list[index]
+        if (!hourlyForecastList.isNullOrEmpty()) {
+            items(hourlyForecastList.size) { index ->
+                HourlyWeatherCard(showDecimals, hourlyForecastList[index]) {
+                    selectedForecast = hourlyForecastList[index]
                     showDialog = true
                 }
                 Spacer(modifier = Modifier.width(16.dp))
@@ -68,8 +67,8 @@ fun HourlyWeather(showDecimals: Boolean = false, hourlyForecastResponse: HourlyF
     }
 
     HourlyForecastDialog(showDialog, { showDialog = false }, selectedForecast)
-
 }
+
 
 @Composable
 fun HourlyWeatherCard(showDecimals: Boolean = false, hourlyForecast: HourlyForecast, onClick: () -> Unit) {
@@ -250,10 +249,4 @@ fun DialogParameter(title: String, value: String) {
             modifier = Modifier.weight(0.4f)
         )
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun DailyWeatherPreview() {
-    HourlyWeather()
 }

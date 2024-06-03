@@ -125,6 +125,7 @@ fun Start(firebaseAnalytics: FirebaseAnalytics?) {
             val timestamp = backStackEntry.arguments?.getString("timestamp")
 
             WeatherDetailScreen(
+                preferencesViewModel = preferencesViewModel,
                 town = town,
                 timestamp = timestamp,
                 weatherViewModel = weatherViewModel,

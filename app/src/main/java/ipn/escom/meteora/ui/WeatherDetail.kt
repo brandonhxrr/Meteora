@@ -45,6 +45,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import ipn.escom.meteora.R
+import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.data.weather.WeatherViewModel
 import ipn.escom.meteora.data.weather.data.network.response.DailyForecast
 import ipn.escom.meteora.data.weather.data.network.response.HourlyForecast
@@ -58,6 +59,7 @@ import ipn.escom.meteora.utils.getLocalDateString
 
 @Composable
 fun WeatherDetailScreen(
+    preferencesViewModel: PreferencesViewModel,
     town: String?,
     timestamp: String?,
     weatherViewModel: WeatherViewModel,
@@ -69,6 +71,7 @@ fun WeatherDetailScreen(
     var selectedDayForecast by remember {
         mutableStateOf(dailyForecast?.list?.find { it.dt.toString() == timestamp })
     }
+    val showDecimals by preferencesViewModel.showDecimals.observeAsState(initial = false)
     var selectedHourlyForecast by remember {
         mutableStateOf(
             hourlyForecast?.list?.filter {
@@ -160,20 +163,7 @@ fun WeatherDetailScreen(
                             style = MaterialTheme.typography.headlineMedium,
                             modifier = Modifier.padding(20.dp)
                         )
-                        LazyRow(modifier = Modifier.padding(horizontal = 16.dp)) {
-                            items(selectedHourlyForecast!!.size) { index ->
-                                HourlyWeatherCard(hourlyForecast = selectedHourlyForecast!![index]) {
-                                    selectedForecast = selectedHourlyForecast!![index]
-                                    showDialog = true
-                                }
-                                Spacer(modifier = Modifier.width(16.dp))
-                                HourlyForecastDialog(
-                                    showDialog = showDialog,
-                                    onDismiss = { showDialog = false },
-                                    selectedForecast = selectedHourlyForecast!![index]
-                                )
-                            }
-                        }
+                        HourlyWeather(showDecimals, selectedHourlyForecast)
                     }
 
                     Text(
