@@ -49,7 +49,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -61,8 +60,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import ipn.escom.meteora.R
 import ipn.escom.meteora.ui.Screens
-import ipn.escom.meteora.ui.theme.indigo
-import ipn.escom.meteora.ui.theme.indigoLight
 
 @Composable
 fun Header(title: String, subtitle: String = "") {

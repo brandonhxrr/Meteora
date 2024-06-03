@@ -52,7 +52,6 @@ class MainActivity : ComponentActivity() {
             MeteoraTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
                 ) {
                     Start(firebaseAnalytics = firebaseAnalytics)
                 }
