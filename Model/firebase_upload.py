@@ -16,7 +16,7 @@ def upload_to_firebase():
     with open('final_predictions.json', 'r') as file:
         json_data = json.load(file)
 
-    ref = db.reference('/predictions')
+    ref = db.reference('/predictions/')
     ref.set(json_data)
 
     print("Datos subidos exitosamente a Firebase")
