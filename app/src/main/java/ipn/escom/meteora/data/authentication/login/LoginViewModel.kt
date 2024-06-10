@@ -9,27 +9,27 @@ import ipn.escom.meteora.data.authentication.data.network.response.Authenticatio
 import ipn.escom.meteora.data.authentication.domain.AuthenticationUseCase
 import kotlinx.coroutines.launch
 
-class LoginViewModel : ViewModel() {
+open class LoginViewModel : ViewModel() {
 
     private val authenticationUseCase = AuthenticationUseCase()
 
     private val _email = MutableLiveData<String>()
-    val email: LiveData<String> = _email
+    open val email: LiveData<String> = _email
 
     private val _password = MutableLiveData<String>()
-    val password: LiveData<String> = _password
+    open val password: LiveData<String> = _password
 
     private val _isLoginEnabled = MutableLiveData<Boolean>()
-    val isLoginEnabled: LiveData<Boolean> = _isLoginEnabled
+    open val isLoginEnabled: LiveData<Boolean> = _isLoginEnabled
 
     private val _errorMessage = MutableLiveData<String>()
-    val errorMessage: LiveData<String> = _errorMessage
+    open val errorMessage: LiveData<String> = _errorMessage
 
     private val _signInSuccess = MutableLiveData<Boolean>()
-    val signInSuccess: LiveData<Boolean> = _signInSuccess
+    open val signInSuccess: LiveData<Boolean> = _signInSuccess
 
     private val _errorCounter = MutableLiveData<Int>()
-    val errorCounter: LiveData<Int> = _errorCounter
+    open val errorCounter: LiveData<Int> = _errorCounter
 
     fun onLoginChanged(email: String, password: String) {
         _email.value = email
@@ -40,7 +40,7 @@ class LoginViewModel : ViewModel() {
     private fun enableLogin(email: String, password: String) =
         Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length >= 8
 
-    fun signIn() {
+    open fun signIn() {
         val email = _email.value.orEmpty()
         val password = _password.value.orEmpty()
 

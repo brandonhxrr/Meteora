@@ -326,7 +326,7 @@ fun Legend(selectedMap: Int, preferencesViewModel: PreferencesViewModel) {
             "70" to Color(0xF4F4FFBF),
             "80" to Color(0xE9E9DFCC),
             "90" to Color(0xDEDEDED8),
-            "100+" to Color(0xD2D2D2FF)
+            "100" to Color(0xD2D2D2FF)
         )
 
         4 -> "%" to listOf(
@@ -335,7 +335,7 @@ fun Legend(selectedMap: Int, preferencesViewModel: PreferencesViewModel) {
             "40" to Color(0xFFEDE100),
             "60" to Color(0xFF8BD600),
             "80" to Color(0xFF00A808),
-            "100+" to Color(0xFF000099)
+            "100" to Color(0xFF000099)
         )
 
         else -> "" to emptyList()

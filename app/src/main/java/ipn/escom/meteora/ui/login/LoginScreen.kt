@@ -1,6 +1,5 @@
 package ipn.escom.meteora.ui.login
 
-import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -28,9 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.authentication.login.LoginViewModel
 import ipn.escom.meteora.ui.Screens
@@ -141,37 +137,6 @@ fun LoginButton(
         )
     }
 
-}
-
-fun loginWithFirebase(
-    email: String,
-    password: String,
-    context: Context,
-    onLoginSuccess: () -> Unit
-) {
-    val auth = FirebaseAuth.getInstance()
-
-    auth.signInWithEmailAndPassword(email, password)
-        .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                onLoginSuccess()
-            } else {
-                val errorText = try {
-                    throw task.exception!!
-                } catch (e: FirebaseAuthInvalidUserException) {
-                    "Usuario no encontrado"
-                } catch (e: FirebaseAuthInvalidCredentialsException) {
-                    "Credenciales inválidas"
-                } catch (e: Exception) {
-                    "Error en la autenticación"
-                }
-                Toast.makeText(
-                    context,
-                    errorText,
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
 }
 
 @Preview(showBackground = true)
