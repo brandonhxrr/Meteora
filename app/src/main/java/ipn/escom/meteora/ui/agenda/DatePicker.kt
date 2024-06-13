@@ -22,14 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.utils.formatSelectedDate
 import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerField(date: Long, enabled: Boolean, onDateSelected: (Long) -> Unit) {
-    var initialSelectedDateMillis by remember { mutableLongStateOf(date) }
+    var initialSelectedDateMillis by remember {
+        mutableLongStateOf(date.takeIf { it != 0L } ?: System.currentTimeMillis())
+    }
 
     if (date == 0L) {
         initialSelectedDateMillis = System.currentTimeMillis()
@@ -42,13 +43,14 @@ fun DatePickerField(date: Long, enabled: Boolean, onDateSelected: (Long) -> Unit
         initialSelectedDateMillis = initialSelectedDateMillis,
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                val currentSelectedDate = LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(utcTimeMillis),
-                    ZoneId.systemDefault()
-                )
-                return !currentSelectedDate.isBefore(LocalDateTime.now()) && !currentSelectedDate.isAfter(
-                    LocalDateTime.now().plusMonths(6)
-                )
+                val selectedDateUtc = Instant.ofEpochMilli(utcTimeMillis)
+                    .atZone(ZoneOffset.UTC)
+                    .toLocalDate()
+                val todayUtc = LocalDate.now(ZoneOffset.UTC)
+                val sixMonthsLater = todayUtc.plusMonths(6)
+
+                return (selectedDateUtc.isEqual(todayUtc) || selectedDateUtc.isAfter(todayUtc)) &&
+                        !selectedDateUtc.isAfter(sixMonthsLater)
             }
         }
     )
@@ -71,11 +73,8 @@ fun DatePickerField(date: Long, enabled: Boolean, onDateSelected: (Long) -> Unit
                 TextButton(onClick = {
                     isDatePickerOpen = false
                     val selectedDateMillis = pickerState.selectedDateMillis ?: return@TextButton
-                    val selectedDate = Instant.ofEpochMilli(selectedDateMillis)
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDate().atStartOfDay()
-
                     onDateSelected(selectedDateMillis)
+                    initialSelectedDateMillis = selectedDateMillis
                 }) {
                     Text("Aceptar")
                 }
