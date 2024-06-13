@@ -27,9 +27,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -42,6 +47,8 @@ import com.google.firebase.ktx.Firebase
 import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.ui.theme.getBackground
 import ipn.escom.meteora.ui.theme.getOnBackground
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -49,6 +56,8 @@ fun UserScreen(navController: NavController? = null, preferencesViewModel: Prefe
     val currentUser = FirebaseAuth.getInstance().currentUser
     val useMetric by preferencesViewModel.useMetric.observeAsState(initial = true)
     val showDecimals by preferencesViewModel.showDecimals.observeAsState(initial = false)
+    var isButtonEnabled by remember { mutableStateOf(true) }
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -64,8 +73,13 @@ fun UserScreen(navController: NavController? = null, preferencesViewModel: Prefe
                 contentDescription = null,
                 modifier = Modifier
                     .size(32.dp)
-                    .clickable {
+                    .clickable(enabled = isButtonEnabled) {
                         navController?.navigateUp()
+                        isButtonEnabled = false
+                        coroutineScope.launch {
+                            delay(500)
+                            isButtonEnabled = true
+                        }
                     }
             )
 

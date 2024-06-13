@@ -170,7 +170,7 @@ fun SignUpButton(
             }
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black,
+            containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ),
         modifier = Modifier

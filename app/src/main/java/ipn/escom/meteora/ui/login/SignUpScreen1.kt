@@ -111,7 +111,7 @@ fun SignUp1(navController: NavController? = null, signUpViewModel: SignUpViewMod
                 navController?.navigate(Screens.SignUp2.name)
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Black,
+                containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
             ),
             modifier = Modifier

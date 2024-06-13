@@ -1,6 +1,7 @@
 package ipn.escom.meteora.ui
 
 import android.location.Location
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,8 @@ import ipn.escom.meteora.data.weather.data.network.response.DailyForecastRespons
 import ipn.escom.meteora.data.weather.data.network.response.HourlyForecastResponse
 import ipn.escom.meteora.data.weather.data.network.response.WeatherResponse
 import ipn.escom.meteora.utils.getHourWithMinutesString
+import ipn.escom.meteora.utils.getLocalityFromPostalCode
+import ipn.escom.meteora.utils.getPostalCode
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,6 +58,7 @@ fun Forecast(
     val dailyForecast by weatherViewModel.dailyForecast.observeAsState(initial = DailyForecastResponse())
     val weather by weatherViewModel.weather.observeAsState(initial = WeatherResponse())
     val showDecimals by preferencesViewModel.showDecimals.observeAsState(initial = false)
+    val context = LocalContext.current
 
     LaunchedEffect(location) {
         location?.let {
@@ -90,6 +94,12 @@ fun Forecast(
                     lat = it.latitude,
                     lon = it.longitude
                 )
+
+                val postalCode = getPostalCode(context, location)
+                val locality = getLocalityFromPostalCode(context, postalCode)
+
+                Log.d("Forecast", "Postal code: $postalCode")
+                Log.d("Forecast", "Locality: $locality")
             }
             delay(1500)
             refreshState.endRefresh()

@@ -142,6 +142,13 @@ fun getBackground(): Color {
 }
 
 @Composable
+fun getButtonColor(): Color {
+    return if (isSystemInDarkTheme()) {
+        MaterialTheme.colorScheme.primary
+    } else Color.Black
+}
+
+@Composable
 fun getOnBackground(): Color {
     return if (isSystemInDarkTheme()) {
         MaterialTheme.colorScheme.surfaceContainer

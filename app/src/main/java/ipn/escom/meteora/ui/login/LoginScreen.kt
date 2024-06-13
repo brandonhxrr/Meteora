@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.authentication.login.LoginViewModel
 import ipn.escom.meteora.ui.Screens
+import ipn.escom.meteora.ui.theme.getButtonColor
 
 @Composable
 fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) {
@@ -121,7 +122,7 @@ fun LoginButton(
             loginViewModel.signIn()
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Black,
+            containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ),
         shape = MaterialTheme.shapes.small,
