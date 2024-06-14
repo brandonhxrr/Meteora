@@ -92,15 +92,26 @@ fun AgendaScreen(
                 }
             }
 
-            items(upcomingEvents?.size ?: 0) { index ->
-                val event = upcomingEvents!![index]
-                EventItem(eventResponse = event, onClick = {
-                    selectedEvent = event
-                    showDetailSheet = true
-                })
+            if (upcomingEvents.isNullOrEmpty()) {
+                item {
+                    Text(
+                        text = "No hay próximos eventos",
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    )
+                }
+            } else {
+                items(upcomingEvents?.size ?: 0) { index ->
+                    val event = upcomingEvents!![index]
+                    EventItem(eventResponse = event, onClick = {
+                        selectedEvent = event
+                        showDetailSheet = true
+                    })
+                }
             }
-
-
 
             if (pastEvents?.isNotEmpty() == true) {
                 item {

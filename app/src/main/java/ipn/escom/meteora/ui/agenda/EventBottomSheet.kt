@@ -171,9 +171,7 @@ fun EventBottomSheet(
                             agendaViewModel.addEvent(userId, event)
 
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    onDismissRequest()
-                                }
+                                onDismissRequest()
                             }
                         } else {
                             if (isEditable) {
@@ -187,9 +185,7 @@ fun EventBottomSheet(
                                 )
                                 agendaViewModel.updateEvent(userId, event)
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        onDismissRequest()
-                                    }
+                                    onDismissRequest()
                                 }
                             } else {
                                 isEditable = true
@@ -440,9 +436,7 @@ fun EventBottomSheet(
                         agendaViewModel.deleteEvent(userId, eventResponse!!.id!!)
                         showDeleteDialog = false
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                onDismissRequest()
-                            }
+                            onDismissRequest()
                         }
                     }) {
                         Text("Sí")
