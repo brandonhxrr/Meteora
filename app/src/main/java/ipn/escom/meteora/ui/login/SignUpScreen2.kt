@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material3.AlertDialog
@@ -57,10 +59,13 @@ fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewMod
         }
     })
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(scrollState),
     ) {
         Header(title = stringResource(id = R.string.sign_up), subtitle = "Queremos conocerte mejor")
 
@@ -144,6 +149,8 @@ fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewMod
                 }
             )
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
