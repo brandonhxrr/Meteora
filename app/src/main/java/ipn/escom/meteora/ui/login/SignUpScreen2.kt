@@ -57,7 +57,6 @@ fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewMod
         }
     })
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -75,7 +74,7 @@ fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewMod
             signUpViewModel.onSignUpChanged(it, password, repeatPassword)
         }
 
-        Password(password = password, repeat = false, final = false) {
+        Password(password, repeat = false, final = false) {
             signUpViewModel.onSignUpChanged(email, it, repeatPassword)
         }
 
@@ -85,10 +84,7 @@ fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewMod
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        SignUpButton(
-            isSignUpEnabled,
-            signUpViewModel
-        )
+        SignUpButton(isSignUpEnabled, signUpViewModel)
 
         Spacer(modifier = Modifier.height(50.dp))
 
@@ -161,13 +157,10 @@ fun SignUpButton(
 
     Button(
         shape = MaterialTheme.shapes.small,
+        enabled = enable,
         onClick = {
-            if (enable) {
-                keyboardController?.hide()
-                signUpViewModel.signUp(context)
-            } else {
-                signUpViewModel.showError()
-            }
+            keyboardController?.hide()
+            signUpViewModel.signUp(context)
         },
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,

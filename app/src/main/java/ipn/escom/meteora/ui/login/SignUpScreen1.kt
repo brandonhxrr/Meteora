@@ -47,8 +47,6 @@ fun SignUp1(navController: NavController? = null, signUpViewModel: SignUpViewMod
 
     val username: String by signUpViewModel.username.observeAsState(initial = "")
     val selectedImageUri: String? by signUpViewModel.selectedImageUri.observeAsState()
-    val errorMessage: String by signUpViewModel.errorMessage.observeAsState(initial = "")
-    val showError: Boolean by signUpViewModel.showError.observeAsState(initial = false)
 
     val registerImageActivityLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -63,10 +61,6 @@ fun SignUp1(navController: NavController? = null, signUpViewModel: SignUpViewMod
         Header(title = stringResource(id = R.string.sign_up), subtitle = "Queremos conocerte mejor")
 
         Spacer(modifier = Modifier.height(36.dp))
-
-        if (showError) {
-            ErrorMessage(errorMessage)
-        }
 
         Box(
             modifier = Modifier

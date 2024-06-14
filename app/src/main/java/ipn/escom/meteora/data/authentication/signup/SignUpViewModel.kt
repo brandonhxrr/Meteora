@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ipn.escom.meteora.data.authentication.data.network.response.AuthenticationResponse
 import ipn.escom.meteora.data.authentication.domain.AuthenticationUseCase
-import ipn.escom.meteora.ui.login.PasswordSecurity
 import kotlinx.coroutines.launch
 
 class SignUpViewModel : ViewModel() {
@@ -56,64 +55,59 @@ class SignUpViewModel : ViewModel() {
         _email.value = email
         _password.value = password
         _repeatPassword.value = repeatPassword
-        _isSignUpEnabled.value = enableSignUp(email, password, repeatPassword)
+        validateFields(email, password, repeatPassword)
     }
 
-    private fun evaluatePasswordSecurity(password: String): PasswordSecurity {
-        val minLength = 8
-        val hasUppercase = password.any { it.isUpperCase() }
-        val hasLowercase = password.any { it.isLowerCase() }
-        val hasDigit = password.any { it.isDigit() }
-        val hasSpecialChar = password.any { !it.isLetterOrDigit() }
+    private fun validateFields(email: String, password: String, repeatPassword: String) {
+        _errorMessage.value = ""
 
-        return when {
-            password.length < minLength -> PasswordSecurity.NONE
-            !hasUppercase && !hasLowercase && !hasDigit && !hasSpecialChar -> PasswordSecurity.WEAK
-            (hasUppercase || hasLowercase) && hasDigit && hasSpecialChar -> PasswordSecurity.STRONG
-            else -> PasswordSecurity.MODERATE
-        }
-    }
-
-    private fun enableSignUp(
-        email: String,
-        password: String,
-        repeatPassword: String
-    ): Boolean {
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             _errorMessage.value = "El correo no es válido"
-        } else if (password.isBlank()) {
-            _errorMessage.value = "La contraseña no puede estar vacía"
-        } else if (password != repeatPassword) {
-            _errorMessage.value = "Las contraseñas no coinciden"
-        } else if (evaluatePasswordSecurity(password) != PasswordSecurity.STRONG) {
-            _errorMessage.value =
-                "La contraseña debe ser de al menos 8 caracteres, tener al menos una mayúscula, una minúscula, un número y un caracter especial"
-        } else {
-            _errorMessage.value = ""
+            _showError.value = true
+            return
         }
 
-        return validateSignUp(email, password, repeatPassword)
-    }
+        if (password.length < 8) {
+            _errorMessage.value = "La contraseña debe tener al menos 8 caracteres"
+            _showError.value = true
+            return
+        }
 
-    private fun validateSignUp(
-        email: String,
-        password: String,
-        repeatPassword: String
-    ) =
-        android.util.Patterns.EMAIL_ADDRESS.matcher(email)
-            .matches() && password.length >= 8 && password == repeatPassword && evaluatePasswordSecurity(
-            password
-        ) == PasswordSecurity.STRONG
+        if (!password.any { it.isUpperCase() }) {
+            _errorMessage.value = "La contraseña debe tener al menos una mayúscula"
+            _showError.value = true
+            return
+        }
 
-    fun showError() {
-        _showError.value = true
-    }
+        if (!password.any { it.isLowerCase() }) {
+            _errorMessage.value = "La contraseña debe tener al menos una minúscula"
+            _showError.value = true
+            return
+        }
 
-    fun hideError() {
+        if (!password.any { it.isDigit() }) {
+            _errorMessage.value = "La contraseña debe tener al menos un número"
+            _showError.value = true
+            return
+        }
+
+        if (!password.any { !it.isLetterOrDigit() }) {
+            _errorMessage.value = "La contraseña debe tener al menos un carácter especial"
+            _showError.value = true
+            return
+        }
+
+        if (password != repeatPassword) {
+            _errorMessage.value = "Las contraseñas no coinciden"
+            _showError.value = true
+            return
+        }
+
         _showError.value = false
+        _isSignUpEnabled.value = true
     }
 
-    fun signUp(context: Context){
+    fun signUp(context: Context) {
         val username = _username.value.orEmpty()
         val email = _email.value.orEmpty()
         val password = _password.value.orEmpty()
@@ -121,8 +115,9 @@ class SignUpViewModel : ViewModel() {
 
         _showSignUpIndicator.value = true
 
-        viewModelScope.launch{
-            val result = authenticationUseCase.signUp(context, username, email, password, selectedImageUri)
+        viewModelScope.launch {
+            val result =
+                authenticationUseCase.signUp(context, username, email, password, selectedImageUri)
             _showSignUpIndicator.value = false
             if (result is AuthenticationResponse.Success) {
                 _showError.value = false
