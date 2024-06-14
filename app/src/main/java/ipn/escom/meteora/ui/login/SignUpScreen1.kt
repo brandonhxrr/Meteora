@@ -16,9 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddPhotoAlternate
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,38 +68,59 @@ fun SignUp1(navController: NavController? = null, signUpViewModel: SignUpViewMod
             ErrorMessage(errorMessage)
         }
 
-        Box(modifier = Modifier
-            .size(100.dp)
-            .clip(CircleShape)
-            .clickable {
-                registerImageActivityLauncher.launch("image/*")
-            }
-            .align(Alignment.CenterHorizontally), contentAlignment = Alignment.Center
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .align(Alignment.CenterHorizontally)
         ) {
-            if (selectedImageUri != null) {
+            if (selectedImageUri != null && selectedImageUri!!.isNotEmpty()) {
                 GlideImage(
                     model = selectedImageUri,
                     contentDescription = "",
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Rounded.AddPhotoAlternate,
-                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(100.dp)
-                        .background(MaterialTheme.colorScheme.onBackground)
-                        .padding(20.dp),
-                    tint = Color.White
+                        .clip(CircleShape)
                 )
+
+                IconButton(
+                    onClick = {
+                        signUpViewModel.onImageSelected("")
+                    },
+                    modifier = Modifier
+                        .size(32.dp)
+                        .align(Alignment.TopEnd)
+                        .background(MaterialTheme.colorScheme.secondary, CircleShape)
+                        .padding(2.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Close,
+                        contentDescription = "Eliminar foto",
+                        tint = MaterialTheme.colorScheme.onSecondary
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .clickable {
+                            registerImageActivityLauncher.launch("image/*")
+                        }
+                        .background(MaterialTheme.colorScheme.onBackground),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.AddPhotoAlternate,
+                        contentDescription = null,
+                        modifier = Modifier.size(50.dp),
+                        tint = Color.White
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
-
-        if (showError) {
-            ErrorMessage(errorMessage)
-        }
 
         UserName(username) {
             signUpViewModel.onNameChanged(it)
