@@ -7,7 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.events.domain.EventsUseCase
+import ipn.escom.meteora.utils.combineDateAndTime
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 class AgendaViewModel() : ViewModel() {
 
@@ -69,13 +71,24 @@ class AgendaViewModel() : ViewModel() {
     }
 
     private fun updateEventLists(events: List<EventResponse>, ascending: Boolean) {
-        val currentTime = System.currentTimeMillis()
+        val currentUtcDateTime = Instant.now().toEpochMilli()
+
         val sortedEvents = if (ascending) {
             events.sortedBy { it.date }
         } else {
             events.sortedByDescending { it.date }
         }
-        _upcomingEvents.postValue(sortedEvents.filter { it.date >= currentTime })
-        _pastEvents.postValue(sortedEvents.filter { it.date < currentTime })
+
+        val upcomingEvents = sortedEvents.filter { event ->
+            combineDateAndTime(event.date, event.time) >= currentUtcDateTime
+        }
+
+        val pastEvents = sortedEvents.filter { event ->
+            combineDateAndTime(event.date, event.time) < currentUtcDateTime
+        }
+
+        _upcomingEvents.postValue(upcomingEvents)
+        _pastEvents.postValue(pastEvents)
     }
+
 }

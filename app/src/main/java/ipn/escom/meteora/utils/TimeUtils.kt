@@ -124,7 +124,7 @@ fun combineDateAndTime(dateMillis: Long, timeMillis: Long): Long {
     val time = if (timeMillis != 0L) {
         Instant.ofEpochMilli(timeMillis).atZone(localZoneId).toLocalTime()
     } else {
-        LocalTime.MIDNIGHT
+        LocalTime.of(23, 59, 59)
     }
 
     val dateTime = LocalDateTime.of(date, time)
