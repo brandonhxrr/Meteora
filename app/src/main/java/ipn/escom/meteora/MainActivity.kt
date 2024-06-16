@@ -1,5 +1,9 @@
 package ipn.escom.meteora
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import androidx.activity.ComponentActivity
@@ -41,6 +45,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        createNotificationChannel(this)
 
         lifecycleScope.launch(Dispatchers.Default) {
             FirebaseApp.initializeApp(applicationContext)
@@ -149,6 +155,20 @@ fun Start(firebaseAnalytics: FirebaseAnalytics?) {
         }
     }
 }
+
+fun createNotificationChannel(context: Context) {
+    val name = "Meteora"
+    val descriptionText = "Recordatorio de evento"
+    val importance = NotificationManager.IMPORTANCE_HIGH
+    val channel = NotificationChannel("event_reminders", name, importance).apply {
+        description = descriptionText
+    }
+
+    val notificationManager: NotificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.createNotificationChannel(channel)
+}
+
 
 @Preview(showBackground = true)
 @Composable

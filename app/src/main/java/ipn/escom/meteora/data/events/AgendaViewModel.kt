@@ -1,15 +1,22 @@
 package ipn.escom.meteora.data.events
 
+import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.google.firebase.auth.FirebaseAuth
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.events.domain.EventsUseCase
+import ipn.escom.meteora.data.notifications.EventReminderWorker
 import ipn.escom.meteora.utils.combineDateAndTime
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 class AgendaViewModel() : ViewModel() {
 
@@ -90,5 +97,32 @@ class AgendaViewModel() : ViewModel() {
         _upcomingEvents.postValue(upcomingEvents)
         _pastEvents.postValue(pastEvents)
     }
+
+    fun scheduleEventNotifications(context: Context, event: EventResponse) {
+        val workManager = WorkManager.getInstance(context)
+        val eventTimeMillis = combineDateAndTime(event.date, event.time)
+
+        val notificationTimes = listOf(
+            eventTimeMillis - TimeUnit.DAYS.toMillis(5),
+            eventTimeMillis - TimeUnit.DAYS.toMillis(1),
+            eventTimeMillis
+        )
+
+        notificationTimes.forEach { time ->
+            val data = workDataOf(
+                "title" to event.time,
+                "message" to "Recuerda tu evento ${event.title}"
+            )
+
+            val delay = time - System.currentTimeMillis()
+            val workRequest = OneTimeWorkRequestBuilder<EventReminderWorker>()
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                .setInputData(data)
+                .build()
+
+            workManager.enqueue(workRequest)
+        }
+    }
+
 
 }

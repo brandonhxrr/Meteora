@@ -100,6 +100,7 @@ dependencies {
     implementation("com.patrykandpatrick.vico:core:2.0.0-alpha.20")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.maps.android:maps-compose:4.4.1")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
     ksp("com.google.devtools.ksp:symbol-processing-api:1.9.0-1.0.13")

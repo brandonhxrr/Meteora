@@ -169,6 +169,7 @@ fun EventBottomSheet(
                                 location = eventLocation
                             )
                             agendaViewModel.addEvent(userId, event)
+                            agendaViewModel.scheduleEventNotifications(context, event)
 
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
                                 onDismissRequest()
