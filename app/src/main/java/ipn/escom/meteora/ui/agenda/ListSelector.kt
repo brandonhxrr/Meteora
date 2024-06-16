@@ -21,10 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.firebase.auth.FirebaseAuth
+import ipn.escom.meteora.R
 import ipn.escom.meteora.ui.theme.amber
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -37,7 +39,7 @@ fun ListSelector() {
         if (auth.currentUser?.photoUrl != null) {
             GlideImage(
                 model = auth.currentUser?.photoUrl,
-                contentDescription = "User profile picture",
+                contentDescription = stringResource(R.string.user_profile_picture_description),
                 modifier = Modifier
                     .clip(
                         CircleShape
@@ -48,7 +50,7 @@ fun ListSelector() {
         } else {
             Icon(
                 imageVector = Icons.Filled.AccountCircle,
-                contentDescription = "User profile picture"
+                contentDescription = stringResource(R.string.user_profile_picture_description)
             )
         }
         Spacer(modifier = Modifier.width(16.dp))
@@ -63,7 +65,7 @@ fun ListSelector() {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Eventos",
+                    text = stringResource(R.string.events),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )

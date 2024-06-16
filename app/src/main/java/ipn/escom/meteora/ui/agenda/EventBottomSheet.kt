@@ -3,7 +3,6 @@ package ipn.escom.meteora.ui.agenda
 import android.content.Context
 import android.content.Intent
 import android.provider.CalendarContract
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.FocusInteraction
@@ -55,6 +54,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,8 +65,6 @@ import ipn.escom.meteora.data.events.EventViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.localities.getLocalityKeyFromName
 import ipn.escom.meteora.data.predictions.PredictionsViewModel
-import ipn.escom.meteora.data.predictions.data.network.response.Prediction
-import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
 import ipn.escom.meteora.data.predictions.data.network.response.StringPrediction
 import ipn.escom.meteora.data.predictions.data.network.response.StringPredictionsResponse
 import ipn.escom.meteora.ui.login.AlertMessage
@@ -105,7 +103,9 @@ fun EventBottomSheet(
     val interactionSource = remember { MutableInteractionSource() }
     var allDayEvent by remember { mutableStateOf(eventResponse?.time == 0L) }
     val predictionsViewModel = PredictionsViewModel(preferencesViewModel)
-    val predictions: StringPredictionsResponse? by predictionsViewModel.predictions.observeAsState(initial = StringPredictionsResponse())
+    val predictions: StringPredictionsResponse? by predictionsViewModel.predictions.observeAsState(
+        initial = StringPredictionsResponse()
+    )
     var localityKey by remember { mutableStateOf(getLocalityKeyFromName(eventLocation)) }
     val context = LocalContext.current
 
@@ -115,8 +115,6 @@ fun EventBottomSheet(
         if (eventLocation.isNotEmpty() && eventDate != 0L) {
             localityKey = getLocalityKeyFromName(eventLocation)
             predictionsViewModel.getPredictions(localityKey)
-            Log.d("EventBottomSheet", "LocalityKey111111: $localityKey")
-            Log.d("EventBottomSheet", "Predictions111111: $predictions")
         }
     }
 
@@ -156,7 +154,7 @@ fun EventBottomSheet(
                     if (eventName.isBlank() || eventLocation.isBlank()) {
                         Toast.makeText(
                             context,
-                            "Completa todos los campos requeridos",
+                            context.getString(R.string.fill_required_fields),
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
@@ -206,7 +204,11 @@ fun EventBottomSheet(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(if (isEditable || isNewEvent) "Guardar" else "Editar")
+                Text(
+                    if (isEditable || isNewEvent) stringResource(R.string.save) else stringResource(
+                        R.string.edit
+                    )
+                )
             }
         }
 
@@ -224,7 +226,7 @@ fun EventBottomSheet(
                     },
                     placeholder = {
                         Text(
-                            "Agregar título",
+                            stringResource(R.string.add_title),
                             style = MaterialTheme.typography.bodySmall.copy(fontSize = 24.sp)
                         )
                     },
@@ -308,8 +310,6 @@ fun EventBottomSheet(
                 HorizontalDivider()
 
                 if (predictions != null && predictions != StringPredictionsResponse()) {
-                    Log.d("EventBottomSheet", "LocalityKey: $localityKey")
-                    Log.d("EventBottomSheet", "Predictions: $predictions")
 
                     val prediction = findPrediction(
                         predictions!!,
@@ -321,7 +321,7 @@ fun EventBottomSheet(
                     if (prediction != null) {
                         WeatherPreview(prediction = prediction)
                     }
-                    AlertMessage("Las predicciones son generadas con modelos de Aprendizaje automático (IA), por lo que pueden ser no totalmente precisas.")
+                    AlertMessage(stringResource(R.string.model_warning))
                 }
 
                 if (eventResponse != null && !isNewEvent) {
@@ -365,12 +365,12 @@ fun EventBottomSheet(
                             ) {
                                 Image(
                                     painter = painterResource(id = R.drawable.google_calendar),
-                                    contentDescription = "Google Calendar Icon",
+                                    contentDescription = stringResource(R.string.google_calendar_icon_description),
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Agregar al calendario",
+                                    text = stringResource(R.string.add_to_calendar),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
@@ -391,11 +391,14 @@ fun EventBottomSheet(
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.Delete,
-                                contentDescription = "Delete",
+                                contentDescription = stringResource(id = R.string.delete),
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Eliminar", style = MaterialTheme.typography.bodySmall)
+                            Text(
+                                stringResource(R.string.delete),
+                                style = MaterialTheme.typography.bodySmall
+                            )
                         }
                     }
                 }
@@ -405,8 +408,8 @@ fun EventBottomSheet(
         if (showCancelDialog) {
             AlertDialog(
                 onDismissRequest = { showCancelDialog = false },
-                title = { Text("Cancelar cambios") },
-                text = { Text("¿Está seguro de que desea cancelar los cambios?") },
+                title = { Text(stringResource(R.string.cancel_changes)) },
+                text = { Text(stringResource(R.string.confirm_cancel_changes)) },
                 confirmButton = {
                     TextButton(onClick = {
                         showCancelDialog = false
@@ -416,12 +419,12 @@ fun EventBottomSheet(
                             }
                         }
                     }) {
-                        Text("Sí")
+                        Text(stringResource(R.string.yes))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showCancelDialog = false }) {
-                        Text("No")
+                        Text(stringResource(R.string.no))
                     }
                 }
             )
@@ -430,8 +433,8 @@ fun EventBottomSheet(
         if (showDeleteDialog) {
             AlertDialog(
                 onDismissRequest = { showDeleteDialog = false },
-                title = { Text("Eliminar evento") },
-                text = { Text("¿Está seguro de que desea eliminar el evento?") },
+                title = { Text(stringResource(R.string.delete_event)) },
+                text = { Text(stringResource(R.string.confirm_delete_event)) },
                 confirmButton = {
                     TextButton(onClick = {
                         agendaViewModel.deleteEvent(userId, eventResponse!!.id!!)
@@ -440,12 +443,12 @@ fun EventBottomSheet(
                             onDismissRequest()
                         }
                     }) {
-                        Text("Sí")
+                        Text(stringResource(id = R.string.yes))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showDeleteDialog = false }) {
-                        Text("No")
+                        Text(stringResource(id = R.string.no))
                     }
                 }
             )
@@ -462,7 +465,6 @@ fun addEventToGoogleCalendar(
     endTime: Long,
     allDay: Boolean
 ) {
-    Log.d("EventBottomSheet", "All day: $allDay")
     val intent = Intent(Intent.ACTION_INSERT).apply {
         data = CalendarContract.Events.CONTENT_URI
         putExtra(CalendarContract.Events.TITLE, title)
@@ -475,7 +477,10 @@ fun addEventToGoogleCalendar(
     if (intent.resolveActivity(context.packageManager) != null) {
         context.startActivity(intent)
     } else {
-        Toast.makeText(context, "No se encontró una aplicación de calendario", Toast.LENGTH_SHORT)
+        Toast.makeText(
+            context,
+            context.getString(R.string.calendar_app_not_found), Toast.LENGTH_SHORT
+        )
             .show()
     }
 }

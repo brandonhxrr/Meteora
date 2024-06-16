@@ -19,7 +19,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import ipn.escom.meteora.R
 import ipn.escom.meteora.utils.formatSelectedDate
 import java.time.Instant
 import java.time.LocalDate
@@ -76,7 +78,7 @@ fun DatePickerField(date: Long, enabled: Boolean, onDateSelected: (Long) -> Unit
                     onDateSelected(selectedDateMillis)
                     initialSelectedDateMillis = selectedDateMillis
                 }) {
-                    Text("Aceptar")
+                    Text(stringResource(R.string.ok))
                 }
             }
         ) {

@@ -29,9 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ipn.escom.meteora.R
 import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
@@ -61,9 +63,9 @@ fun AgendaScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = getOnBackground(),
                 onClick = {
-                showBottomSheet = true
-            }) {
-                Icon(Icons.Rounded.Add, contentDescription = "Add event")
+                    showBottomSheet = true
+                }) {
+                Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.add_event))
             }
         },
         modifier = modifier.fillMaxSize()
@@ -80,7 +82,7 @@ fun AgendaScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "Próximos eventos",
+                        stringResource(R.string.next_events),
                         style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier
                             .padding(16.dp)
@@ -95,7 +97,7 @@ fun AgendaScreen(
             if (upcomingEvents.isNullOrEmpty()) {
                 item {
                     Text(
-                        text = "No hay próximos eventos",
+                        text = stringResource(R.string.next_events_empty),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -124,18 +126,20 @@ fun AgendaScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Eventos pasados",
+                            text = stringResource(R.string.past_events),
                             style = MaterialTheme.typography.titleSmall,
                             textAlign = TextAlign.Start
                         )
                         Icon(
                             imageVector = if (isExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                            contentDescription = if (isExpanded) "Cerrar" else "Abrir"
+                            contentDescription = if (isExpanded) stringResource(R.string.close) else stringResource(
+                                R.string.open
+                            )
                         )
                     }
                 }
 
-                if(isExpanded){
+                if (isExpanded) {
                     items(pastEvents?.size ?: 0) { index ->
                         val event = pastEvents!![index]
                         EventItem(eventResponse = event, onClick = {

@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,7 +43,7 @@ fun WeatherPreview(
                 .align(Alignment.Top)
         )
         Text(
-            text = "Temperatura máxima:",
+            text = stringResource(R.string.max_temperature),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
@@ -75,7 +76,7 @@ fun WeatherPreview(
                 .align(Alignment.Top)
         )
         Text(
-            text = "Nivel de lluvia:",
+            text = stringResource(R.string.rainfall),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
@@ -107,7 +108,7 @@ fun WeatherPreview(
                 .align(Alignment.Top)
         )
         Text(
-            text = "Temperatura mínima:",
+            text = stringResource(R.string.minimum_temperature),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier
                 .align(Alignment.CenterVertically)

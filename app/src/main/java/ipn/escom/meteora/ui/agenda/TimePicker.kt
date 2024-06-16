@@ -17,12 +17,15 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import ipn.escom.meteora.R
 import ipn.escom.meteora.utils.convertMillisToTimeFormat
 import ipn.escom.meteora.utils.getHoursAndMinutesFromMillis
 import java.time.LocalDate
@@ -34,7 +37,7 @@ import java.time.ZonedDateTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerField(time: Long, enabled: Boolean, onTimeSelected: (Long) -> Unit) {
-    var initialSelectedTimeMillis by remember { mutableStateOf(time) }
+    var initialSelectedTimeMillis by remember { mutableLongStateOf(time) }
 
     if (time == 0L) {
         initialSelectedTimeMillis = System.currentTimeMillis()
@@ -82,7 +85,7 @@ fun TimePickerField(time: Long, enabled: Boolean, onTimeSelected: (Long) -> Unit
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = { isTimePickerOpen = false }) {
-                            Text("Cancelar")
+                            Text(stringResource(R.string.cancel))
                         }
                         TextButton(onClick = {
                             val selectedLocalTime = LocalTime.of(
@@ -98,7 +101,7 @@ fun TimePickerField(time: Long, enabled: Boolean, onTimeSelected: (Long) -> Unit
                             onTimeSelected(selectedTimeMillis)
                             isTimePickerOpen = false
                         }) {
-                            Text("Aceptar")
+                            Text(stringResource(R.string.ok))
                         }
                     }
                 }

@@ -17,9 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ipn.escom.meteora.R
 
 @Composable
 fun DescriptionField(
@@ -46,7 +48,13 @@ fun DescriptionField(
         OutlinedTextField(
             value = eventDescription,
             onValueChange = { onEventDescriptionChanged(it) },
-            placeholder = { Text(if(!enabled && eventDescription.isEmpty()) "Sin descripción" else "Descripción", style = MaterialTheme.typography.bodyMedium) },
+            placeholder = {
+                Text(
+                    if (!enabled && eventDescription.isEmpty()) stringResource(R.string.event_details_empty) else stringResource(
+                        R.string.event_details
+                    ), style = MaterialTheme.typography.bodyMedium
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.Top),
@@ -57,9 +65,9 @@ fun DescriptionField(
                 unfocusedContainerColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent,
-                disabledTextColor = MaterialTheme.colorScheme.onSurface, // Use the same text color
-                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant, // If you have leading icons
-                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant // If you have trailing icons
+                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             textStyle = MaterialTheme.typography.bodyMedium,
             keyboardOptions = KeyboardOptions(
@@ -73,5 +81,5 @@ fun DescriptionField(
 @Preview(showBackground = true)
 @Composable
 fun DescriptionFieldPreview() {
-    DescriptionField(eventDescription = "Descripción") {}
+    DescriptionField(eventDescription = stringResource(id = R.string.event_details)) {}
 }

@@ -38,7 +38,6 @@ fun EventItem(eventResponse: EventResponse, onClick: () -> Unit) {
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp)
             .clickable {
-                Log.d("EventItem", "${eventResponse.id}")
                 onClick()
             },
         colors = CardDefaults.cardColors(
@@ -130,8 +129,8 @@ fun EventItemPreview() {
             title = "Evento de prueba",
             description = "Descripción de prueba",
             location = "Lugar de prueba",
-            date = 1683993600000L, // 13 May 2023 00:00:00 GMT
-            time = 3600000L // 1 hour in milliseconds
+            date = 1683993600000L,
+            time = 3600000L
         ),
         onClick = {}
     )

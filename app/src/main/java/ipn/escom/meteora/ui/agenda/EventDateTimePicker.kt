@@ -15,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ipn.escom.meteora.R
 
 @Composable
 fun EventDateTimePicker(
@@ -47,7 +49,7 @@ fun EventDateTimePicker(
         ) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Todo el día",
+                    text = stringResource(R.string.all_day),
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
                         .weight(1f),
