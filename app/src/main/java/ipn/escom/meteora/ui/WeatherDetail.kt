@@ -1,6 +1,5 @@
 package ipn.escom.meteora.ui
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +17,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -96,11 +95,14 @@ fun WeatherDetailScreen(
         topBar = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { navController.navigateUp() }) {
-                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Atrás")
+                    Icon(
+                        Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
                 }
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "Pronóstico extendido",
+                    text = stringResource(id = R.string.extended_forecast),
                     style = MaterialTheme.typography.headlineMedium
                 )
             }
@@ -154,12 +156,8 @@ fun WeatherDetailScreen(
                     }
 
                     if (!selectedHourlyForecast.isNullOrEmpty()) {
-                        Log.d(
-                            "WeatherDetailScreen",
-                            "selectedHourlyForecast: $selectedHourlyForecast"
-                        )
                         Text(
-                            text = "Pronóstico por hora",
+                            text = stringResource(id = R.string.hourly_forecast),
                             style = MaterialTheme.typography.headlineMedium,
                             modifier = Modifier.padding(20.dp)
                         )
@@ -167,7 +165,7 @@ fun WeatherDetailScreen(
                     }
 
                     Text(
-                        text = "Condiciones diarias",
+                        text = stringResource(id = R.string.daily_conditions),
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier.padding(20.dp)
                     )
@@ -186,7 +184,7 @@ fun WeatherDetailScreen(
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         HumidityCard(
-                            humity = weather.humidity,
+                            humidity = weather.humidity,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()

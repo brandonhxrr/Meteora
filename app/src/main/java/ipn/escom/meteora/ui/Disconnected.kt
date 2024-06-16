@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Arrangement
@@ -16,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import ipn.escom.meteora.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -25,7 +26,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 @Composable
-fun DisconnectedScreen(onRetry :() -> Unit) {
+fun DisconnectedScreen(onRetry: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -34,12 +35,12 @@ fun DisconnectedScreen(onRetry :() -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "No hay conexión a Internet",
+            text = stringResource(R.string.no_internet_connection),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 16.dp)
         )
         Button(onClick = { onRetry() }) {
-            Text("Reintentar")
+            Text(stringResource(R.string.retry))
         }
     }
 }
@@ -79,7 +80,8 @@ suspend fun isNetworkAvailable(context: Context): Boolean = withContext(Dispatch
 }
 
 fun isNetworkAvailable2(context: Context): Boolean {
-    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val network = connectivityManager.activeNetwork ?: return false
     val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
     return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
@@ -90,7 +92,7 @@ fun hasInternetAccess(): Boolean {
     return try {
         val url = URL("https://www.google.com")
         val urlConnection = url.openConnection() as HttpURLConnection
-        urlConnection.connectTimeout = 3000 // 3 segundos
+        urlConnection.connectTimeout = 3000
         urlConnection.connect()
         true
     } catch (e: IOException) {

@@ -10,13 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.ArrowDropUp
-import androidx.compose.material.icons.rounded.WbSunny
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,11 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,7 +29,6 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
-import ipn.escom.meteora.ui.theme.amber
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.weather.data.network.response.formatTemperature
 
@@ -82,19 +73,24 @@ fun CurrentWeatherContent(
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
                 Text(
-                    text = "Se siente como ${formatTemperature(feelsLike, showDecimals)}",
+                    text = stringResource(
+                        R.string.feels_like_value,
+                        formatTemperature(feelsLike, showDecimals)
+                    ),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 if (maxt != null && mint != null) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-                    ){
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                    ) {
                         Row(
                             modifier = Modifier.weight(1f)
-                        ){
+                        ) {
                             Icon(
                                 imageVector = Icons.Rounded.ArrowDropUp,
-                                contentDescription = "Máxima",
+                                contentDescription = stringResource(R.string.maximum),
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
@@ -105,10 +101,10 @@ fun CurrentWeatherContent(
                         }
                         Row(
                             modifier = Modifier.weight(1f)
-                        ){
+                        ) {
                             Icon(
                                 imageVector = Icons.Rounded.ArrowDropDown,
-                                contentDescription = "Mínima",
+                                contentDescription = stringResource(R.string.minimum),
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
@@ -127,8 +123,8 @@ fun CurrentWeatherContent(
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     val composition by rememberLottieComposition(
-                            LottieCompositionSpec.RawRes(animatedIcon)
-                            )
+                        LottieCompositionSpec.RawRes(animatedIcon)
+                    )
                     LottieAnimation(
                         composition = composition,
                         iterations = LottieConstants.IterateForever,

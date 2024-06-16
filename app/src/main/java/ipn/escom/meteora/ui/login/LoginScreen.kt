@@ -19,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -30,7 +29,6 @@ import androidx.navigation.NavController
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.authentication.login.LoginViewModel
 import ipn.escom.meteora.ui.Screens
-import ipn.escom.meteora.ui.theme.getButtonColor
 
 @Composable
 fun Login(navController: NavController? = null, loginViewModel: LoginViewModel) {
@@ -115,11 +113,12 @@ fun LoginButton(
     loginViewModel: LoginViewModel
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
 
     Button(
         onClick = {
             keyboardController?.hide()
-            loginViewModel.signIn()
+            loginViewModel.signIn(context)
         },
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,

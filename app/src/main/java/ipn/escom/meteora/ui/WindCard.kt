@@ -24,18 +24,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.R
 
 @Composable
 fun WindCardContent(
+    modifier: Modifier = Modifier,
     windSpeed: Double,
     windDirection: Int,
     hiddenIcon: Boolean = false,
-    modifier: Modifier = Modifier
 ) {
-    ParameterCard(title = "Viento", modifier = modifier) {
+    ParameterCard(title = stringResource(id = R.string.wind), modifier = modifier) {
         Row(modifier = modifier.fillMaxHeight()) {
             Column(
                 modifier = Modifier
@@ -55,12 +56,12 @@ fun WindCardContent(
                     )
                 }
                 val intensity = when {
-                    windSpeed < 1 -> "Calmado"
-                    windSpeed < 5 -> "Bajo"
-                    windSpeed < 11 -> "Moderado"
-                    windSpeed < 19 -> "Fuerte"
-                    windSpeed < 28 -> "Muy fuerte"
-                    else -> "Huracanado"
+                    windSpeed < 1 -> stringResource(R.string.calm)
+                    windSpeed < 5 -> stringResource(R.string.low)
+                    windSpeed < 11 -> stringResource(id = R.string.moderate)
+                    windSpeed < 19 -> stringResource(id = R.string.strong)
+                    windSpeed < 28 -> stringResource(id = R.string.very_strong)
+                    else -> stringResource(id = R.string.hurricane)
                 }
 
                 Text(
@@ -69,7 +70,7 @@ fun WindCardContent(
                     modifier = Modifier
                 )
             }
-            if(!hiddenIcon){
+            if (!hiddenIcon) {
                 WindDirectionsVisualizer(
                     windDirection,
                     Modifier.align(Alignment.CenterVertically)
@@ -100,7 +101,7 @@ fun WindDirectionsVisualizer(
     ) {
         Icon(
             painter = painterResource(R.drawable.arrow),
-            contentDescription = "Dirección del viento",
+            contentDescription = stringResource(id = R.string.wind_direction),
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .size(50.dp)
@@ -114,17 +115,18 @@ fun WindDirectionsVisualizer(
     }
 }
 
+@Composable
 fun getWindDirection(windDirection: Int): String {
     return when {
-        windDirection < 22 -> "Norte"
-        windDirection < 67 -> "Noreste"
-        windDirection < 112 -> "Este"
-        windDirection < 157 -> "Sureste"
-        windDirection < 202 -> "Sur"
-        windDirection < 247 -> "Suroeste"
-        windDirection < 292 -> "Oeste"
-        windDirection < 337 -> "Noroeste"
-        else -> "Norte"
+        windDirection < 22 -> stringResource(R.string.north)
+        windDirection < 67 -> stringResource(R.string.northeast)
+        windDirection < 112 -> stringResource(R.string.east)
+        windDirection < 157 -> stringResource(R.string.southeast)
+        windDirection < 202 -> stringResource(R.string.south)
+        windDirection < 247 -> stringResource(R.string.southwest)
+        windDirection < 292 -> stringResource(R.string.west)
+        windDirection < 337 -> stringResource(R.string.northwest)
+        else -> stringResource(R.string.north)
     }
 }
 

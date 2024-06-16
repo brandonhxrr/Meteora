@@ -278,7 +278,7 @@ fun GoogleSignInButton(navController: NavController?) {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Sign in with Google",
+                text = stringResource(R.string.sign_in_with_google),
             )
         }
     }

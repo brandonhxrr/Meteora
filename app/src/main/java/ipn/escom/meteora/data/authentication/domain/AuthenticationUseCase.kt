@@ -19,7 +19,7 @@ class AuthenticationUseCase() {
         return authenticationRepository.signUp(context, username, email, password, selectedImageUri)
     }
 
-    suspend fun signIn(email: String, password: String): AuthenticationResponse {
-        return authenticationRepository.signIn(email, password)
+    suspend fun signIn(context: Context, email: String, password: String): AuthenticationResponse {
+        return authenticationRepository.signIn(context, email, password)
     }
 }

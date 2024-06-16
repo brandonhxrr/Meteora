@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.R
@@ -49,7 +50,6 @@ import ipn.escom.meteora.data.events.AgendaViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.localities.availableLocalities
 import ipn.escom.meteora.data.predictions.PredictionsViewModel
-import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
 import ipn.escom.meteora.data.predictions.data.network.response.StringPredictionsResponse
 import ipn.escom.meteora.ui.agenda.EventBottomSheet
 import ipn.escom.meteora.ui.login.AlertMessage
@@ -73,7 +73,7 @@ fun PredictionsScreen(
 ) {
     val context = LocalContext.current
     val predictions by predictionsViewModel.predictions.observeAsState(initial = StringPredictionsResponse())
-    var selectedIndex by remember { mutableIntStateOf(0) }
+    var selectedIndex by remember { mutableIntStateOf(2) }
     var postalCode: String? by remember { mutableStateOf("") }
 
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -176,7 +176,10 @@ fun PredictionsScreen(
                     .padding(8.dp)
                     .horizontalScroll(rememberScrollState())
             ) {
-                val options = listOf("Pasadas", "Gráficas", "Futuras")
+                val options = listOf(
+                    stringResource(R.string.past_predictions),
+                    stringResource(R.string.graphics), stringResource(R.string.future_predictions)
+                )
                 val icons = listOf(
                     R.drawable.ic_past,
                     R.drawable.ic_graph,
@@ -230,7 +233,7 @@ fun PredictionsScreen(
                         if (pastPredictions.predictions.isNotEmpty()) {
                             LazyColumn(modifier = Modifier.fillMaxSize()) {
                                 item {
-                                    AlertMessage("Las predicciones son generadas con modelos de Aprendizaje automático (IA), por lo que pueden ser no totalmente precisas.")
+                                    AlertMessage(stringResource(id = R.string.model_warning))
                                     PredictionsCard(
                                         predictionsResponse = pastPredictions,
                                         onDayClick = { eventResponse ->
@@ -249,7 +252,7 @@ fun PredictionsScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    "No hay predicciones pasadas",
+                                    stringResource(R.string.past_predictions_empty),
                                     modifier = Modifier.padding(16.dp),
                                     style = MaterialTheme.typography.bodyMedium,
                                     textAlign = TextAlign.Center,
@@ -263,9 +266,9 @@ fun PredictionsScreen(
                                 .fillMaxSize()
                         ) {
                             item {
-                                AlertMessage("Las predicciones son generadas con modelos de Aprendizaje automático (IA), por lo que pueden ser no totalmente precisas.")
+                                AlertMessage(stringResource(id = R.string.model_warning))
                                 Text(
-                                    "Temperatura máxima",
+                                    stringResource(id = R.string.max_temperature),
                                     style = MaterialTheme.typography.titleSmall,
                                     modifier = Modifier
                                         .padding(16.dp)
@@ -284,7 +287,7 @@ fun PredictionsScreen(
 
                             item {
                                 Text(
-                                    "Temperatura mínima",
+                                    stringResource(id = R.string.minimum_temperature),
                                     style = MaterialTheme.typography.titleSmall,
                                     modifier = Modifier
                                         .padding(16.dp)
@@ -303,7 +306,7 @@ fun PredictionsScreen(
 
                             item {
                                 Text(
-                                    "Nivel de lluvia",
+                                    stringResource(id = R.string.rainfall),
                                     style = MaterialTheme.typography.titleSmall,
                                     modifier = Modifier
                                         .padding(16.dp)
@@ -326,7 +329,7 @@ fun PredictionsScreen(
                         if (futurePredictions.predictions.isNotEmpty()) {
                             LazyColumn(modifier = Modifier.fillMaxSize()) {
                                 item {
-                                    AlertMessage("Las predicciones son generadas con modelos de Aprendizaje automático (IA), por lo que pueden ser no totalmente precisas.")
+                                    AlertMessage(stringResource(id = R.string.model_warning))
                                     PredictionsCard(
                                         predictionsResponse = futurePredictions,
                                         onDayClick = { eventResponse ->
@@ -345,7 +348,7 @@ fun PredictionsScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    "No hay predicciones futuras",
+                                    stringResource(R.string.future_predictions_empty),
                                     modifier = Modifier.padding(16.dp),
                                     style = MaterialTheme.typography.bodyMedium,
                                     textAlign = TextAlign.Center
@@ -371,7 +374,7 @@ fun PredictionsScreen(
     }
 }
 
-suspend fun loadPredictions(
+fun loadPredictions(
     localityName: String?,
     predictionsViewModel: PredictionsViewModel
 ) {

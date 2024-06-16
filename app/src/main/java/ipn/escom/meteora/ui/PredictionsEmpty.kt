@@ -9,11 +9,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import ipn.escom.meteora.R
 
 @Composable
-fun PredictionsEmpty(onRetry :() -> Unit) {
+fun PredictionsEmpty(onRetry: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -22,12 +24,12 @@ fun PredictionsEmpty(onRetry :() -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "No hay predicciones disponibles",
+            text = stringResource(R.string.predictions_empty),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 16.dp)
         )
         Button(onClick = { onRetry() }) {
-            Text("Reintentar")
+            Text(stringResource(id = R.string.retry))
         }
     }
 }

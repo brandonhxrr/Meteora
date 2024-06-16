@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.storage.FirebaseStorage
+import ipn.escom.meteora.R
 import ipn.escom.meteora.data.authentication.data.network.response.AuthenticationResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -34,19 +35,19 @@ class AuthenticationService {
             uploadProfilePicture(context, user, username, selectedImageUri)
             AuthenticationResponse.Success(user)
         } catch (e: FirebaseAuthUserCollisionException) {
-            AuthenticationResponse.Error("Correo ya registrado")
+            AuthenticationResponse.Error(context.getString(R.string.email_already_used))
         } catch (e: Exception) {
-            AuthenticationResponse.Error("Error en el registro")
+            AuthenticationResponse.Error(context.getString(R.string.error_in_registration))
         }
     }
 
-    suspend fun signIn(email: String, password: String): AuthenticationResponse {
+    suspend fun signIn(context: Context, email: String, password: String): AuthenticationResponse {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
             val user = auth.currentUser ?: throw Exception("User not found")
             AuthenticationResponse.Success(user)
         } catch (e: FirebaseAuthInvalidUserException) {
-            AuthenticationResponse.Error("Usuario no encontrado")
+            AuthenticationResponse.Error(context.getString(R.string.user_not_found))
         } catch (e: FirebaseAuthInvalidCredentialsException) {
             AuthenticationResponse.Error("Credenciales inválidas")
         } catch (e: Exception) {

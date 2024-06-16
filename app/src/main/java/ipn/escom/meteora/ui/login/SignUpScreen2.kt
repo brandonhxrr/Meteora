@@ -48,6 +48,7 @@ fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewMod
     val errorMessage: String by signUpViewModel.errorMessage.observeAsState(initial = "")
     val showError: Boolean by signUpViewModel.showError.observeAsState(initial = false)
     val signUpSuccess: Boolean by signUpViewModel.signUpSuccess.observeAsState(initial = false)
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = signUpSuccess, block = {
         if (signUpSuccess) {
@@ -76,15 +77,15 @@ fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewMod
         }
 
         Email(email) {
-            signUpViewModel.onSignUpChanged(it, password, repeatPassword)
+            signUpViewModel.onSignUpChanged(context, it, password, repeatPassword)
         }
 
         Password(password, repeat = false, final = false) {
-            signUpViewModel.onSignUpChanged(email, it, repeatPassword)
+            signUpViewModel.onSignUpChanged(context, email, it, repeatPassword)
         }
 
         Password(password = repeatPassword, repeat = true, final = true) {
-            signUpViewModel.onSignUpChanged(email, password, it)
+            signUpViewModel.onSignUpChanged(context, email, password, it)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -122,7 +123,7 @@ fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewMod
                 onDismissRequest = {
                 },
                 title = {
-                    Text(text = "Registrando usuario")
+                    Text(text = stringResource(R.string.registering_user))
                 },
                 icon = {
                     Icon(
@@ -137,7 +138,7 @@ fun SignUp2(navController: NavController? = null, signUpViewModel: SignUpViewMod
                             .fillMaxWidth()
                             .padding(8.dp)
                     ) {
-                        Text("No salgas de la aplicación")
+                        Text(stringResource(R.string.dont_exit))
                         Spacer(modifier = Modifier.height(8.dp))
                         LinearProgressIndicator(
                             modifier = Modifier.fillMaxWidth()

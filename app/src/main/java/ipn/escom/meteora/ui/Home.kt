@@ -153,7 +153,7 @@ fun Home(
                         if (auth.currentUser?.photoUrl != null) {
                             GlideImage(
                                 model = auth.currentUser?.photoUrl,
-                                contentDescription = "User profile picture",
+                                contentDescription = stringResource(id = R.string.user_profile_picture_description),
                                 modifier = Modifier
                                     .clip(
                                         CircleShape
@@ -164,7 +164,7 @@ fun Home(
                         } else {
                             Icon(
                                 imageVector = Icons.Filled.AccountCircle,
-                                contentDescription = "User profile picture"
+                                contentDescription = stringResource(id = R.string.user_profile_picture_description)
                             )
                         }
                     }

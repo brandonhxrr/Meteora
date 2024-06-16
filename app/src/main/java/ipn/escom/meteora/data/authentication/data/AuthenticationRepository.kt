@@ -18,7 +18,7 @@ class AuthenticationRepository() {
         return authenticationService.signUp(context, username, email, password, selectedImageUri)
     }
 
-    suspend fun signIn(email: String, password: String): AuthenticationResponse {
-        return authenticationService.signIn(email, password)
+    suspend fun signIn(context: Context, email: String, password: String): AuthenticationResponse {
+        return authenticationService.signIn(context, email, password)
     }
 }

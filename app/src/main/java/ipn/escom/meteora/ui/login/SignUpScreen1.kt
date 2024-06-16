@@ -58,7 +58,10 @@ fun SignUp1(navController: NavController? = null, signUpViewModel: SignUpViewMod
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        Header(title = stringResource(id = R.string.sign_up), subtitle = "Queremos conocerte mejor")
+        Header(
+            title = stringResource(id = R.string.sign_up),
+            subtitle = stringResource(R.string.auth_subtitle)
+        )
 
         Spacer(modifier = Modifier.height(36.dp))
 
@@ -89,7 +92,7 @@ fun SignUp1(navController: NavController? = null, signUpViewModel: SignUpViewMod
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Close,
-                        contentDescription = "Eliminar foto",
+                        contentDescription = stringResource(R.string.delete_picture),
                         tint = MaterialTheme.colorScheme.onSecondary
                     )
                 }
@@ -137,7 +140,10 @@ fun SignUp1(navController: NavController? = null, signUpViewModel: SignUpViewMod
                 .height(50.dp),
             enabled = username.isNotEmpty()
         ) {
-            Text(text = "Continuar", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = stringResource(R.string.continue_action),
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
 
         OrDivider()

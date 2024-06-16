@@ -1,6 +1,5 @@
 package ipn.escom.meteora.data.events
 
-import android.app.Application
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,6 +9,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.google.firebase.auth.FirebaseAuth
+import ipn.escom.meteora.R
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.events.domain.EventsUseCase
 import ipn.escom.meteora.data.notifications.EventReminderWorker
@@ -111,7 +111,7 @@ class AgendaViewModel() : ViewModel() {
         notificationTimes.forEach { time ->
             val data = workDataOf(
                 "title" to event.time,
-                "message" to "Recuerda tu evento ${event.title}"
+                "message" to context.getString(R.string.dont_forget_your_event_value, event.title)
             )
 
             val delay = time - System.currentTimeMillis()

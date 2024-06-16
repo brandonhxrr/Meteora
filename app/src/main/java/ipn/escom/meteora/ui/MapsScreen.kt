@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
@@ -72,7 +73,11 @@ fun MapsScreen(
     preferencesViewModel: PreferencesViewModel
 ) {
     var selectedIndex by remember { mutableIntStateOf(0) }
-    val options = listOf("Temperatura", "Lluvia", "Viento", "Nubosidad", "Humedad")
+    val options = listOf(
+        R.string.temperature,
+        R.string.rain, R.string.wind,
+        R.string.cloudiness, R.string.humidity
+    )
     val icons = listOf(
         R.drawable.ic_temperature,
         R.drawable.ic_rain,
@@ -93,11 +98,16 @@ fun MapsScreen(
                 FilterChip(
                     selected = index == selectedIndex,
                     onClick = { selectedIndex = index },
-                    label = { Text(text = label, style = MaterialTheme.typography.bodySmall) },
+                    label = {
+                        Text(
+                            text = stringResource(id = label),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    },
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = icons[index]),
-                            contentDescription = label,
+                            contentDescription = stringResource(id = label),
                             tint = Color.Unspecified,
                             modifier = Modifier.size(20.dp)
                         )
@@ -207,7 +217,6 @@ class HttpTileProvider(
     override fun getTile(x: Int, y: Int, zoom: Int): Tile? {
         val url = urlTemplate.replace("{x}", x.toString()).replace("{y}", y.toString())
             .replace("{z}", zoom.toString())
-        Log.d("MapsScreen", "Generated Tile URL: $url")
 
         return try {
             val connection = URL(url).openConnection() as HttpURLConnection
@@ -279,13 +288,13 @@ fun Legend(selectedMap: Int, preferencesViewModel: PreferencesViewModel) {
     )
 
     val rainValues = listOf(
-        "Muy débil",
-        "Débil",
-        "Moderada",
-        "Fuerte",
-        "Muy fuerte",
-        "Extrema",
-        "Violenta"
+        stringResource(R.string.very_weak),
+        stringResource(R.string.weak),
+        stringResource(R.string.moderate),
+        stringResource(R.string.strong),
+        stringResource(R.string.very_strong),
+        stringResource(R.string.extreme),
+        stringResource(R.string.violent)
     )
 
     val windColors = listOf(

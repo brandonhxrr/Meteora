@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.airbnb.lottie.compose.LottieAnimation
@@ -40,7 +39,6 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import ipn.escom.meteora.R
 import ipn.escom.meteora.data.weather.data.network.response.HourlyForecast
-import ipn.escom.meteora.data.weather.data.network.response.HourlyForecastResponse
 import ipn.escom.meteora.data.weather.data.network.response.formatTemperature
 import ipn.escom.meteora.data.weather.getAnimatedIcon
 import ipn.escom.meteora.data.weather.getDescription
@@ -71,7 +69,11 @@ fun HourlyWeather(showDecimals: Boolean = false, hourlyForecastList: List<Hourly
 
 
 @Composable
-fun HourlyWeatherCard(showDecimals: Boolean = false, hourlyForecast: HourlyForecast, onClick: () -> Unit) {
+fun HourlyWeatherCard(
+    showDecimals: Boolean = false,
+    hourlyForecast: HourlyForecast,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .width(90.dp)
@@ -93,9 +95,11 @@ fun HourlyWeatherCard(showDecimals: Boolean = false, hourlyForecast: HourlyForec
                 LottieCompositionSpec.RawRes(getAnimatedIcon(hourlyForecast.weather[0].icon))
             )
             Text(
-                text = formatTemperature(hourlyForecast.main.temp, showDecimals), modifier = Modifier
+                text = formatTemperature(hourlyForecast.main.temp, showDecimals),
+                modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 4.dp), style = MaterialTheme.typography.bodyMedium
+                    .padding(bottom = 4.dp),
+                style = MaterialTheme.typography.bodyMedium
             )
             LottieAnimation(
                 composition = composition,
@@ -205,21 +209,36 @@ fun HourlyForecastDialog(
             },
             text = {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    DialogParameter("Temperatura", "${selectedForecast?.main?.temp}°C")
-                    DialogParameter("Sensación térmica", "${selectedForecast?.main?.feelsLike}°C")
-                    DialogParameter("Humedad", "${selectedForecast?.main?.humidity}%")
-                    DialogParameter("Presión", "${selectedForecast?.main?.pressure} hPa")
-                    DialogParameter("Velocidad del viento", "${selectedForecast?.wind?.speed} m/s")
                     DialogParameter(
-                        "Dirección del viento",
+                        stringResource(R.string.temperature),
+                        "${selectedForecast?.main?.temp}°"
+                    )
+                    DialogParameter(
+                        stringResource(R.string.feels_like),
+                        "${selectedForecast?.main?.feelsLike}°"
+                    )
+                    DialogParameter(
+                        stringResource(R.string.humidity),
+                        "${selectedForecast?.main?.humidity}%"
+                    )
+                    DialogParameter(
+                        stringResource(R.string.pressure),
+                        "${selectedForecast?.main?.pressure} hPa"
+                    )
+                    DialogParameter(
+                        stringResource(R.string.wind_speed),
+                        "${selectedForecast?.wind?.speed} m/s"
+                    )
+                    DialogParameter(
+                        stringResource(R.string.wind_direction),
                         getWindDirection(selectedForecast?.wind?.deg ?: 0)
                     )
                     DialogParameter(
-                        title = "Probabilidad de lluvia",
+                        title = stringResource(R.string.probability_of_rain),
                         value = "${(selectedForecast?.pop?.times(100))?.toInt()}%"
                     )
                     DialogParameter(
-                        title = "Nivel de lluvia (mm)",
+                        title = stringResource(R.string.rainfall_mm),
                         value = "${selectedForecast?.rain?.oneHour ?: 0} mm"
                     )
                 }

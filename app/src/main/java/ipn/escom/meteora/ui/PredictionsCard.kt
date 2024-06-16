@@ -32,7 +32,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,15 +41,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.R
-import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.data.events.data.network.response.EventResponse
 import ipn.escom.meteora.data.localities.getLocalityNameFromKey
-import ipn.escom.meteora.data.predictions.data.network.response.MonthPrediction
 import ipn.escom.meteora.data.predictions.data.network.response.MonthStringPrediction
-import ipn.escom.meteora.data.predictions.data.network.response.PredictionsResponse
 import ipn.escom.meteora.data.predictions.data.network.response.StringPredictionsResponse
 import ipn.escom.meteora.ui.theme.getOnBackground
 import ipn.escom.meteora.utils.getMonthName
@@ -115,7 +112,7 @@ fun MonthPredictionCard(
             )
             val rotation: Float by animateFloatAsState(if (expanded) 180f else 0f, label = "")
             Icon(imageVector = Icons.Rounded.ExpandMore,
-                contentDescription = "Expand button",
+                contentDescription = stringResource(R.string.expand_button),
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .weight(0.1f)
@@ -213,7 +210,7 @@ fun DailyPredictionCard(
             Row {
                 Icon(
                     imageVector = Icons.Rounded.ExpandLess,
-                    contentDescription = "Max Temperature",
+                    contentDescription = stringResource(id = R.string.max_temperature),
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -222,13 +219,13 @@ fun DailyPredictionCard(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-            
+
             Spacer(modifier = Modifier.width(12.dp))
 
             Row {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_rain),
-                    contentDescription = "Rainfall",
+                    contentDescription = stringResource(id = R.string.rainfall),
                     modifier = Modifier.size(16.dp),
                     tint = Color.Unspecified
                 )
@@ -245,7 +242,7 @@ fun DailyPredictionCard(
             Row {
                 Icon(
                     imageVector = Icons.Rounded.ExpandMore,
-                    contentDescription = "Min Temperature",
+                    contentDescription = stringResource(id = R.string.minimum_temperature),
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))

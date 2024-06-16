@@ -34,8 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -44,6 +44,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import ipn.escom.meteora.R
 import ipn.escom.meteora.data.PreferencesViewModel
 import ipn.escom.meteora.ui.theme.getBackground
 import ipn.escom.meteora.ui.theme.getOnBackground
@@ -86,7 +87,7 @@ fun UserScreen(navController: NavController? = null, preferencesViewModel: Prefe
             Spacer(modifier = Modifier.width(16.dp))
 
             Text(
-                text = "Perfil",
+                text = stringResource(R.string.profile),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -101,7 +102,7 @@ fun UserScreen(navController: NavController? = null, preferencesViewModel: Prefe
             Spacer(modifier = Modifier.height(16.dp))
             GlideImage(
                 model = currentUser?.photoUrl,
-                contentDescription = "Profile picture",
+                contentDescription = stringResource(id = R.string.user_profile_picture_description),
                 modifier = Modifier
                     .size(100.dp)
                     .align(Alignment.CenterHorizontally)
@@ -135,7 +136,7 @@ fun UserScreen(navController: NavController? = null, preferencesViewModel: Prefe
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Configuración",
+                    text = stringResource(R.string.settings),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -148,7 +149,7 @@ fun UserScreen(navController: NavController? = null, preferencesViewModel: Prefe
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Sistema métrico (°C)",
+                        text = stringResource(R.string.metric_system),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )
@@ -165,7 +166,7 @@ fun UserScreen(navController: NavController? = null, preferencesViewModel: Prefe
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Mostrar decimales",
+                        text = stringResource(R.string.show_decimals),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )
@@ -195,7 +196,10 @@ fun UserScreen(navController: NavController? = null, preferencesViewModel: Prefe
         ) {
             Icon(imageVector = Icons.AutoMirrored.Rounded.Logout, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Cerrar sesión", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = stringResource(R.string.logout),
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

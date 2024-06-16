@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ipn.escom.meteora.ui.theme.getOnBackground
-import ipn.escom.meteora.ui.theme.lightOnBackground
 
 @Composable
 fun ParameterCard(
@@ -20,10 +19,12 @@ fun ParameterCard(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Card(modifier = modifier.fillMaxHeight(),
+    Card(
+        modifier = modifier.fillMaxHeight(),
         colors = CardDefaults.cardColors(
             containerColor = getOnBackground()
-        )) {
+        )
+    ) {
         Column(
             modifier = Modifier
                 .padding(16.dp)

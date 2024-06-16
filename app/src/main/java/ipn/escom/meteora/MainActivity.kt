@@ -3,17 +3,16 @@ package ipn.escom.meteora
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
@@ -46,8 +45,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        createNotificationChannel(this)
-
         lifecycleScope.launch(Dispatchers.Default) {
             FirebaseApp.initializeApp(applicationContext)
             FirebaseDatabase.getInstance().setPersistenceEnabled(true)
@@ -56,6 +53,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MeteoraTheme {
+                CreateNotificationChannel(this)
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
@@ -156,9 +154,10 @@ fun Start(firebaseAnalytics: FirebaseAnalytics?) {
     }
 }
 
-fun createNotificationChannel(context: Context) {
-    val name = "Meteora"
-    val descriptionText = "Recordatorio de evento"
+@Composable
+fun CreateNotificationChannel(context: Context) {
+    val name = stringResource(id = R.string.app_name)
+    val descriptionText = context.getString(R.string.event_reminder)
     val importance = NotificationManager.IMPORTANCE_HIGH
     val channel = NotificationChannel("event_reminders", name, importance).apply {
         description = descriptionText

@@ -1,5 +1,6 @@
 package ipn.escom.meteora.data.authentication.login
 
+import android.content.Context
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -40,12 +41,12 @@ open class LoginViewModel : ViewModel() {
     private fun enableLogin(email: String, password: String) =
         Patterns.EMAIL_ADDRESS.matcher(email).matches() && password.length >= 8
 
-    open fun signIn() {
+    open fun signIn(context: Context) {
         val email = _email.value.orEmpty()
         val password = _password.value.orEmpty()
 
         viewModelScope.launch {
-            val result = authenticationUseCase.signIn(email, password)
+            val result = authenticationUseCase.signIn(context, email, password)
 
             if (result is AuthenticationResponse.Success) {
                 _signInSuccess.value = true

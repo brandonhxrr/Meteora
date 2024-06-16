@@ -32,11 +32,11 @@ fun SunriseSunsetMiniCard(
     sunsetHour: Long,
     modifier: Modifier = Modifier
 ) {
-    ParameterCard(title = "Horas de luz", modifier = modifier) {
+    ParameterCard(title = stringResource(R.string.day_hours), modifier = modifier) {
         Column {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Amanecer",
+                text = stringResource(id = R.string.sunrise),
                 style = MaterialTheme.typography.bodySmall
             )
             Text(
@@ -45,7 +45,7 @@ fun SunriseSunsetMiniCard(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Atardecer",
+                text = stringResource(id = R.string.sunset),
                 style = MaterialTheme.typography.bodySmall
             )
             Text(

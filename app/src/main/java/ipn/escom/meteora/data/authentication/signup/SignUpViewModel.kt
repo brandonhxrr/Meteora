@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ipn.escom.meteora.R
 import ipn.escom.meteora.data.authentication.data.network.response.AuthenticationResponse
 import ipn.escom.meteora.data.authentication.domain.AuthenticationUseCase
 import kotlinx.coroutines.launch
@@ -51,54 +52,59 @@ class SignUpViewModel : ViewModel() {
         _username.value = username
     }
 
-    fun onSignUpChanged(email: String, password: String, repeatPassword: String) {
+    fun onSignUpChanged(context: Context, email: String, password: String, repeatPassword: String) {
         _email.value = email
         _password.value = password
         _repeatPassword.value = repeatPassword
-        validateFields(email, password, repeatPassword)
+        validateFields(context, email, password, repeatPassword)
     }
 
-    private fun validateFields(email: String, password: String, repeatPassword: String) {
+    private fun validateFields(
+        context: Context,
+        email: String,
+        password: String,
+        repeatPassword: String
+    ) {
         _errorMessage.value = ""
 
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _errorMessage.value = "El correo no es válido"
+            _errorMessage.value = context.getString(R.string.invalid_email)
             _showError.value = true
             return
         }
 
         if (password.length < 8) {
-            _errorMessage.value = "La contraseña debe tener al menos 8 caracteres"
+            _errorMessage.value = context.getString(R.string.invalid_password_length)
             _showError.value = true
             return
         }
 
         if (!password.any { it.isUpperCase() }) {
-            _errorMessage.value = "La contraseña debe tener al menos una mayúscula"
+            _errorMessage.value = context.getString(R.string.password_caps_required)
             _showError.value = true
             return
         }
 
         if (!password.any { it.isLowerCase() }) {
-            _errorMessage.value = "La contraseña debe tener al menos una minúscula"
+            _errorMessage.value = context.getString(R.string.password_lower_case_required)
             _showError.value = true
             return
         }
 
         if (!password.any { it.isDigit() }) {
-            _errorMessage.value = "La contraseña debe tener al menos un número"
+            _errorMessage.value = context.getString(R.string.password_number_required)
             _showError.value = true
             return
         }
 
         if (!password.any { !it.isLetterOrDigit() }) {
-            _errorMessage.value = "La contraseña debe tener al menos un carácter especial"
+            _errorMessage.value = context.getString(R.string.password_special_character_required)
             _showError.value = true
             return
         }
 
         if (password != repeatPassword) {
-            _errorMessage.value = "Las contraseñas no coinciden"
+            _errorMessage.value = context.getString(R.string.passwords_unmatch)
             _showError.value = true
             return
         }

@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -128,7 +127,7 @@ fun Forecast(
                     }
 
                     Text(
-                        text = "Pronóstico por hora",
+                        text = stringResource(R.string.hourly_forecast),
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier.padding(20.dp)
                     )
@@ -136,7 +135,7 @@ fun Forecast(
                     HourlyWeather(showDecimals, hourlyForecast.list.take(24))
 
                     Text(
-                        text = "Condiciones diarias",
+                        text = stringResource(R.string.daily_conditions),
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier.padding(20.dp)
                     )
@@ -155,7 +154,7 @@ fun Forecast(
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         HumidityCard(
-                            humity = weather.main.humidity,
+                            humidity = weather.main.humidity,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
@@ -171,7 +170,7 @@ fun Forecast(
                     )
 
                     Text(
-                        text = "Pronóstico extendido",
+                        text = stringResource(R.string.extended_forecast),
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier.padding(20.dp)
                     )

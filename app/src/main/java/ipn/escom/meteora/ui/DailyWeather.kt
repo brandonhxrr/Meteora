@@ -56,15 +56,22 @@ fun DailyWeather(
 }
 
 @Composable
-fun DailyWeatherCard(showDecimals: Boolean, town: String, dailyForecast: DailyForecast, navController: NavController?) {
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .clickable {
-            navController?.navigate("dailyForecast/${town}/${dailyForecast.dt}")
-        },
+fun DailyWeatherCard(
+    showDecimals: Boolean,
+    town: String,
+    dailyForecast: DailyForecast,
+    navController: NavController?
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                navController?.navigate("dailyForecast/${town}/${dailyForecast.dt}")
+            },
         colors = CardDefaults.cardColors(
             containerColor = getOnBackground()
-        )) {
+        )
+    ) {
         Row(modifier = Modifier.padding(16.dp)) {
             Column {
                 Text(
@@ -94,7 +101,12 @@ fun DailyWeatherCard(showDecimals: Boolean, town: String, dailyForecast: DailyFo
             }
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "${formatTemperature(dailyForecast.temp.max, showDecimals)} / ${formatTemperature(dailyForecast.temp.min, showDecimals)}",
+                text = "${
+                    formatTemperature(
+                        dailyForecast.temp.max,
+                        showDecimals
+                    )
+                } / ${formatTemperature(dailyForecast.temp.min, showDecimals)}",
                 modifier = Modifier.align(Alignment.CenterVertically),
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1
