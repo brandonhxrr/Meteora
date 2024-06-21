@@ -127,6 +127,7 @@ fun PredictionsScreen(
     } else {
 
         val today = LocalDate.now()
+        val sixMonthsFromToday = today.plusMonths(6)
 
         val pastPredictions = predictions.predictions.map { localityPrediction ->
             val filteredYears = localityPrediction.years.map { yearPrediction ->
@@ -159,7 +160,8 @@ fun PredictionsScreen(
                                 monthPrediction.month,
                                 dayPrediction.day
                             )
-                        predictionDate.isAfter(today) || predictionDate.isEqual(today)
+                        (predictionDate.isAfter(today) || predictionDate.isEqual(today)) &&
+                                predictionDate.isBefore(sixMonthsFromToday)
                     }
                     if (filteredDays.isNotEmpty()) monthPrediction.copy(days = filteredDays) else null
                 }

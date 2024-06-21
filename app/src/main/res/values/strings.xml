@@ -144,9 +144,7 @@
     <string name="invalid_password_length">Password must be at least 8 characters long</string>
     <string name="password_caps_required">Password must have at least one uppercase letter</string>
     <string name="password_lower_case_required">Password must have at least one lowercase letter</string>
-    <string name="password_number_required">Password must have at least one number</
-
-        string>
+    <string name="password_number_required">Password must have at least one number</string>
     <string name="password_special_character_required">Password must have at least one special character</string>
     <string name="passwords_unmatch">Passwords do not match</string>
     <string name="dont_forget_your_event_value">Remember your event %1$s</string>
